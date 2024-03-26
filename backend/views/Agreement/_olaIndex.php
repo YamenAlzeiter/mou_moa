@@ -51,7 +51,7 @@ use yii\widgets\Pjax;
                 },
                 'update' => function ($url, $model, $key) {
                     $build = new builders();
-                    if($model->status == 1 || $model->status == 21 || $model->status == 31 || $model->status == 41) {
+                    if($model->status == 1 || $model->status == 21 || $model->status == 31 || $model->status == 41 || $model->status == 61) {
                         return $build->actionBuilder($model, 'update',);
                     } else return null;
                 },

@@ -5,9 +5,11 @@ namespace backend\controllers;
 use common\models\admin;
 use common\models\Agreement;
 use common\models\EmailTemplate;
+use common\models\Log;
 use common\models\search\AgreementSearch;
 use common\models\User;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -106,12 +108,19 @@ class AgreementController extends Controller
      */
     public function actionUpdate($id)
     {
+//        if (!Yii::$app->request->isAjax) {
+//            // Redirect the user back to the index view or show an error message
+//            Yii::$app->session->setFlash('error', 'Direct access to update view is not allowed.');
+//            return $this->redirect(['index']); // Redirect to index view
+//        }
         $model = $this->findModel($id);
         $status = $model->status;
+        $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
+        $this->fileHandler($model, 'oscDraft', 'draftOSC', 'doc_newer_draft');
+        $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
         if ($this->request->isPost && $model->load($this->request->post())) {
-
             if ($model->save()){
-                $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
+
                 if($model->status == 2
                     || $model->status == 12 || $model->status == 11
                     || $model->status == 32 || $model->status == 33
@@ -156,6 +165,22 @@ class AgreementController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionLog($id)
+    {
+        $logsDataProvider = new ActiveDataProvider([
+            'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
+                'pageSize' => 15,
+            ], 'sort' => [
+                'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
+            ],
+        ]);
+
+        return $this->renderAjax
+        ('log', [
+            'logsDataProvider' => $logsDataProvider,
+        ]);
     }
 
     public function actionDownloader($filePath)

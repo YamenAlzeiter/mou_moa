@@ -49,6 +49,8 @@ class Agreement extends \yii\db\ActiveRecord
     public $submitter;
     public $fileUpload;
     public $olaDraft;
+    public $oscDraft;
+    public $finalDraft;
     /**
      * {@inheritdoc}
      */
@@ -63,9 +65,9 @@ class Agreement extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fileUpload', 'olaDraft'],  'file', 'extensions' => 'docx, pdf'], [
+            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft'],  'file', 'extensions' => 'docx, pdf'], [
                 [
-                    'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details',
+                    'finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details',
                     'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title',
                     'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type',
                 ], 'required', 'on' => 'uploadCreate'
@@ -167,36 +169,37 @@ class Agreement extends \yii\db\ActiveRecord
         if (!isset($changedAttributes['status']) && !$this->status == 10) {
             return; // No status change, nothing to log
         }
-        var_dump(isset($changedAttributes['status']));
-        die();
-        //check if new application initiated
-        $isInit = !isset($changedAttributes['status']) && $this->status == 10;
 
-        $oldStatus = $isInit ? 0 : $changedAttributes['status'];
-        $newStatus = $this->status;
+        if(isset($changedAttributes['status'])){
+            //check if new application initiated
+            $isInit = !isset($changedAttributes['status']) && $this->status == 10;
+
+            $oldStatus = $isInit ? 0 : $changedAttributes['status'];
+            $newStatus = $this->status;
 
 
-        if ($oldStatus == $newStatus) {
-            return; // Status hasn't changed, no need to log
+            if ($oldStatus == $newStatus) {
+                return; // Status hasn't changed, no need to log
+            }
+
+            $reasonMap = [
+                // Old Status => New Status (requires reason)
+                10 => 2, //transition from 10 to 2 requires reason
+                1  => 12, // Transition from 1 to 12 requires reason
+                21 => [32, 33],
+                31 => [42, 43],
+                82 => true, // Status 82 always requires reason
+                33 => true, // Status 33 always requires reason
+                43 => true, // Status 43 always requires reason
+            ];
+
+            $needsReason = isset($reasonMap[$oldStatus]);
+            $message = $needsReason ? $this->reason : null;
+
+            $message = $isInit ? 'New Application Submitted' : $message;
+
+            $this->createStatusLog($oldStatus, $newStatus, $message);
         }
-
-        $reasonMap = [
-            // Old Status => New Status (requires reason)
-            10 => 2, //transition from 10 to 2 requires reason
-            1  => 12, // Transition from 1 to 12 requires reason
-            21 => [32, 33],
-            31 => [42, 43],
-            82 => true, // Status 82 always requires reason
-            33 => true, // Status 33 always requires reason
-            43 => true, // Status 43 always requires reason
-        ];
-
-        $needsReason = isset($reasonMap[$oldStatus]);
-        $message = $needsReason ? $this->reason : null;
-
-        $message = $isInit ? 'New Application Submitted' : $message;
-
-        $this->createStatusLog($oldStatus, $newStatus, $message);
     }
 
     protected function createStatusLog($oldStatus, $newStatus, $message)
