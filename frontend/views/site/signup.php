@@ -25,7 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
                 <?= $form->field($model, 'email') ?>
 
-                <?= $form->field($model, 'type')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag','kcdio'), ['prompt' => 'Select Nationality']) ?>
+                <?= $form->field($model, 'type')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag','kcdio'), ['prompt' => 'Select KCDIO']) ?>
 
                 <?= $form->field($model, 'password')->passwordInput() ?>
 

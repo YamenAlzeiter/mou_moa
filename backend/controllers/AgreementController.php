@@ -2,19 +2,23 @@
 
 namespace backend\controllers;
 
+use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
+use common\models\Countries;
 use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\search\AgreementSearch;
 use common\models\User;
 use Yii;
+use yii\bootstrap5\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 use yii\web\UploadedFile;
 
 /**
@@ -67,6 +71,9 @@ class AgreementController extends Controller
     public function actionView($id)
     {
         if(!Yii::$app->user->isGuest){
+            if (!Yii::$app->request->isAjax) {
+                return throw new ForbiddenHttpException('You are not authorized  to access this page!');
+            }
             return $this->renderAjax('view', [
                 'model' => $this->findModel($id),
             ]);
@@ -108,11 +115,9 @@ class AgreementController extends Controller
      */
     public function actionUpdate($id)
     {
-//        if (!Yii::$app->request->isAjax) {
-//            // Redirect the user back to the index view or show an error message
-//            Yii::$app->session->setFlash('error', 'Direct access to update view is not allowed.');
-//            return $this->redirect(['index']); // Redirect to index view
-//        }
+        if (!Yii::$app->request->isAjax) {
+            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
+        }
         $model = $this->findModel($id);
         $status = $model->status;
         $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
@@ -169,6 +174,9 @@ class AgreementController extends Controller
 
     public function actionLog($id)
     {
+        if (!Yii::$app->request->isAjax) {
+            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
+        }
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
                 'pageSize' => 15,
@@ -182,6 +190,34 @@ class AgreementController extends Controller
             'logsDataProvider' => $logsDataProvider,
         ]);
     }
+
+    /**
+     * Creates a new Agreement model.
+     * If creation is successful, the browser will be redirected to the 'view' page.
+     * @return string|\yii\web\Response
+     */
+
+
+    public function actionAddActivity($id = '')
+    {
+        $model = new Activities();
+        $model->agreement_id = $id;
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post())){
+                $model->scenario = $this->request->post("submit");
+                if ($model->save()){
+                    return $this->redirect(['index']);
+                }
+            }
+
+        }
+//        return Html::a('<i class="ti fs-7 ti-radar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="Add New Activity"></i>', [Url::to(['add-activity', 'id' => $model->id]), 'class' => 'btn-action',]);
+        return $this->render('addActivity', [
+            'model' => $model,
+        ]);
+    }
+
 
     public function actionDownloader($filePath)
     {
@@ -255,4 +291,24 @@ class AgreementController extends Controller
             $model->save(false);
         }
     }
+    public function actionGetOrganization()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $kcdio = Yii::$app->request->post('kcdio');
+        $userType = Yii::$app->request->post('userType');
+
+        $organizations = Agreement::find()
+            ->where(['transfer_to' => $userType, 'pi_kulliyyah' => $kcdio])
+            ->all();
+
+        $options = '<option value="">Select Organization</option>';
+        foreach ($organizations as $organization) {
+            $options .= '<option value="'.$organization->col_organization.'">'.$organization->pi_kulliyyah.' - '. $organization->col_organization.'</option>';
+        }
+
+        return ['html' => $options];
+    }
+
+
 }

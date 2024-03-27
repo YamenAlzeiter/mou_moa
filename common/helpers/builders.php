@@ -31,14 +31,22 @@ class builders
     public function actionBuilder($model, $type , $modal_id ="#modal")
     {
         $icon = [
-            'view'     => 'text-primary ti-eye             ',
-            'delete'   => 'text-danger ti-trash            ',
-            'update'   => 'text-dark ti-edit-circle        ',
-            'log'      => 'text-warning ti-file-description',
+            'view'     => 'text-primary ti-eye              ',
+            'delete'   => 'text-danger ti-trash             ',
+            'update'   => 'text-dark ti-edit-circle         ',
+            'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',
+            'Add Activity' => 'text-indigo ti-radar-2',
+            'create'     => 'text-primary ti-eye              ',
+
         ];
 
-         $url = $type == 'MCOM Date' ? 'update' : $type;
+
+        if ($type == 'MCOM Date') {
+            $url = 'update';
+        } elseif ($type == 'Add Activity') {
+            $url = 'add-activity';
+        }else $url = $type;
 
         return Html::button(
             '<i class="ti fs-7 ' . $icon[$type] . '" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="' . $type . '"></i>',

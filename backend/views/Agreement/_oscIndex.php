@@ -2,6 +2,7 @@
 
 use common\helpers\builders;
 use common\models\Agreement;
+use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Url;
@@ -13,7 +14,7 @@ use yii\widgets\Pjax;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 ?>
 
-<?php Pjax::begin(); ?>
+<?php Pjax::begin(['id' => 'grid-view']); ?>
 <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 
 <?= GridView::widget([
@@ -39,7 +40,7 @@ use yii\widgets\Pjax;
         ],
         [
             'class' => ActionColumn::className(),
-            'template' => '{update}{view}{log}',
+            'template' => '{update}{addActivity}{view}{log}',
             'buttons' => [
                 'view' => function ($url, $model, $key) {
                     $build = new builders();
@@ -54,6 +55,12 @@ use yii\widgets\Pjax;
                      if($model->status == 10 || $model->status == 51) {
                          return $build->actionBuilder($model, 'update',);
                      } else return null;
+                },
+                'addActivity' => function ($url, $model, $key) {
+                    $build = new builders();
+                    if($model->status == 81) {
+                        return $build->actionBuilder($model, 'Add Activity',);
+                    } else return null;
                 },
             ],
         ],

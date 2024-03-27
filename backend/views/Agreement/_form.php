@@ -4,6 +4,7 @@
 use Itstructure\CKEditor\CKEditor;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
@@ -45,9 +46,8 @@ if($model->status != 41 && $model->status !=51){
 
 
 <div class="agreement-form">
-<?php $form = ActiveForm::begin([
 
-]); ?>
+<?php $form = ActiveForm::begin(['id' => $model->formName()]); ?>
 
     <?php if($model->status == 41): ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => 51])->label(false)?>
@@ -62,7 +62,7 @@ if($model->status != 41 && $model->status !=51){
                 [
                     'item' => function ($index, $label, $name, $checked, $value) {
                         $class = 'border-dark p-4 border rounded-4';
-                        return '<label class="border-dark-light px-4 py-5 w-25 border rounded-4 fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
+                        return '<label class="border-dark-light px-4 py-5 w-25 border rounded-4  fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
                     }
                 ]
             )->label(false); ?>
@@ -87,6 +87,9 @@ if($model->status != 41 && $model->status !=51){
 
 <?php ActiveForm::end(); ?>
 
+
+
+
     <script>
         $("#is2, #is12, #is32, #is42, #is33, #is43, #is51").on("change", function () {
             console.log('here is eme1')
@@ -103,3 +106,26 @@ if($model->status != 41 && $model->status !=51){
             }
         });
     </script>
+
+    <?php $script = <<<JS
+    $('form#{$model->formName()}').on('beforeSubmit', function (e){
+        var \$form = $(this);
+        $.post(
+            \$form.attr("action"),
+            \$form.serialize()
+        )
+        .done(function(result){
+            if(result.message === 'Success'){
+                $(document).find('#secondmodal').modal('hide');
+                $.pjax.reload({container : '#grid-view'});
+            }else{
+                $(\$form).trigger('reset');
+                $("#message").html(result.message);
+            }
+        }).fail(function (){
+            console.log('server error');
+        });
+        return false
+    });
+ JS;
+$this->registerJs($script); ?>

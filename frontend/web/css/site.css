@@ -32,6 +32,10 @@ a{
 .mw-pill{
     min-width: 5.5rem;
 }
+
+.w-35{
+    width: 35%;
+}
 main > .container, main > .container-fluid
 {
     padding: 70px 15px 20px;

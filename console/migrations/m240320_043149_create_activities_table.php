@@ -13,20 +13,21 @@ class m240320_043149_create_activities_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%activities}}', [
-            'id' => $this->primaryKey(),
-            'agreement_id' => $this->integer(),
-            'name' =>$this->string(522),
-            'staff_number' => $this->string(7),
-            'kcdio' => $this->string(522),
-            'mou_moa' => $this->string(522),
+            'id'            => $this->primaryKey(),
+            'agreement_id'  => $this->integer   (),
+            'name'          => $this->string(522),
+            'staff_number'  => $this->string(7),
+            'kcdio'         => $this->string(522),
+            'mou_moa'       => $this->string(522),
             'activity_type' => $this->string(522),
 
             //Student Mobility for Credited && non-Credited
-            'type' => $this->string(10),
+            'type'            => $this->string(10),
             'number_students' => $this->integer(3),
-            'name_students' => $this->text(),
-            'semester' => $this->string(10),
-            'program_name' => $this->string(522), //only for non-Credited
+            'name_students'   => $this->text    (),
+            'semester'        => $this->string(10),
+            'year'            => $this->date    (),
+            'program_name'    => $this->string(522), //only for non-Credited
 
             //Staff Mobility (Inbound / outbound)
             'number_of_staff' => $this->integer(3),
@@ -38,6 +39,7 @@ class m240320_043149_create_activities_table extends Migration
             'date_of_program' => $this->date(),
             'program_venue' => $this->string(522),
             'participants_number' =>$this->integer(3),
+            'name_participants_involved' => $this->string(),
 
             //Research
             'research_title' => $this->text(),
