@@ -45,43 +45,43 @@ if($model->status != 41 && $model->status !=51){
 ?>
 
 
-<div class="agreement-form">
+    <div class="agreement-form">
 
 <?php $form = ActiveForm::begin(['id' => $model->formName()]); ?>
 
-    <?php if($model->status == 41): ?>
-        <?= $form->field($model, 'status')->hiddenInput(['value' => 51])->label(false)?>
-        <?= $form->field($model, 'olaDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-    <?php elseif($model->status == 51) :?>
-        <?= $form->field($model, 'status')->hiddenInput(['value' => 61])->label(false)?>
-        <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-    <?php else: ?>
-        <div class="mb-2">
-            <?= $form->field($model, 'status')->radioList(
-                $options,
-                [
-                    'item' => function ($index, $label, $name, $checked, $value) {
-                        $class = 'border-dark p-4 border rounded-4';
-                        return '<label class="border-dark-light px-4 py-5 w-25 border rounded-4  fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
-                    }
-                ]
-            )->label(false); ?>
-        </div>
-        <?php if ($model->status == 61): ?>
+<?php if($model->status == 41): ?>
+    <?= $form->field($model, 'status')->hiddenInput(['value' => 51])->label(false)?>
+    <?= $form->field($model, 'olaDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+<?php elseif($model->status == 51) :?>
+    <?= $form->field($model, 'status')->hiddenInput(['value' => 61])->label(false)?>
+    <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+<?php else: ?>
+    <div class="mb-2">
+        <?= $form->field($model, 'status')->radioList(
+            $options,
+            [
+                'item' => function ($index, $label, $name, $checked, $value) {
+                    $class = 'border-dark p-4 border rounded-4';
+                    return '<label class="border-dark-light px-4 py-5 w-25 border rounded-4  fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
+                }
+            ]
+        )->label(false); ?>
+    </div>
+    <?php if ($model->status == 61): ?>
         <div class="doc-approved mb-4 d-none">
             <?= $form->field($model, 'finalDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
         </div>
-        <?php endif;?>
-        <div class="not-complete mb-4 d-none">
-            <?= $form->field($model, 'reason')->widget(CKEditor::className(),  [
-                'preset' => 'basic',
-                'options' => ['value' => ''],
-            ])->label(false);?>
-        </div>
-    <?php endif; ?>
-        <div class="d-flex flex-row gap-2 mb-2 justify-content-end">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
-        </div>
+    <?php endif;?>
+    <div class="not-complete mb-4 d-none">
+        <?= $form->field($model, 'reason')->widget(CKEditor::className(),  [
+            'preset' => 'basic',
+            'options' => ['value' => ''],
+        ])->label(false);?>
+    </div>
+<?php endif; ?>
+    <div class="d-flex flex-row gap-2 mb-2 justify-content-end">
+        <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
+    </div>
 
 
 
@@ -107,7 +107,7 @@ if($model->status != 41 && $model->status !=51){
         });
     </script>
 
-    <?php $script = <<<JS
+<?php $script = <<<JS
     $('form#{$model->formName()}').on('beforeSubmit', function (e){
         var \$form = $(this);
         $.post(

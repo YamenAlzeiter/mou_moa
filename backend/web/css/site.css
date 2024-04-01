@@ -28,6 +28,12 @@ a{
 .modal-inner-padding-body{
     padding: 0 3rem !important;
 }
+.detail-view td {
+    word-wrap: break-word;
+    max-width: 500px;
+}
+
+
 
 .mw-pill{
     min-width: 5.5rem;

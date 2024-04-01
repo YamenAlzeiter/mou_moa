@@ -67,6 +67,7 @@ class Activities extends \yii\db\ActiveRecord
             [['consultancy_name', 'project_duration'], 'required', 'on' => 'section-8'],
             [['other', 'date'], 'required', 'on' => 'section-9'],
             [['justification'], 'required', 'on' => 'section-10'],
+
             [['agreement_id', 'number_students', 'number_of_staff', 'participants_number'], 'default', 'value' => null],
             [['agreement_id', 'number_students', 'number_of_staff', 'participants_number'], 'integer'],
             [['name_students', 'staffs_name', 'research_title', 'justification'], 'string'],

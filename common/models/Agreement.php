@@ -66,11 +66,7 @@ class Agreement extends \yii\db\ActiveRecord
     {
         return [
             [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft'],  'file', 'extensions' => 'docx, pdf'], [
-                [
-                    'finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details',
-                    'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title',
-                    'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type',
-                ], 'required', 'on' => 'uploadCreate'
+                ['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type',], 'required', 'on' => 'uploadCreate'
             ],
             [['pi_email', 'col_email'], 'email'],
             [['project_title', 'proposal', 'reason'], 'string'],

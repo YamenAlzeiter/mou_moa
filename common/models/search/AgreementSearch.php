@@ -18,7 +18,7 @@ class AgreementSearch extends Agreement
     {
         return [
             [['id', 'status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'sign_date', 'end_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'meeting_link', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason'], 'safe'],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'sign_date', 'end_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'meeting_link', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason', 'transfer_to', 'agreement_type'], 'safe'],
         ];
     }
 
@@ -90,7 +90,9 @@ class AgreementSearch extends Agreement
             ->andFilterWhere(['ilike', 'doc_re_draft', $this->doc_re_draft])
             ->andFilterWhere(['ilike', 'doc_final', $this->doc_final])
             ->andFilterWhere(['ilike', 'doc_extra', $this->doc_extra])
-            ->andFilterWhere(['ilike', 'reason', $this->reason]);
+            ->andFilterWhere(['ilike', 'reason', $this->reason])
+            ->andFilterWhere(['ilike', 'transfer_to', $this->transfer_to])
+            ->andFilterWhere(['ilike', 'agreement_type', $this->agreement_type]);
 
         return $dataProvider;
     }

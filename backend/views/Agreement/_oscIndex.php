@@ -26,8 +26,7 @@ use yii\widgets\Pjax;
     'columns' => [
         'id',
         'col_organization',
-        'col_name',
-        'col_address',
+        'country',
         'agreement_type',
         [
             'label' => 'Status',
@@ -65,6 +64,10 @@ use yii\widgets\Pjax;
             ],
         ],
     ],
+    'pager' => [
+        'class' => yii\bootstrap5\LinkPager::className(),
+        // additional pager options if needed
+    ],'layout' => "{items}\n{pager}",
 ]); ?>
 
 <?php Pjax::end(); ?>

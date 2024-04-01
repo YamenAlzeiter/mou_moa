@@ -10,6 +10,8 @@ use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\search\AgreementSearch;
 use common\models\User;
+use Exception;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yii;
 use yii\bootstrap5\ActiveForm;
 use yii\data\ActiveDataProvider;
@@ -53,6 +55,9 @@ class AgreementController extends Controller
     {
         $searchModel = new AgreementSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+        $dataProvider->pagination = [
+            'pageSize' => 10,
+        ];
         if(!Yii::$app->user->isGuest){
             return $this->render('index', [
                 'searchModel' => $searchModel,
@@ -70,12 +75,26 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
+        $haveActivity = Activities::findOne(['agreement_id'=> $id])!== null;
         if(!Yii::$app->user->isGuest){
             if (!Yii::$app->request->isAjax) {
                 return throw new ForbiddenHttpException('You are not authorized  to access this page!');
             }
             return $this->renderAjax('view', [
                 'model' => $this->findModel($id),
+                'haveActivity' => $haveActivity
+            ]);
+        }else return throw new ForbiddenHttpException("You need to login in order to have access to this page");
+
+    }
+
+    public function actionViewActivities($id)
+    {
+        $model = Activities::find()->where(['agreement_id'=> $id])->all();
+        if(!Yii::$app->user->isGuest){
+
+            return $this->renderAjax('viewActivities', [
+                'model' => $model,
             ]);
         }else return throw new ForbiddenHttpException("You need to login in order to have access to this page");
 
@@ -203,17 +222,35 @@ class AgreementController extends Controller
         $model = new Activities();
         $model->agreement_id = $id;
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post())){
-                $model->scenario = $this->request->post("submit");
-                if ($model->save()){
-                    return $this->redirect(['index']);
-                }
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            if ($model->save()) {
+                return $this->redirect('index');
+            }
+        }
+
+        return $this->renderAjax('addActivity', [
+            'model' => $model,
+        ]);
+    }
+
+
+
+    public function actionTest($id)
+    {
+
+        $model = Activities::findOne(['id' => $id]);
+        $model->scenario = 'section-1';
+        if ($this->request->isPost && $model->load($this->request->post())) {
+
+
+            if ( $model->save()){
+
+                return $this->redirect(['index']);
             }
 
         }
-//        return Html::a('<i class="ti fs-7 ti-radar" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="Add New Activity"></i>', [Url::to(['add-activity', 'id' => $model->id]), 'class' => 'btn-action',]);
-        return $this->render('addActivity', [
+
+        return $this->renderAjax('test', [
             'model' => $model,
         ]);
     }
@@ -250,14 +287,14 @@ class AgreementController extends Controller
         $body = str_replace('{reason}', $model->reason, $body);
 //        $body = str_replace('{link}', $viewLink, $body);
 
-         $mailer = Yii::$app->mailer->compose([
+        $mailer = Yii::$app->mailer->compose([
             'html' => '@backend/views/email/emailTemplate.php'
         ],[
             'subject' => $mail->subject,
             'recipientName' => $model->pi_name,
             'reason' => $model->reason,
             'body' => $body
-            ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->pi_email)->setSubject($mail->subject);
+        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->pi_email)->setSubject($mail->subject);
 
         if ($needCC) {
             foreach ($osc as $admin)
@@ -310,5 +347,47 @@ class AgreementController extends Controller
         return ['html' => $options];
     }
 
+    public function actionImportExcel()
+    {
+        $inputFile = Yii::getAlias('@backend/uploads/moumoa.xlsx');
+
+        try {
+            $spreadsheet = IOFactory::load($inputFile);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            unset($sheetData[1]);
+
+            $batchData = [];
+            foreach ($sheetData as $row) {
+
+                // Assuming your Excel columns are in the same order as your database columns
+                $batchData[] = [
+                    $row['B'],
+                    $row['C'],
+                    $row['D'],
+                    $row['E'],
+                    $row['G'],
+                    $row['H'],
+                    $row['I'],
+                    $row['J'],
+                    $row['K'],
+                    $row['L'],
+                ];
+            }
+
+            // Perform batch insert
+            Yii::$app->db->createCommand()->batchInsert('agreement',
+                ['agreement_type', 'col_organization', 'country',
+                    'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area',
+                    'pi_details', 'col_details', 'status'], $batchData)->execute();
+
+            Yii::$app->session->setFlash('success', 'Data imported successfully.');
+
+            // You can redirect the user to another page or render a view here
+            return $this->redirect(['index']); // Redirect to index or wherever you want
+        } catch (Exception $e) {
+            var_dump($e);
+          die();
+        }
+    }
 
 }

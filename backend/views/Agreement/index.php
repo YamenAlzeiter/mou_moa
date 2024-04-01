@@ -29,10 +29,10 @@ if(!Yii::$app->user->isGuest){
         ]);
     }
 }
-    ?>
+?>
 
 
-<!--modal view IO/RMC/OIL-->
+    <!--modal view IO/RMC/OIL-->
 <?php modal::begin([
     'title' => '',
     'id' => 'modal',
@@ -47,10 +47,3 @@ echo "<div id='modalContent'></div>";
 
 modal::end();
 ?>
-
-
-
-
-
-
-

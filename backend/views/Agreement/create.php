@@ -1,10 +1,10 @@
 <?php
 
 use common\models\Kcdio;
-use yii\bootstrap5\Modal;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\bootstrap5\ActiveForm;
+use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var common\models\Activities $model */
@@ -26,22 +26,10 @@ $activityOptionsMap = array_combine($activityOptions, $activityOptions);
 $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{input}{error}';
 ?>
 
+
+
 <?php $form = ActiveForm::begin([
-    'fieldConfig' => ['enableClientValidation' => false, 'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],], 'id' =>'add_activity']); ?>
-
-<div class="header-section">
-    <div class = "row">
-        <div class = "col-lg-6"><?= $form->field($model, 'name', ['enableClientValidation' => true])->textInput(['maxlength' => true, 'placeholder' => ''])?></div>
-        <div class = "col-lg-6"><?= $form->field($model, 'staff_number', ['enableClientValidation' => true])->textInput(['maxlength' => true, 'placeholder' => ''])?></div>
-    </div>
-
-    <div class = "row">
-        <div class = "col-lg-4"><?= $form->field($model, 'kcdio', ['enableClientValidation' => true])->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag','kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => 'loadOrganizations(this.value)',]) ?></div>
-        <div class = "col-lg-4"><?= $form->field($model, 'mou_moa', ['enableClientValidation' => true])->dropDownList([], ['prompt' => 'Select Organization']) ?></div>
-        <div class = "col-lg-4"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type']) ?></div>
-    </div>
-</div>
-
+    'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],]]); ?>
 <section id = "section-1" class = "form-section d-none">
     <h2 class="my-4">Student Mobility for Credited</h2>
     <div class = "row align-items-center">
@@ -66,7 +54,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     </div>
 
     <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-1']) ?>
+        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-2']) ?>
     </div>
 </section>
 
@@ -226,72 +214,3 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 </section>
 <?php ActiveForm::end(); ?>
 
-
-
-
-<?php
-// ... (your existing modal code)
-?>
-
-
-<script>
-
-
-
-    $(document).ready(function() {
-        var sectionMap = {
-            'Student Mobility for Credited': '1',
-            'Student Mobility Non-Credited': '2',
-            'Staff Mobility (Inbound)': '3',
-            'Staff Mobility (Outbound)': '4',
-            'Seminar/Conference/Workshop/Training': '5',
-            'Research': '6',
-            'Publication': '7',
-            'Consultancy': '8',
-            'Any other of Cooperation, Please specify': '9',
-            'No Activity, Please specify': '10'
-        };
-
-        $('#activities-activity_type').change(function() {
-            var selectedOption = $(this).val();
-            var sectionNumber = sectionMap[selectedOption];
-            updateSection('section-' + sectionNumber)
-        });
-    });
-
-    function updateSection(sectionIdSelector) {
-        $('.form-section').addClass('d-none');
-
-        $('#' + sectionIdSelector).removeClass('d-none');
-        $('#' + sectionIdSelector).find('input').prop('required', true);
-
-        // Add event listener for blur on input fields
-        $('#' + sectionIdSelector).find('input').on('blur', function() {
-            // Check if the input field is empty
-            if ($(this).val().trim() === '') {
-                $(this).addClass('is-invalid'); // Add is-invalid class
-            } else {
-                $(this).removeClass('is-invalid'); // Remove is-invalid class if it's not empty
-            }
-        });
-    }
-
-
-</script>
-
-
-<script>
-    function loadOrganizations(kcdioValue) {
-
-        var userType = '<?= Yii::$app->user->identity->type ?>'; // Get user type
-        $.ajax({
-            url: '/agreement/get-organization',
-            type: 'POST',
-            data: { kcdio: kcdioValue, userType: userType },
-            success: function(response) {
-                var options = response.html;
-                $('#activities-mou_moa').html(options);
-            }
-        });
-    }
-</script>
