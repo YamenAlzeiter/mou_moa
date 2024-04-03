@@ -13,20 +13,20 @@ use yii\widgets\Pjax;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 ?>
 
-<?php Pjax::begin(); ?>
-<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+
+<?= $this->render('_search', ['model' => $searchModel]); ?>
+
 
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
-//        'filterModel' => $searchModel,
-//        'dataColumnClass' => 'common\helpers\customColumClass',
+//    'filterModel' => $searchModel,
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex'],
     'summary' => '',
     'columns' => [
         'id',
         'col_organization',
-        'col_name',
-        'col_address',
+        'country',
         'agreement_type',
         [
             'label' => 'Status',
@@ -51,15 +51,22 @@ use yii\widgets\Pjax;
                 },
                 'update' => function ($url, $model, $key) {
                     $build = new builders();
-                    if($model->status == 1 || $model->status == 21 || $model->status == 31 || $model->status == 41 || $model->status == 61) {
-                        return $build->actionBuilder($model, 'update',);
-                    } else return null;
+                    if($model->status == 1 ||
+                        $model->status == 21 || $model->status == 31 ||
+                        $model->status == 41 || $model->status == 61) {
+                        return $build->actionBuilder($model, 'update');
+                    } else {
+                        return null;
+                    }
                 },
             ],
         ],
     ],
+    'pager' => [
+        'class' => yii\bootstrap5\LinkPager::className(),
+        'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+        'activePageCssClass' => ['class' => 'link-white active'],
+        // additional pager options if needed
+    ],
+    'layout' => "{items}\n{pager}",
 ]); ?>
-
-<?php Pjax::end(); ?>
-
-

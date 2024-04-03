@@ -19,7 +19,10 @@ use yii\db\Expression;
  * @property string|null $col_email
  * @property string|null $pi_name
  * @property string|null $pi_kulliyyah
+ * @property string|null $updated_at
+ * @property string|null $created_at
  * @property string|null $pi_phone_number
+ * @property string|null $country
  * @property string|null $pi_email
  * @property string|null $project_title
  * @property string|null $grant_fund
@@ -47,6 +50,7 @@ use yii\db\Expression;
 class Agreement extends \yii\db\ActiveRecord
 {
     public $submitter;
+
     public $fileUpload;
     public $olaDraft;
     public $oscDraft;
@@ -65,15 +69,16 @@ class Agreement extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft'],  'file', 'extensions' => 'docx, pdf'], [
-                ['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type',], 'required', 'on' => 'uploadCreate'
+            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft'],  'file', 'extensions' => 'docx, pdf'],
+            [
+                ['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type'], 'required', 'on' => 'uploadCreate'
             ],
             [['pi_email', 'col_email'], 'email'],
             [['project_title', 'proposal', 'reason'], 'string'],
-            [['sign_date', 'end_date', 'mcom_date'], 'safe'],
+            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
             [['status'], 'default', 'value' => null],
             [['status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra','transfer_to', 'agreement_type'], 'string', 'max' => 522],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra','transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
@@ -120,6 +125,8 @@ class Agreement extends \yii\db\ActiveRecord
             'reason' => 'Reason',
             'transfer_to' => 'direction',
             'agreement_type' => 'type',
+            'created_at' => 'Created At',
+            'updated_at' => 'Updated At',
         ];
     }
 
@@ -142,14 +149,14 @@ class Agreement extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Log::class, ['agreement_id' => 'id']);
     }
-//    public function beforeSave($insert)
-//    {
-//        if($this->isAttributeChanged('Status') || $this->isNewRecord){
-//            $this->updated_at = new Expression('NOW()');
-//
-//        }
-//        return parent::beforeSave($insert);
-//    }
+    public function beforeSave($insert)
+    {
+        if($this->isAttributeChanged('status') || $this->isNewRecord){
+            $this->updated_at = new Expression('NOW()');
+
+        }
+        return parent::beforeSave($insert);
+    }
 
     public function afterSave($insert, $changedAttributes)
     {

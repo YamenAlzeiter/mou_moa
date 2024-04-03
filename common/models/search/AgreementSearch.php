@@ -11,6 +11,9 @@ use common\models\Agreement;
  */
 class AgreementSearch extends Agreement
 {
+    public $full_info;
+    public $applications;
+
     /**
      * {@inheritdoc}
      */
@@ -18,7 +21,8 @@ class AgreementSearch extends Agreement
     {
         return [
             [['id', 'status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'sign_date', 'end_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'meeting_link', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason', 'transfer_to', 'agreement_type'], 'safe'],
+            [['col_organization', 'col_name', 'country','col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'sign_date', 'end_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'meeting_link', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason', 'transfer_to', 'agreement_type', 'full_info', 'type',
+                'applications'], 'safe'],
         ];
     }
 
@@ -61,39 +65,51 @@ class AgreementSearch extends Agreement
             'id' => $this->id,
             'sign_date' => $this->sign_date,
             'end_date' => $this->end_date,
-            'status' => $this->status,
             'mcom_date' => $this->mcom_date,
         ]);
 
-        $query->andFilterWhere(['ilike', 'col_organization', $this->col_organization])
-            ->andFilterWhere(['ilike', 'col_name', $this->col_name])
-            ->andFilterWhere(['ilike', 'col_address', $this->col_address])
-            ->andFilterWhere(['ilike', 'col_contact_details', $this->col_contact_details])
-            ->andFilterWhere(['ilike', 'col_collaborators_name', $this->col_collaborators_name])
-            ->andFilterWhere(['ilike', 'col_wire_up', $this->col_wire_up])
-            ->andFilterWhere(['ilike', 'col_phone_number', $this->col_phone_number])
-            ->andFilterWhere(['ilike', 'col_email', $this->col_email])
-            ->andFilterWhere(['ilike', 'pi_name', $this->pi_name])
-            ->andFilterWhere(['ilike', 'pi_kulliyyah', $this->pi_kulliyyah])
-            ->andFilterWhere(['ilike', 'pi_phone_number', $this->pi_phone_number])
-            ->andFilterWhere(['ilike', 'pi_email', $this->pi_email])
-            ->andFilterWhere(['ilike', 'project_title', $this->project_title])
-            ->andFilterWhere(['ilike', 'grant_fund', $this->grant_fund])
-            ->andFilterWhere(['ilike', 'member', $this->member])
-            ->andFilterWhere(['ilike', 'proposal', $this->proposal])
-            ->andFilterWhere(['ilike', 'ssm', $this->ssm])
-            ->andFilterWhere(['ilike', 'company_profile', $this->company_profile])
-            ->andFilterWhere(['ilike', 'meeting_link', $this->meeting_link])
-            ->andFilterWhere(['ilike', 'doc_applicant', $this->doc_applicant])
-            ->andFilterWhere(['ilike', 'doc_draft', $this->doc_draft])
-            ->andFilterWhere(['ilike', 'doc_newer_draft', $this->doc_newer_draft])
-            ->andFilterWhere(['ilike', 'doc_re_draft', $this->doc_re_draft])
-            ->andFilterWhere(['ilike', 'doc_final', $this->doc_final])
-            ->andFilterWhere(['ilike', 'doc_extra', $this->doc_extra])
-            ->andFilterWhere(['ilike', 'reason', $this->reason])
-            ->andFilterWhere(['ilike', 'transfer_to', $this->transfer_to])
-            ->andFilterWhere(['ilike', 'agreement_type', $this->agreement_type]);
+
+
+        $query->orFilterWhere(['ilike', 'col_organization', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_address', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_contact_details', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_collaborators_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_wire_up', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_phone_number', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_email', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_kulliyyah', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_phone_number', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_email', $this->full_info])
+            ->orFilterWhere(['ilike', 'project_title', $this->full_info])
+            ->orFilterWhere(['ilike', 'grant_fund', $this->full_info])
+            ->orFilterWhere(['ilike', 'member', $this->full_info])
+            ->orFilterWhere(['ilike', 'proposal', $this->full_info])
+            ->orFilterWhere(['ilike', 'ssm', $this->full_info])
+            ->orFilterWhere(['ilike', 'company_profile', $this->full_info])
+            ->orFilterWhere(['ilike', 'meeting_link', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_applicant', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_newer_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_re_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_final', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_extra', $this->full_info])
+            ->orFilterWhere(['ilike', 'reason', $this->full_info])
+            ->orFilterWhere(['ilike', 'country', $this->full_info])
+            ->andFilterWhere(['ilike','agreement_type',$this->agreement_type]);
+
+
+        if ($this->applications === 'new_applications') {
+            $query->andWhere(['<>', 'status', 81]);
+        } elseif ($this->applications === 'active_applications') {
+            $query->andWhere(['status' => 81]);
+        } elseif($this->applications === 'expired_applications'){
+            $query->andWhere(['status' => 83]);
+        }
 
         return $dataProvider;
     }
+
+
 }

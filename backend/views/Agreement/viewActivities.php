@@ -2,6 +2,7 @@
 
 use common\helpers\builders;
 use yii\helpers\Html;
+use yii\web\JqueryAsset;
 use yii\widgets\DetailView;
 use common\models\Activities;
 
@@ -13,10 +14,13 @@ use common\models\Activities;
 
 foreach ($model as $activity) {
 
-
+    $title = "<p class='title_tool_tip'>Created By: " .$activity->name. "</p><p class='title_tool_tip'>Staff Number: " . $activity->name . "</p>";
     // Check activity type and render content accordingly
     if ($activity->activity_type === 'Student Mobility for Credited') {
-        echo '<h4>Student Mobility for Credited</h4>';
+        
+        echo '<div class="d-flex gap-3"> <h4>Student Mobility for Credited</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+
+
         // Render author name only
         echo DetailView::widget([
             'model' => $activity,
@@ -37,12 +41,12 @@ foreach ($model as $activity) {
                     'label' => 'Semester',
                     'value' => $activity->semester,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
 
 
     }elseif($activity->activity_type === 'Student Mobility Non-Credited'){
-        echo '<h4>Student Mobility for Non-Credited</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Student Mobility for Non-Credited</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -66,10 +70,10 @@ foreach ($model as $activity) {
                     'label' => 'Program Name',
                     'value' => $activity->program_name,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Staff Mobility (Inbound)'){
-        echo '<h4>Staff Mobility (Inbound)</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Staff Mobility (Inbound)</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -85,10 +89,10 @@ foreach ($model as $activity) {
                     'label' => 'Department Office',
                     'value' => $activity->department_office,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Staff Mobility (Outbound)'){
-        echo '<h4>Staff Mobility (Outbound)</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Staff Mobility (Outbound)</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -104,10 +108,10 @@ foreach ($model as $activity) {
                     'label' => 'Department Office',
                     'value' => $activity->department_office,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Seminar/Conference/Workshop/Training'){
-        echo '<h4>Seminar/Conference/Workshop/Training</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Seminar/Conference/Workshop/Training</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -131,10 +135,10 @@ foreach ($model as $activity) {
                     'label' => 'Participants Names',
                     'value' => $activity->name_participants_involved,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Research'){
-        echo '<h4>Research</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Research</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -142,10 +146,10 @@ foreach ($model as $activity) {
                     'label' => 'Title',
                     'value' => $activity->research_title,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Publication'){
-        echo '<h4>Publication</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Publication</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -158,9 +162,11 @@ foreach ($model as $activity) {
                     'value' => $activity->publisher,
                 ],
             ],
+            'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
+        echo '</div>';
     }elseif($activity->activity_type === 'Consultancy'){
-        echo '<h4>Consultancy</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Consultancy</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -172,10 +178,10 @@ foreach ($model as $activity) {
                     'label' => 'Project Duration',
                     'value' => $activity->project_duration,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Any other of Cooperation, Please specify'){
-        echo '<h4>Others</h4>';
+        echo '<div class="d-flex gap-3"> <h4>Others</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -187,11 +193,10 @@ foreach ($model as $activity) {
                     'label' => 'date',
                     'value' => $activity->date,
                 ],
-
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'No Activity, Please specify'){
-        echo '<h4>No Activities</h4>';
+        echo '<div class="d-flex gap-3"> <h4>No Activities</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
         echo DetailView::widget([
             'model' => $activity,
             'attributes' => [
@@ -199,10 +204,21 @@ foreach ($model as $activity) {
                     'label' => 'justification',
                     'value' => $activity->justification,
                 ],
-            ],
+            ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }
 
 
 }
+?>
+<?php
+$this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+    ['depends' => [JqueryAsset::class]]);
+$this->registerJs(<<<JS
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+JS
+);
 ?>

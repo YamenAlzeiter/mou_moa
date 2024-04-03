@@ -21,11 +21,13 @@ if(!Yii::$app->user->isGuest){
     if($type == "IO" || $type == "RMC" || $type == "OIL"){
         echo $this->render('_oscIndex', [
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
     elseif ($type == "OLA"){
         echo $this->render('_olaIndex', [
             'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
         ]);
     }
 }
@@ -38,7 +40,7 @@ if(!Yii::$app->user->isGuest){
     'id' => 'modal',
     'size' => 'modal-xl',
     'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
-    'headerOptions' => ['class' => 'modal-inner-padding'],
+    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
     'centerVertical' => true,
     'scrollable' => true,
 ]);

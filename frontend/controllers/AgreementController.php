@@ -48,7 +48,7 @@ class AgreementController extends Controller
 
             $dataProvider = $searchModel->search($this->request->queryParams);
 
-            $dataProvider->query->andWhere(['pi_kulliyyah' => $type]);
+            $dataProvider->query->andWhere(['pi_kulliyyah' => $type]); //KICT || KULLIYYAH OF INFORMATION TECHNOLOGY  == KICT
 
             //---updates the grid view asynchronously, in case database table updated---\\
 

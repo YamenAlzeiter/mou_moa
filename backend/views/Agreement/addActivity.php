@@ -8,6 +8,7 @@ use yii\bootstrap5\ActiveForm;
 
 /** @var yii\web\View $this */
 /** @var common\models\Activities $model */
+/** @var common\models\Agreement $agreement */
 /** @var yii\widgets\ActiveForm $form */
 $type = Yii::$app->user->identity->type;
 $activityOptions = [
@@ -30,16 +31,11 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     'fieldConfig' => ['enableClientValidation' => false, 'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],], 'id' =>'add_activity']); ?>
 
 <div class="header-section">
-    <div class = "row">
-        <div class = "col-lg-6"><?= $form->field($model, 'name', ['enableClientValidation' => true])->textInput(['maxlength' => true, 'placeholder' => ''])?></div>
-        <div class = "col-lg-6"><?= $form->field($model, 'staff_number', ['enableClientValidation' => true])->textInput(['maxlength' => true, 'placeholder' => ''])?></div>
-    </div>
-
-    <div class = "row">
-        <div class = "col-lg-4"><?= $form->field($model, 'kcdio', ['enableClientValidation' => true])->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag','kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => 'loadOrganizations(this.value)',]) ?></div>
-        <div class = "col-lg-4"><?= $form->field($model, 'mou_moa', ['enableClientValidation' => true])->dropDownList([], ['prompt' => 'Select Organization']) ?></div>
+    <?= $form->field($model, 'name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
+    <?= $form->field($model, 'staff_number')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
+    <?= $form->field($model, 'kcdio')->hiddenInput(['value' => $agreement->pi_kulliyyah])->label(false)?>
+    <?= $form->field($model, 'mou_moa')->hiddenInput(['value' => $agreement->col_organization])->label(false)?>
         <div class = "col-lg-4"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type']) ?></div>
-    </div>
 </div>
 
 <section id = "section-1" class = "form-section d-none">
@@ -207,7 +203,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'other')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-6">
-            <?= $form->field($model, 'date')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'date')->textInput(['type' => 'date', 'placeholder' => ''])?>
         </div>
     </div>
     <div class="mb-4 text-end">

@@ -13,8 +13,8 @@ $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col align-items-center"><div class="col-md-2 col-form-label">{label}</div><div class="col-md">{input}</div>{error}</div>';
 
 $status = [
-    2  => 10,
-    12 => 1 ,
+    2  => 15,
+    12 => 15 ,
     11 => 21,
     33 => 10,
     43 => 10,

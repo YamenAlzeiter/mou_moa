@@ -13,6 +13,7 @@ $templateFileInput = '<div class="col align-items-center"><div class="col-md-2 c
 $approveMap = [
     10 => 1 , // init -> accept OSC
     1  => 11, // OSC -> OLA approve OLA
+    15  => 1, // OSC -> OLA approve OLA
     21 => 31, // OLA -> / approve OLA
     31 => 41, // OLA -> / approve OLA
     61 => 81,
@@ -20,6 +21,7 @@ $approveMap = [
 $notCompleteMap = [
     10 => 2 , // OSC -> Applicant
     1  => 12, // OLA -> Applicant
+    15  => 2, // OSC -> OLA approve OLA
     21 => 33, // OLA -> Applicant
     31 => 43, // OLA -> Applicant
     61 => 51,
@@ -47,8 +49,7 @@ if($model->status != 41 && $model->status !=51){
 
     <div class="agreement-form">
 
-<?php $form = ActiveForm::begin(['id' => $model->formName()]); ?>
-
+<?php $form = ActiveForm::begin(['id' => 'actiontaken' ]); ?> //, 'enableAjaxValidation' => true, 'validateOnBlur' => false,  'validateOnChange'=>false,
 <?php if($model->status == 41): ?>
     <?= $form->field($model, 'status')->hiddenInput(['value' => 51])->label(false)?>
     <?= $form->field($model, 'olaDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
@@ -88,8 +89,6 @@ if($model->status != 41 && $model->status !=51){
 <?php ActiveForm::end(); ?>
 
 
-
-
     <script>
         $("#is2, #is12, #is32, #is42, #is33, #is43, #is51").on("change", function () {
             console.log('here is eme1')
@@ -106,26 +105,3 @@ if($model->status != 41 && $model->status !=51){
             }
         });
     </script>
-
-<?php $script = <<<JS
-    $('form#{$model->formName()}').on('beforeSubmit', function (e){
-        var \$form = $(this);
-        $.post(
-            \$form.attr("action"),
-            \$form.serialize()
-        )
-        .done(function(result){
-            if(result.message === 'Success'){
-                $(document).find('#secondmodal').modal('hide');
-                $.pjax.reload({container : '#grid-view'});
-            }else{
-                $(\$form).trigger('reset');
-                $("#message").html(result.message);
-            }
-        }).fail(function (){
-            console.log('server error');
-        });
-        return false
-    });
- JS;
-$this->registerJs($script); ?>

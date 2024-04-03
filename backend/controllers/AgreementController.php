@@ -5,8 +5,8 @@ namespace backend\controllers;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
-use common\models\Countries;
 use common\models\EmailTemplate;
+use common\models\Kcdio;
 use common\models\Log;
 use common\models\search\AgreementSearch;
 use common\models\User;
@@ -55,8 +55,13 @@ class AgreementController extends Controller
     {
         $searchModel = new AgreementSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+
+        $type = Yii::$app->user->identity->type;
+        $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
+     if ($type != 'OLA')
+         $dataProvider->query->andWhere(['transfer_to' => $type]);
         $dataProvider->pagination = [
-            'pageSize' => 10,
+            'pageSize' => 9,
         ];
         if(!Yii::$app->user->isGuest){
             return $this->render('index', [
@@ -134,21 +139,21 @@ class AgreementController extends Controller
      */
     public function actionUpdate($id)
     {
-        if (!Yii::$app->request->isAjax) {
-            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-        }
+
         $model = $this->findModel($id);
         $status = $model->status;
-        $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
-        $this->fileHandler($model, 'oscDraft', 'draftOSC', 'doc_newer_draft');
-        $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
+
+
         if ($this->request->isPost && $model->load($this->request->post())) {
+            $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
+            $this->fileHandler($model, 'oscDraft', 'draftOSC', 'doc_newer_draft');
+            $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
             if ($model->save()){
 
-                if($model->status == 2
-                    || $model->status == 12 || $model->status == 11
-                    || $model->status == 32 || $model->status == 33
-                    || $model->status == 42 || $model->status == 43 || $model->status == 51){
+                    if($model->status == 2
+                        || $model->status == 12 || $model->status == 11
+                        || $model->status == 32 || $model->status == 33
+                        || $model->status == 42 || $model->status == 43 || $model->status == 51){
                     $this->sendEmail($model, $model->status != 2);
                 }
                 return $this->redirect(['index']);
@@ -219,6 +224,7 @@ class AgreementController extends Controller
 
     public function actionAddActivity($id = '')
     {
+        $agreement = $this->findModel($id);
         $model = new Activities();
         $model->agreement_id = $id;
 
@@ -230,6 +236,7 @@ class AgreementController extends Controller
 
         return $this->renderAjax('addActivity', [
             'model' => $model,
+            'agreement' => $agreement,
         ]);
     }
 
@@ -309,6 +316,7 @@ class AgreementController extends Controller
 
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
+
         $file = UploadedFile::getInstance($model, $attribute);
         if ($file) {
 
@@ -349,7 +357,73 @@ class AgreementController extends Controller
 
     public function actionImportExcel()
     {
+
         $inputFile = Yii::getAlias('@backend/uploads/moumoa.xlsx');
+        $to = 'IO';
+        try {
+            $spreadsheet = IOFactory::load($inputFile);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            unset($sheetData[1]);
+
+            $batchData = [];
+            foreach ($sheetData as $row) {
+
+                if (!empty($row['A'])) {
+                    $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? $row['G'];
+                    $pi_details = $this->applyExcelFormula($row['K']);
+                    $col_details = $this->applyExcelFormula($row['J']);
+
+                    // Assuming your Excel columns are in the same order as your database columns
+                    $batchData[] = [
+                        $row['B'],
+                        $row['C'],
+                        $row['D'],
+                        $kcdioName,
+                        $row['G'], //kulliyyah
+                        $row['H'],
+                        $row['I'],
+                        $col_details,
+                        $pi_details,
+                        $row['L'],
+                        $to,
+                    ];
+                }
+            }
+            // Perform batch insert
+            Yii::$app->db->createCommand()->batchInsert('agreement',
+                ['agreement_type', 'col_organization', 'country',
+                    'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area',
+                    'pi_details', 'col_details', 'status', 'transfer_to'], $batchData)->execute();
+
+            Yii::$app->session->setFlash('success', 'Data imported successfully.');
+
+            // You can redirect the user to another page or render a view here
+            return $this->redirect(['index']); // Redirect to index or wherever you want
+        } catch (Exception $e) {
+            var_dump($e);
+          die();
+        }
+    }
+
+    private function applyExcelFormula($value)
+    {
+        // Replace line breaks in each cell value
+        return str_replace(["\r\n", "\n", "\r"], "</br>", $value);
+    }
+
+    public function actionImportExcelActivity()
+    {
+        $inputFile = Yii::getAlias('@backend/uploads/activity.xlsx');
+        $input_string = "ALUMNI - International Islamic Fiqh Academy, Saudi Arabia (19/09/2025)";
+        $parts = explode('-', $input_string);
+
+// Extracting the desired part
+        $second_part = $parts[1];
+
+// Extracting "International Islamic Fiqh Academy"
+        $academy_name = substr($second_part, 0, strpos($second_part, ','));
+
+
 
         try {
             $spreadsheet = IOFactory::load($inputFile);
@@ -359,34 +433,35 @@ class AgreementController extends Controller
             $batchData = [];
             foreach ($sheetData as $row) {
 
-                // Assuming your Excel columns are in the same order as your database columns
-                $batchData[] = [
-                    $row['B'],
-                    $row['C'],
-                    $row['D'],
-                    $row['E'],
-                    $row['G'],
-                    $row['H'],
-                    $row['I'],
-                    $row['J'],
-                    $row['K'],
-                    $row['L'],
-                ];
+                if (!empty($row['A'])){
+
+                    $academy_name = substr(explode('-', $row['F'])[1], 1,
+                        strpos(explode('-', $row['F'])[1], ',') - 1);
+
+                    $agreement_id = Agreement::findOne(['col_organization' => $academy_name])->id ?? null;
+
+                    $batchData[] = [
+                        $agreement_id,
+                        $row['C'], //Name:
+                        $row['D'], //Staff No
+                        $row['E'], //KCDIOs
+                        $row['G'], //Implementation Activities
+                    ];
+                }
+
             }
 
             // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('agreement',
-                ['agreement_type', 'col_organization', 'country',
-                    'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area',
-                    'pi_details', 'col_details', 'status'], $batchData)->execute();
+            Yii::$app->db->createCommand()->batchInsert('activities',
+                ['agreement_id', 'name', 'staff_number',
+                    'kcdio', 'activity_type'], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
             // You can redirect the user to another page or render a view here
             return $this->redirect(['index']); // Redirect to index or wherever you want
         } catch (Exception $e) {
-            var_dump($e);
-          die();
+
         }
     }
 

@@ -37,7 +37,7 @@ modal::end();
 
     <?php Pjax::begin(); ?>
 
-<!--    --><?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+    <?php  echo $this->render('_search', ['model' => $searchModel]); ?>
 
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
@@ -109,7 +109,6 @@ modal::end();
     'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
 ]);
 ?>
-
 
 
 <!-- Enables automatic updates of the GridView every 5 seconds -->

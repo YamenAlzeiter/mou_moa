@@ -56,7 +56,7 @@ class Activities extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'staff_number', 'kcdio', 'mou_moa', 'activity_type'], 'required'],
+            [['activity_type'], 'required'],
             [['type', 'number_students', 'name_students', 'semester', 'number_students'],  'required', 'on' => 'section-1'],
             [['type', 'number_students', 'name_students', 'semester', 'number_students', 'program_name'], 'required', 'on' => 'section-2'],
             [['number_of_staff', 'staffs_name'], 'required', 'on' => 'section-3'],

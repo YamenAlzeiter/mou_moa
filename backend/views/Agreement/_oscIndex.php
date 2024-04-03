@@ -14,8 +14,10 @@ use yii\widgets\Pjax;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 ?>
 
-<?php Pjax::begin(['id' => 'grid-view']); ?>
-<?php // echo $this->render('_search', ['model' => $searchModel]); ?>
+
+
+<?= $this->render('_search', ['model' => $searchModel]); ?>
+
 
 <?= GridView::widget([
     'dataProvider' => $dataProvider,
@@ -51,7 +53,7 @@ use yii\widgets\Pjax;
                 },
                 'update' => function ($url, $model, $key) {
                     $build = new builders();
-                     if($model->status == 10 || $model->status == 51) {
+                     if($model->status == 10 || $model->status == 51 || $model->status == 15) {
                          return $build->actionBuilder($model, 'update',);
                      } else return null;
                 },
@@ -66,10 +68,14 @@ use yii\widgets\Pjax;
     ],
     'pager' => [
         'class' => yii\bootstrap5\LinkPager::className(),
+        'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+        'activePageCssClass' => ['class' => 'link-white active'],
+
+
         // additional pager options if needed
     ],'layout' => "{items}\n{pager}",
 ]); ?>
 
-<?php Pjax::end(); ?>
+
 
 

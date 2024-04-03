@@ -20,7 +20,7 @@ $build = new builders();
     'id' => 'modal-activity',
     'size' => 'modal-lg',
     'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
-    'headerOptions' => ['class' => 'modal-inner-padding'],
+    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
     'centerVertical' => true,
     'scrollable' => true,
 ]);
@@ -61,7 +61,7 @@ modal::end();
 <?php if ($model->col_name == "" || $model->col_name == null):?>
     <div class = "row">
         <div class = "">
-            <p class="fw-bolder mb-2"><span class="fw-normal"><?= $model->col_details?></span></p>
+            <p class="fw-bolder mb-2"><span class="fw-normal"><?= nl2br($model->col_details)?></span></p>
         </div>
     </div>
 <?php else :?>
@@ -82,7 +82,7 @@ modal::end();
 
     <h4>Person In Charge Details</h4>
    <?php if ($model->pi_name == "" || $model->pi_name == null):?>
-    <p class="fw-bolder mb-2">Details <span class="fw-normal"><?= $model->pi_details?></span></p>
+    <p class="fw-bolder mb-2">Details <span class="fw-normal"><?= nl2br($model->pi_details)?></span></p>
     <?php else :?>
     <div class="row">
     <div class="col-md-6">
@@ -114,11 +114,13 @@ modal::end();
     <p class="fw-bolder mb-2">Sign Data: <span class="fw-normal"><?= $model->sign_date?></span></p>
     <p class="fw-bolder mb-2">End Data: <span class="fw-normal"><?= $model->end_date?></span></p>
 
-
-
+<?php if ($model->doc_applicant != null):?>
     <h4>Files</h4>
-<?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
-<?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
-<?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
-<?php echo $build->downloadLinkBuilder($model->doc_re_draft, 'Draft'); ?>
-<?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
+    <?php endif;?>
+<div class="d-flex gap-3">
+    <?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_re_draft, 'Draft'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
+</div>

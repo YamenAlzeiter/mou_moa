@@ -13,10 +13,7 @@ body{
     width: 50px;
     border: 0;
 }
-a{
-    text-decoration: none;
-    color: black;
-}
+
 .table-header-flex > thead > tr > th > a {
     display: flex;
     justify-content: space-between;
@@ -30,13 +27,41 @@ a{
 }
 .detail-view td {
     word-wrap: break-word;
-    max-width: 500px;
+
+}
+.iium{
+    background: #00928f;
 }
 
-
-
+.iium .nav-link{
+    color: white !important;
+}
+.link-white > a{
+    color: white !important;
+}
+.link-white > a :hover {
+    color: white !important;
+}
+.page-item{
+    border: none !important;
+}
+.page-link{
+    border: none !important;
+    border-radius: .3rem;
+}
+.page-link .active, .active > .page-link {
+    background-color: #00928f !important;
+    color: white !important;
+}
 .mw-pill{
     min-width: 5.5rem;
+}
+.title_tool_tip{
+    margin-bottom: 0;
+    font-size: 16px;
+}
+.tooltip-inner {
+    max-width: 250px !important;
 }
 main > .container, main > .container-fluid
 {

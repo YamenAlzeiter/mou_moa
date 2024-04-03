@@ -38,9 +38,15 @@ class builders
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',
             'create'     => 'text-primary ti-eye              ',
-
         ];
-
+        $title = [
+            21 => 'Result of MCOM Meeting',
+            31 => 'Result of UMC Meeting',
+            11 => 'Set MCOM Date',
+        ];
+        if ($type == 'update'){
+            $label = (isset($title[$model->status])) ? $title[$model->status] : "$type: $model->id";
+        }else  $label ="$type: $model->id";
 
         if ($type == 'MCOM Date') {
             $url = 'update';
@@ -59,7 +65,7 @@ class builders
             $('#modalContent').append('');
             
             // Set the modal title
-            $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$type: $model->id</h1>');
+            $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$label</h1>');
         });"
             ]
         );

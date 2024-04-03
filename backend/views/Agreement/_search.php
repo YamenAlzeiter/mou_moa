@@ -1,5 +1,7 @@
 <?php
 
+use common\models\McomDate;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -8,87 +10,52 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 ?>
 
-<div class="agreement-search">
 
-    <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
-        'options' => [
-            'data-pjax' => 1
-        ],
-    ]); ?>
 
-    <?= $form->field($model, 'id') ?>
+<?php $form = ActiveForm::begin([
+    'action' => [''], 'method' => 'get', 'options' => ['class' => 'row gap-2']
+]); ?>
+<div class = "d-flex flex-column gap-3">
 
-    <?= $form->field($model, 'col_organization') ?>
+    <?php
+    echo $form->field($model, 'applications')->radioList([
+        'all' => 'All', 'new_applications' => 'New Applications', 'active_applications' => 'Active Applications',
+        'expired_applications' => 'Expired Applications'
+    ], [
+        'class' => 'd-flex', 'item' => function ($index, $label, $name, $checked, $value) {
+            $checkedAttribute = $checked ? 'checked' : ($index === 0 ? 'checked' : ''); // Check the first radio button by default
+            $radio = '<input type="radio" class="btn-check" name="'.$name.'" id="'.$name.$index.'" value="'.$value.'" autocomplete="off" '.$checkedAttribute.' onchange="$(this).closest(\'form\').submit();">';
+            $label = '<label class="btn-bb btn-outline-dark  font-medium me-2 mb-2" for="'.$name.$index.'">'.$label.'</label>';
+            return '<div>'.$radio.$label.'</div>';
+        }
+    ])->label(false);
+    ?>
 
-    <?= $form->field($model, 'col_name') ?>
+    <div class = "d-flex gap-3">
+        <?= $form->field($model, 'full_info', ['options' => ['mb-0']])->textInput([
+            'class' => 'form-control', // Add class for styling
+            'placeholder' => 'Search', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+        ])->label(false) ?>
 
-    <?= $form->field($model, 'col_address') ?>
+        <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])->dropDownList([
+            'MOU' => 'MOU', 'MOUA' => 'MOUA', 'MOA' => 'MOA', 'MOAA' => 'MOAA'
+        ], [
+            'class' => 'form-select', 'prompt' => 'Pick Country', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+        ])->label(false) ?>
 
-    <?= $form->field($model, 'col_contact_details') ?>
-
-    <?php // echo $form->field($model, 'col_collaborators_name') ?>
-
-    <?php // echo $form->field($model, 'col_wire_up') ?>
-
-    <?php // echo $form->field($model, 'col_phone_number') ?>
-
-    <?php // echo $form->field($model, 'col_email') ?>
-
-    <?php // echo $form->field($model, 'pi_name') ?>
-
-    <?php // echo $form->field($model, 'pi_kulliyyah') ?>
-
-    <?php // echo $form->field($model, 'pi_phone_number') ?>
-
-    <?php // echo $form->field($model, 'pi_email') ?>
-
-    <?php // echo $form->field($model, 'project_title') ?>
-
-    <?php // echo $form->field($model, 'grant_fund') ?>
-
-    <?php // echo $form->field($model, 'sign_date') ?>
-
-    <?php // echo $form->field($model, 'end_date') ?>
-
-    <?php // echo $form->field($model, 'member') ?>
-
-    <?php // echo $form->field($model, 'proposal') ?>
-
-    <?php // echo $form->field($model, 'status') ?>
-
-    <?php // echo $form->field($model, 'ssm') ?>
-
-    <?php // echo $form->field($model, 'company_profile') ?>
-
-    <?php // echo $form->field($model, 'mcom_date') ?>
-
-    <?php // echo $form->field($model, 'meeting_link') ?>
-
-    <?php // echo $form->field($model, 'doc_applicant') ?>
-
-    <?php // echo $form->field($model, 'doc_draft') ?>
-
-    <?php // echo $form->field($model, 'doc_newer_draft') ?>
-
-    <?php // echo $form->field($model, 'doc_re_draft') ?>
-
-    <?php // echo $form->field($model, 'doc_final') ?>
-
-    <?php // echo $form->field($model, 'doc_extra') ?>
-
-    <?php // echo $form->field($model, 'reason') ?>
-
-    <?php // echo $form->field($model, 'transfer_to') ?>
-
-    <?php // echo $form->field($model, 'agreement_type') ?>
-
-    <div class="form-group">
-        <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
-        <?= Html::resetButton('Reset', ['class' => 'btn btn-outline-secondary']) ?>
+        <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array) McomDate::find()->all(), 'date',
+            'date'), [
+            'prompt' => 'Select a Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
+        ])->label(false) ?>
     </div>
 
-    <?php ActiveForm::end(); ?>
-
 </div>
+
+
+<?php ActiveForm::end(); ?>
+
+
+
+
