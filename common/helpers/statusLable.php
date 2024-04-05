@@ -59,7 +59,7 @@ class statusLable
 
     public function statusBadgeClass($status)
     {
-        return 'badge fw-semibold fs-3 d-inline-flex align-items-center justify-content-between mw-pill ' . $this->getStatusClasses($status, 'badge');
+        return 'badge fw-semibold fs-3 d-inline-flex align-items-center justify-content-between mw-pill rounded-2 ' . $this->getStatusClasses($status, 'badge');
     }
 
     public function statusDotClass($status)

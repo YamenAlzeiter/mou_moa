@@ -22,10 +22,15 @@ use yii\widgets\Pjax;
     'dataProvider' => $dataProvider,
 //    'filterModel' => $searchModel,
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex'],
+    'headerOptions' => ['class' => 'text-decoration-none text-danger'],
     'summary' => '',
     'columns' => [
         'id',
         'col_organization',
+         [
+                    'attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/m/y'],
+                    'enableSorting' => false,
+                ],
         'country',
         'agreement_type',
         [

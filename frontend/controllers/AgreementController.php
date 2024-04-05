@@ -7,6 +7,7 @@ use common\models\Log;
 use common\models\search\AgreementSearch;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -22,18 +23,26 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'view-activities'],
+                        'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+        ];
     }
+
 
     /**
      * Lists all Agreement models.
@@ -48,7 +57,12 @@ class AgreementController extends Controller
 
             $dataProvider = $searchModel->search($this->request->queryParams);
 
+
             $dataProvider->query->andWhere(['pi_kulliyyah' => $type]); //KICT || KULLIYYAH OF INFORMATION TECHNOLOGY  == KICT
+            $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
+            $dataProvider->pagination = [
+                'pageSize' => 11,
+            ];
 
             //---updates the grid view asynchronously, in case database table updated---\\
 

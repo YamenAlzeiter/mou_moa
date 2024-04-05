@@ -26,7 +26,7 @@ use yii\widgets\Pjax;
                     'label' => 'Current Status', 'format' => 'raw',       'value' => function ($model) {
                         $statusHelper = new builders();
                         return $statusHelper->pillBuilder($model->new_status);
-                    }, 'contentOptions' => ['class' => 'col-1'],
+                    }, 'contentOptions' => ['class' => 'col-1 text-start'],
                 ],
                 [
                     'attribute' => 'From', 'value' => function ($model) {

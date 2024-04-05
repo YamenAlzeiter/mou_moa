@@ -9,18 +9,24 @@ body{
     border: 0;
 }
 .btn-create{
-    height: 50px;
-    width: 50px;
+    height: 70px;
+    width:  70px;
     border: 0;
+    background: teal;
+    color: white;
 }
-a{
-    text-decoration: none;
-    color: black;
+.btn-crete:hover{
+    background: #0a3622;
 }
+
 .table-header-flex > thead > tr > th > a {
     display: flex;
     justify-content: space-between;
     align-items: center; /* Updated property */
+    text-decoration: none;
+}
+.table > tbody > tr > td > a{
+    text-decoration: none;
 }
 .modal-inner-padding{
     padding: 3rem 3rem 1rem 3rem !important;
@@ -28,17 +34,52 @@ a{
 .modal-inner-padding-body{
     padding: 0 3rem !important;
 }
+.detail-view td {
+    word-wrap: break-word;
 
+}
+.iium{
+    background: #00928f;
+}
+
+.iium .nav-link{
+    color: white !important;
+}
+.link-white > a{
+    color: white !important;
+}
+.link-white > a :hover {
+    color: white !important;
+}
+.page-item{
+    border: none !important;
+}
+.page-link{
+    border: none !important;
+    border-radius: .3rem;
+}
+.page-link .active, .active > .page-link {
+    background-color: teal !important;
+    color: white !important;
+}
 .mw-pill{
     min-width: 5.5rem;
 }
-
-.w-35{
-    width: 35%;
+.title_tool_tip{
+    margin-bottom: 0;
+    font-size: 16px;
+}
+.tooltip-inner {
+    max-width: 250px !important;
+}
+.add-btn{
+    position: absolute;
+    bottom: 3.5rem;
+    right: 5rem;
 }
 main > .container, main > .container-fluid
 {
-    padding: 70px 15px 20px;
+    padding: 75px 15px 20px;
 }
 
 .footer {
@@ -47,7 +88,7 @@ main > .container, main > .container-fluid
     height: 60px;
 }
 
-.footer > .container, .footer > .container-fluid {
+.footer > .container {
     padding-right: 15px;
     padding-left: 15px;
 }
@@ -56,7 +97,6 @@ main > .container, main > .container-fluid
     color: #c55;
     font-style: italic;
 }
-
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     content: '';
@@ -104,13 +144,13 @@ a.desc:after {
 }
 
 /* align the logout "link" (button in form) of the navbar */
-.navbar form > button.logout {
+.nav li > form > button.logout {
     padding-top: 7px;
     color: rgba(255, 255, 255, 0.5);
 }
 
 @media(max-width:767px) {
-    .navbar form > button.logout {
+    .nav li > form > button.logout {
         display:block;
         text-align: left;
         width: 100%;
@@ -118,24 +158,12 @@ a.desc:after {
     }
 }
 
-.navbar form > button.logout:focus,
-.navbar form > button.logout:hover {
+.nav > li > form > button.logout:focus,
+.nav > li > form > button.logout:hover {
     text-decoration: none;
     color: rgba(255, 255, 255, 0.75);
 }
 
-.navbar form > button.logout:focus {
+.nav > li > form > button.logout:focus {
     outline: none;
-}
-
-/* style breadcrumb widget as in previous bootstrap versions */
-.breadcrumb {
-    background-color: var(--bs-gray-200);
-    border-radius: .25rem;
-    padding: .75rem 1rem;
-}
-
-.breadcrumb-item > a
-{
-    text-decoration: none;
 }

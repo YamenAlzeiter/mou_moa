@@ -25,7 +25,7 @@ use yii\widgets\ActiveForm;
         'class' => 'd-flex', 'item' => function ($index, $label, $name, $checked, $value) {
             $checkedAttribute = $checked ? 'checked' : ($index === 0 ? 'checked' : ''); // Check the first radio button by default
             $radio = '<input type="radio" class="btn-check" name="'.$name.'" id="'.$name.$index.'" value="'.$value.'" autocomplete="off" '.$checkedAttribute.' onchange="$(this).closest(\'form\').submit();">';
-            $label = '<label class="btn-bb btn-outline-dark  font-medium me-2 mb-2" for="'.$name.$index.'">'.$label.'</label>';
+            $label = '<label class="btn-bb btn-outline-dark fs-5 fw-bold font-medium me-2 mb-2" for="'.$name.$index.'">'.$label.'</label>';
             return '<div>'.$radio.$label.'</div>';
         }
     ])->label(false);
@@ -41,13 +41,13 @@ use yii\widgets\ActiveForm;
         <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])->dropDownList([
             'MOU' => 'MOU', 'MOUA' => 'MOUA', 'MOA' => 'MOA', 'MOAA' => 'MOAA'
         ], [
-            'class' => 'form-select', 'prompt' => 'Pick Country', // Placeholder text
+            'class' => 'form-select', 'prompt' => 'Pick Type', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
         <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array) McomDate::find()->all(), 'date',
             'date'), [
-            'prompt' => 'Select a Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
+            'prompt' => 'Select MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
         ])->label(false) ?>
     </div>
 

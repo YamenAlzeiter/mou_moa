@@ -109,7 +109,7 @@ modal::end();
     <p class="fw-bolder mb-2">ssm: <span class="fw-normal"><?= $model->ssm?></span></p>
     <p class="fw-bolder mb-2">company_profile: <span class="fw-normal"><?= $model->company_profile?></span></p>
 
-    <p class="fw-bolder mb-2">Project Title: <span class="fw-normal"><?= $model->mcom_date?></span></p>
+    <p class="fw-bolder mb-2">MCOM Date: <span class="fw-normal"><?= $model->mcom_date?></span></p>
 
     <p class="fw-bolder mb-2">Sign Data: <span class="fw-normal"><?= $model->sign_date?></span></p>
     <p class="fw-bolder mb-2">End Data: <span class="fw-normal"><?= $model->end_date?></span></p>

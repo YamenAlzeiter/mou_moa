@@ -24,6 +24,8 @@ use yii\widgets\Pjax;
 //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex'],
+
+
     'summary' => '',
     'columns' => [
         'id',

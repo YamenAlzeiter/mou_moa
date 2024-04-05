@@ -34,7 +34,7 @@ AppAsset::register($this);
 //        'brandLabel' => Yii::$app->name,
 //        'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar navbar-expand-md navbar-iium iium fixed-top shadow',
+            'class' => 'navbar navbar-expand-md bg-light px-5 fixed-top shadow',
         ],
     ]);
     $menuItems = [

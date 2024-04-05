@@ -18,6 +18,7 @@ body{
     display: flex;
     justify-content: space-between;
     align-items: center; /* Updated property */
+    text-decoration: none;
 }
 .modal-inner-padding{
     padding: 3rem 3rem 1rem 3rem !important;
@@ -50,7 +51,7 @@ body{
     border-radius: .3rem;
 }
 .page-link .active, .active > .page-link {
-    background-color: #00928f !important;
+    background-color: teal !important;
     color: white !important;
 }
 .mw-pill{
@@ -65,7 +66,7 @@ body{
 }
 main > .container, main > .container-fluid
 {
-    padding: 70px 15px 20px;
+    padding: 75px 15px 20px;
 }
 
 .footer {
@@ -83,7 +84,6 @@ main > .container, main > .container-fluid
     color: #c55;
     font-style: italic;
 }
-
 /* add sorting icons to gridview sort links */
 a.asc:after, a.desc:after {
     content: '';

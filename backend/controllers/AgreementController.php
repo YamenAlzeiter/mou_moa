@@ -15,6 +15,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yii;
 use yii\bootstrap5\ActiveForm;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -33,17 +34,24 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    [
+                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'add-activity', 'view-activities'],
+                        'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
+                    'logout' => ['post'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -61,7 +69,7 @@ class AgreementController extends Controller
      if ($type != 'OLA')
          $dataProvider->query->andWhere(['transfer_to' => $type]);
         $dataProvider->pagination = [
-            'pageSize' => 9,
+            'pageSize' => 11,
         ];
         if(!Yii::$app->user->isGuest){
             return $this->render('index', [
@@ -139,7 +147,6 @@ class AgreementController extends Controller
      */
     public function actionUpdate($id)
     {
-
         $model = $this->findModel($id);
         $status = $model->status;
 
@@ -160,6 +167,7 @@ class AgreementController extends Controller
             }
 
         }
+
 
         return $this->renderAjax('update', [
             'model' => $model,
@@ -203,7 +211,7 @@ class AgreementController extends Controller
         }
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => 99,
             ], 'sort' => [
                 'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
             ],
@@ -239,29 +247,6 @@ class AgreementController extends Controller
             'agreement' => $agreement,
         ]);
     }
-
-
-
-    public function actionTest($id)
-    {
-
-        $model = Activities::findOne(['id' => $id]);
-        $model->scenario = 'section-1';
-        if ($this->request->isPost && $model->load($this->request->post())) {
-
-
-            if ( $model->save()){
-
-                return $this->redirect(['index']);
-            }
-
-        }
-
-        return $this->renderAjax('test', [
-            'model' => $model,
-        ]);
-    }
-
 
     public function actionDownloader($filePath)
     {

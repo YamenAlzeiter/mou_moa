@@ -31,9 +31,9 @@ class builders
     public function actionBuilder($model, $type , $modal_id ="#modal")
     {
         $icon = [
-            'view'     => 'text-primary ti-eye              ',
+            'view'     => 'text-dark ti-eye              ',
             'delete'   => 'text-danger ti-trash             ',
-            'update'   => 'text-dark ti-edit-circle         ',
+            'update'   => 'text-primary ti-edit-circle         ',
             'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',

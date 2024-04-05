@@ -184,10 +184,10 @@ $badge-border-radius: 4px;
 
 
 // Table
-$table-cell-padding-y: 16px !default;
-$table-cell-padding-x: 16px !default;
+$table-cell-padding-y: 16px 8px !default;
+$table-cell-padding-x: 8px !default;
 $table-th-font-weight: 600 !default;
-$table-striped-bg: $gray-200 !default;
+$table-striped-bg: #F7F6FE !default;
 $table-hover-bg: $gray-100 !default;
 $table-border-color: $border-color !default;
 
@@ -228,7 +228,14 @@ $navbar-light-color: rgba($gray-600, 1) !default;
 $navbar-light-hover-color: rgba($primary, 1) !default;
 $navbar-dark-color: rgba($gray-300, 1) !default;
 $navbar-dark-hover-color: rgba($primary, 1) !default;
+$navbar-padding-y: .7rem;
 
+$nav-link-font-size: 1.1rem;
+$nav-link-font-weight: 500;
+
+//link
+$link-color: $dark !default;
+$link-hover-color: $secondary !default;
 
 $modal-inner-padding:               0;
 
@@ -269,38 +276,12 @@ $modal-scale-transform:             scale(1.02);
 
 
 
-.bg-warning-subtle{
-  background-color: $warning-subtle !important;
-}
-.bg-primary-subtle{
-  background-color: $primary-subtle !important;
-}
-.bg-secondary-subtle{
-  background-color: $secondary-subtle !important;
-}
-.bg-info-subtle{
-  background-color: $info-subtle !important;
-}
-.bg-success-subtle{
-  background-color: $success-subtle !important;
-}
-.bg-danger-subtle{
-  background-color: $danger-subtle !important;
-}
-.bg-indigo-subtle{
-  background-color: $indigo-subtle !important;
-}
+@import "../../../vendor/bower-asset/bootstrap/scss/bootstrap";
+
+
 .fs-7 {
   font-size: map-get($font-sizes, 7) !important;
 }
-a{
-    color: $dark !important;
-    text-decoration: none !important;
-    &:hover{
-        color: $primary !important;
-    }
-}
-
 .btn-bb {
   --bs-btn-padding-x: 16px;
   --bs-btn-padding-y: 7px;
@@ -338,9 +319,5 @@ a{
   border: none;
   border-bottom: 2px solid var(--bs-btn-active-bg);
 }
-
-
-
-@import "../../../vendor/bower-asset/bootstrap/scss/bootstrap";
 
 
