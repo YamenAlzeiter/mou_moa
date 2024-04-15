@@ -3,7 +3,10 @@
 namespace common\models;
 
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "agreement".
@@ -47,7 +50,7 @@ use yii\db\Expression;
  * @property Activities[] $activities
  * @property Log[] $logs
  */
-class Agreement extends \yii\db\ActiveRecord
+class Agreement extends ActiveRecord
 {
     public $submitter;
 
@@ -55,6 +58,8 @@ class Agreement extends \yii\db\ActiveRecord
     public $olaDraft;
     public $oscDraft;
     public $finalDraft;
+    public $executedAgreement;
+
     /**
      * {@inheritdoc}
      */
@@ -69,17 +74,25 @@ class Agreement extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft'],  'file', 'extensions' => 'docx, pdf'],
             [
-                ['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member','transfer_to', 'agreement_type'], 'required', 'on' => 'uploadCreate'
+                ['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf'
             ],
-            [['pi_email', 'col_email'], 'email'],
-            [['project_title', 'proposal', 'reason'], 'string'],
+            [
+                [
+                    'finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address',
+                    'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm',
+                    'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email',
+                    'company_profile', 'grant_fund', 'member', 'transfer_to', 'agreement_type'
+                ], 'required', 'on' => 'uploadCreate'
+            ], [['pi_email', 'col_email'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
-            [['status'], 'default', 'value' => null],
-            [['status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra','transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
-            [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
+            [['status'], 'default', 'value' => null], [['status'], 'integer'], [
+                [
+                    'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name',
+                    'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft',
+                    'doc_re_draft', 'doc_final', 'doc_extra', 'transfer_to', 'agreement_type', 'country'
+                ], 'string', 'max' => 522
+            ], [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
 
@@ -92,40 +105,17 @@ class Agreement extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'col_organization' => 'Col Organization',
-            'col_name' => 'Col Name',
-            'col_address' => 'Col Address',
-            'col_contact_details' => 'Col Contact Details',
-            'col_collaborators_name' => 'Col Collaborators Name',
-            'col_wire_up' => 'Col Wire Up',
-            'col_phone_number' => 'Col Phone Number',
-            'col_email' => 'Col Email',
-            'pi_name' => 'Pi Name',
-            'pi_kulliyyah' => 'Pi Kulliyyah',
-            'pi_phone_number' => 'Pi Phone Number',
-            'pi_email' => 'Pi Email',
-            'project_title' => 'Project Title',
-            'grant_fund' => 'Grant Fund',
-            'sign_date' => 'Sign Date',
-            'end_date' => 'End Date',
-            'member' => 'Member',
-            'proposal' => 'proposal',
-            'status' => 'Status',
-            'ssm' => 'Ssm',
-            'company_profile' => 'Company Profile',
-            'mcom_date' => 'Mcom Date',
-            'meeting_link' => 'Meeting Link',
-            'doc_applicant' => 'Doc Applicant',
-            'doc_draft' => 'Doc Draft',
-            'doc_newer_draft' => 'Doc Newer Draft',
-            'doc_re_draft' => 'Doc Re Draft',
-            'doc_final' => 'Doc Final',
-            'doc_extra' => 'Doc Extra',
-            'reason' => 'Reason',
-            'transfer_to' => 'direction',
-            'agreement_type' => 'type',
-            'created_at' => 'Created At',
+            'id' => 'ID', 'col_organization' => 'Organization', 'col_name' => 'Name', 'col_address' => 'Address',
+            'col_contact_details' => 'Contact Details', 'col_collaborators_name' => 'Collaborators Name',
+            'col_wire_up' => 'Wire Up', 'col_phone_number' => 'Phone Number', 'col_email' => 'Email',
+            'pi_name' => 'Name', 'pi_kulliyyah' => 'Kulliyyah', 'pi_phone_number' => 'Phone Number',
+            'pi_email' => 'Email', 'project_title' => 'Project Title', 'grant_fund' => 'Grant Fund',
+            'sign_date' => 'Sign Date', 'end_date' => 'End Date', 'member' => 'Member', 'proposal' => 'proposal',
+            'status' => 'Status', 'ssm' => 'SSM', 'company_profile' => 'Company Profile', 'mcom_date' => 'MCOM Date',
+            'meeting_link' => 'Meeting Link', 'doc_applicant' => 'Document Applicant', 'doc_draft' => 'Document Draft',
+            'doc_newer_draft' => 'Document Newer Draft', 'doc_re_draft' => 'Document Re-Draft',
+            'doc_final' => 'Document Final', 'doc_extra' => 'Document Extra', 'reason' => 'Reason',
+            'transfer_to' => 'direction', 'agreement_type' => 'type', 'created_at' => 'Created At',
             'updated_at' => 'Updated At',
         ];
     }
@@ -133,7 +123,7 @@ class Agreement extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Activities]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getActivities()
     {
@@ -143,15 +133,16 @@ class Agreement extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Logs]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getLogs()
     {
         return $this->hasMany(Log::class, ['agreement_id' => 'id']);
     }
+
     public function beforeSave($insert)
     {
-        if($this->isAttributeChanged('status') || $this->isNewRecord){
+        if ($this->isAttributeChanged('status') || $this->isNewRecord) {
             $this->updated_at = new Expression('NOW()');
 
         }
@@ -164,8 +155,29 @@ class Agreement extends \yii\db\ActiveRecord
 
         // Handle status log creation based on specific conditions
         $this->createStatusLogIfStatusChanged($changedAttributes);
+
+        //delete draft files when status become 81 AKA ACTV
+        if($this->status == 81) $this->deleteDrafts();
     }
 
+
+    protected function deleteDrafts()
+    {
+        $fileLocations = [
+            $this->doc_applicant,
+            $this->doc_draft,
+            $this->doc_newer_draft
+        ];
+
+        foreach ($fileLocations as $filePath) {
+            if (is_file($filePath)) {  // Use is_file() to check existence
+                FileHelper::unlink($filePath);
+                Yii::info("File deleted: $filePath", __METHOD__);
+            } else {
+                Yii::warning("File not found: $filePath", __METHOD__);
+            }
+        }
+    }
     protected function createStatusLogIfStatusChanged(array $changedAttributes)
     {
 
@@ -173,7 +185,7 @@ class Agreement extends \yii\db\ActiveRecord
             return; // No status change, nothing to log
         }
 
-        if(isset($changedAttributes['status'])){
+        if (isset($changedAttributes['status'])) {
             //check if new application initiated
             $isInit = !isset($changedAttributes['status']) && $this->status == 10;
 
@@ -188,10 +200,8 @@ class Agreement extends \yii\db\ActiveRecord
             $reasonMap = [
                 // Old Status => New Status (requires reason)
                 10 => 2, //transition from 10 to 2 requires reason
-                1  => 12, // Transition from 1 to 12 requires reason
-                21 => [32, 33],
-                31 => [42, 43],
-                82 => true, // Status 82 always requires reason
+                1 => 12, // Transition from 1 to 12 requires reason
+                21 => [32, 33], 31 => [42, 43], 82 => true, // Status 82 always requires reason
                 33 => true, // Status 33 always requires reason
                 43 => true, // Status 43 always requires reason
             ];

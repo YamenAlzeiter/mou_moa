@@ -39,7 +39,7 @@ class AgreementController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'add-activity', 'view-activities'],
+                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities'],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
                     ],
@@ -157,11 +157,13 @@ class AgreementController extends Controller
             $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
             if ($model->save()){
 
-                    if($model->status == 2
+                    if(    $model->status == 1  || $model->status == 2
                         || $model->status == 12 || $model->status == 11
                         || $model->status == 32 || $model->status == 33
-                        || $model->status == 42 || $model->status == 43 || $model->status == 51){
-                    $this->sendEmail($model, $model->status != 2);
+                        || $model->status == 42 || $model->status == 43
+                        || $model->status == 51 || $model->status == 41
+                        || $model->status == 72 || $model->status == 81){
+                    $this->sendEmail($model, ($model->status != 2 && $model->status != 1) );
                 }
                 return $this->redirect(['index']);
             }
@@ -211,7 +213,7 @@ class AgreementController extends Controller
         }
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
-                'pageSize' => 99,
+                'pageSize' => 100,
             ], 'sort' => [
                 'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
             ],
@@ -230,23 +232,23 @@ class AgreementController extends Controller
      */
 
 
-    public function actionAddActivity($id = '')
-    {
-        $agreement = $this->findModel($id);
-        $model = new Activities();
-        $model->agreement_id = $id;
-
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            if ($model->save()) {
-                return $this->redirect('index');
-            }
-        }
-
-        return $this->renderAjax('addActivity', [
-            'model' => $model,
-            'agreement' => $agreement,
-        ]);
-    }
+//    public function actionAddActivity($id = '')
+//    {
+//        $agreement = $this->findModel($id);
+//        $model = new Activities();
+//        $model->agreement_id = $id;
+//
+//        if ($this->request->isPost && $model->load($this->request->post())) {
+//            if ($model->save()) {
+//                return $this->redirect('index');
+//            }
+//        }
+//
+//        return $this->renderAjax('addActivity', [
+//            'model' => $model,
+//            'agreement' => $agreement,
+//        ]);
+//    }
 
     public function actionDownloader($filePath)
     {
@@ -256,14 +258,18 @@ class AgreementController extends Controller
     private function sendEmail($model, $needCC){
         $mailMap =[
             //$model->status => emailTemplate->id//
-            2  => 4, // not complete       from OSC
-            12 => 4, // not complete       from OLA
+            1  => 5, // new application    from OSC to OLA
+            2  => 4, // not complete       from OSC to Applicant
+            12 => 4, // not complete       from OLA to OSC CC Applicant
             11 => 2, // Pick date          from OLA
-            32 => 1, // MCOM Reject        from OLA
-            33 => 4, // MCOM not Complete  from OLA
-            42 => 1, // UMC Reject         from OLA
-            43 => 4, // UMC not Complete   from OLA
-            51 => 3, // draf uploaded      from OLA
+            32 => 1, // MCOM Reject        from OLA to Applicant CC OSC
+            33 => 4, // MCOM not Complete  from OLA to Applicant CC OSC
+            41 => 9, // Approved UMC       from OLA to Applicant CC OSC
+            42 => 1, // UMC Reject         from OLA to Applicant CC OSC
+            43 => 4, // UMC not Complete   from OLA to Applicant CC OSC
+            51 => 3, // draft uploaded     from OLA to Applicant CC OSC
+            72 => 7, // draft rejected     from OLA to OSC
+            81 => 8, // final Draft uploaded from OLA to Applicant CC OSC
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);
@@ -272,6 +278,7 @@ class AgreementController extends Controller
             ->where(['type' => 'IO'])
             ->all();
 
+        $ola = Admin::findOne(['type' => 'OLA']);
 
         $body = $mail->body;
 
@@ -286,7 +293,7 @@ class AgreementController extends Controller
             'recipientName' => $model->pi_name,
             'reason' => $model->reason,
             'body' => $body
-        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->pi_email)->setSubject($mail->subject);
+        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->status ==  1? $ola->email : $model->pi_email)->setSubject($mail->subject);
 
         if ($needCC) {
             foreach ($osc as $admin)

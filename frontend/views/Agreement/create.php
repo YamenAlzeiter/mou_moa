@@ -77,9 +77,7 @@ $templateFileInput = '<div class="col align-items-center"><div class="col-md-2 c
 
 <?= $form->field($model, 'proposal')->textarea(['rows' => 6]) ?>
 
-<?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
 
-<?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
 
 <?= $form->field($model, 'fileUpload', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
 

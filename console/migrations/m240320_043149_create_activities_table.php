@@ -21,18 +21,29 @@ class m240320_043149_create_activities_table extends Migration
             'mou_moa'       => $this->string(522),
             'activity_type' => $this->string(522),
 
-            //Student Mobility for Credited && non-Credited
+            //Student Mobility for Credited
             'type'            => $this->string(10),
             'number_students' => $this->integer(3),
             'name_students'   => $this->text    (),
             'semester'        => $this->string(10),
-            'year'            => $this->date    (),
-            'program_name'    => $this->string(522), //only for non-Credited
+            'year'            => $this->string    (),
 
-            //Staff Mobility (Inbound / outbound)
-            'number_of_staff' => $this->integer(3),
-            'staffs_name' => $this->text(),
-            'department_office' => $this->string(100), //inbound only
+            //Student Mobility for Non_Credited
+            'non_type'            => $this->string(10),
+            'non_number_students' => $this->integer(3),
+            'non_name_students'   => $this->text    (),
+            'non_semester'        => $this->string(10),
+            'non_year'            => $this->string    (),
+            'non_program_name'    => $this->string(522), //only for non-Credited
+
+            //Staff Mobility (Inbound)
+            'in_number_of_staff' => $this->integer(3),
+            'in_staffs_name' => $this->text(),
+            'in_department_office' => $this->string(100),
+
+            //Staff Mobility (Outbound)
+            'out_number_of_staff' => $this->integer(3),
+            'out_staffs_name' => $this->text(),
 
             //Seminar/Conference/Workshop/Training
             'scwt_name_of_program' => $this->string(522),

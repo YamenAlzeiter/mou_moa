@@ -18,11 +18,20 @@ $this->title = 'Agreements';
 
 
 
+
 <?php modal::begin([
-    'title' => '', 'id' => 'modal', 'size' => 'modal-xl', 'bodyOptions' => ['class' => 'modal-inner-padding-body mt-0'],
-    'headerOptions' => ['class' => 'modal-inner-padding'], 'centerVertical' => true, 'scrollable' => true,
+    'title' => '',
+    'id' => 'modal',
+    'size' => 'modal-xl',
+    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
+    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
+    'centerVertical' => true,
+    'scrollable' => true,
+    'footer' =>  '&nbsp;',
 ]);
+
 echo "<div id='modalContent'></div>";
+
 modal::end();
 ?>
 
@@ -33,61 +42,70 @@ modal::end();
 
 <?php echo $this->render('_search', ['model' => $searchModel]); ?>
 
-<?= GridView::widget([
-    'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
+<div class="table-responsive">
+    <?= GridView::widget([
+        'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
-    'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex'], 'summary' => '',
-    'columns' => [
-        'id',
-        'col_organization',
-        [
-            'attribute' => 'created_at',
-            'label' => 'Date',
-            'format' => ['date', 'php:d/m/y'],
-            'enableSorting' => false,
-        ], 'country',
-        'agreement_type', [
-            'label' => 'Status',
-            'attribute' => 'Status',
-            'format' => 'raw',
-            'value' => function ($model) {
-                $statusHelper = new builders();
-                return $statusHelper->pillBuilder($model->status);
-            },
-        ], ['class' => ActionColumn::className(),
-            'template' => '{view}{MCOMDate}{update}{log}',
-            'buttons' => [
-                'update' => function ($url, $model, $key) {
-                    $build = new builders();
-                    if ($model->status == null || $model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43) {
-                        return $build->actionBuilder($model, 'update');
-                    } else {
-                        return null;
-                    }
-                }, 'MCOMDate' => function ($url, $model, $key) {
-                    $build = new builders();
-                    if ($model->status == 11) {
-                        return $build->actionBuilder($model, 'MCOM Date');
-                    } else {
-                        return null;
-                    }
-                }, 'view' => function ($url, $model, $key) {
-                    $build = new builders();
-                    return $build->actionBuilder($model, 'view');
-                }, 'log' => function ($url, $model, $key) {
-                    $build = new builders();
-                    return $build->actionBuilder($model, 'log');
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
+        'columns' => [
+            'id',
+            'col_organization',
+            [
+                'attribute' => 'created_at',
+                'label' => 'Date',
+                'format' => ['date', 'php:d/m/y'],
+                'enableSorting' => false,
+            ], 'country',
+            'agreement_type', [
+                'label' => 'Status',
+                'attribute' => 'Status',
+                'format' => 'raw',
+                'value' => function ($model) {
+                    $statusHelper = new builders();
+                    return $statusHelper->pillBuilder($model->status);
                 },
+            ], ['class' => ActionColumn::className(),
+                'template' => '{view}{addActivity}{MCOMDate}{update}{log}',
+                'buttons' => [
+                    'update' => function ($url, $model, $key) {
+                        $build = new builders();
+                        if ($model->status == null || $model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43) {
+                            return $build->actionBuilder($model, 'update');
+                        } else {
+                            return null;
+                        }
+                    }, 'MCOMDate' => function ($url, $model, $key) {
+                        $build = new builders();
+                        if ($model->status == 11) {
+                            return $build->actionBuilder($model, 'MCOM Date');
+                        } else {
+                            return null;
+                        }
+                    }, 'view' => function ($url, $model, $key) {
+                        $build = new builders();
+                        return $build->actionBuilder($model, 'view');
+                    }, 'log' => function ($url, $model, $key) {
+                        $build = new builders();
+                        return $build->actionBuilder($model, 'log');
+                    },
+                    'addActivity' => function ($url, $model, $key) {
+                        $build = new builders();
+                        if($model->status == 81) {
+                            return $build->actionBuilder($model, 'Add Activity',);
+                        } else return null;
+                    },
+                ],
             ],
-        ],
-    ], 'pager' => [
-        'class' => yii\bootstrap5\LinkPager::className(),
-        'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
-        'activePageCssClass' => ['class' => 'link-white active'],// additional pager options if needed
-    ], 'layout' => "{items}\n{pager}",
-]); ?>
+        ], 'pager' => [
+            'class' => yii\bootstrap5\LinkPager::className(),
+            'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+            'activePageCssClass' => ['class' => 'link-white active'],// additional pager options if needed
+        ], 'layout' => "{items}\n{pager}",
+    ]); ?>
+</div>
 
 <?php Pjax::end(); ?>
+
 
 
 <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i>', [

@@ -14,15 +14,27 @@ use Yii;
  * @property string|null $kcdio
  * @property string|null $mou_moa
  * @property string|null $activity_type
+ *
  * @property string|null $type
  * @property int|null $number_students
  * @property string|null $name_students
  * @property string|null $semester
  * @property string|null $year
- * @property string|null $program_name
- * @property int|null $number_of_staff
- * @property string|null $staffs_name
- * @property string|null $department_office
+ *
+ *  @property string|null $non_type
+ *  @property int|null $non_number_students
+ *  @property string|null $non_name_students
+ *  @property string|null $non_semester
+ *  @property string|null $non_year
+ * @property string|null $non_program_name
+ *
+ * @property int|null $in_number_of_staff
+ * @property string|null $in_staffs_name
+ * @property string|null $in_department_office
+ *
+ *  @property int|null $out_number_of_staff
+ *  @property string|null $out_staffs_name
+ *
  * @property string|null $scwt_name_of_program
  * @property string|null $date_of_program
  * @property string|null $program_venue
@@ -58,9 +70,9 @@ class Activities extends \yii\db\ActiveRecord
         return [
             [['activity_type'], 'required'],
             [['type', 'number_students', 'name_students', 'semester', 'number_students'],  'required', 'on' => 'section-1'],
-            [['type', 'number_students', 'name_students', 'semester', 'number_students', 'program_name'], 'required', 'on' => 'section-2'],
-            [['number_of_staff', 'staffs_name'], 'required', 'on' => 'section-3'],
-            [['number_of_staff', 'staffs_name'], 'required', 'on' => 'section-4'],
+            [['non_type', 'non_number_students', 'non_name_students', 'non_semester', 'non_program_name'], 'required', 'on' => 'section-2'],
+            [['in_number_of_staff', 'in_staffs_name'], 'required', 'on' => 'section-3'],
+            [['out_number_of_staff', 'out_staffs_name'], 'required', 'on' => 'section-4'],
             [['scwt_name_of_program', 'date_of_program', 'program_venue', 'participants_number', 'name_participants_involved'], 'required', 'on' => 'section-5'],
             [['research_title'], 'required', 'on' => 'section-6'],
             [['publication_title', 'publisher'], 'required', 'on' => 'section-7'],
@@ -68,14 +80,14 @@ class Activities extends \yii\db\ActiveRecord
             [['other', 'date'], 'required', 'on' => 'section-9'],
             [['justification'], 'required', 'on' => 'section-10'],
 
-            [['agreement_id', 'number_students', 'number_of_staff', 'participants_number'], 'default', 'value' => null],
-            [['agreement_id', 'number_students', 'number_of_staff', 'participants_number'], 'integer'],
-            [['name_students', 'staffs_name', 'research_title', 'justification'], 'string'],
+            [['agreement_id', 'number_students', 'in_number_of_staff','out_number_of_staff', 'participants_number'], 'default', 'value' => null],
+            [['agreement_id', 'number_students', 'in_number_of_staff','out_number_of_staff', 'participants_number'], 'integer'],
+            [['name_students', 'in_staffs_name',  'out_staffs_name', 'research_title', 'justification'], 'string'],
             [['date_of_program', 'date', 'year'], 'safe'],
-            [['name', 'kcdio', 'mou_moa', 'activity_type', 'program_name', 'scwt_name_of_program', 'program_venue', 'upload_files'], 'string', 'max' => 522],
+            [['name', 'kcdio', 'mou_moa', 'activity_type', 'non_program_name', 'scwt_name_of_program', 'program_venue', 'upload_files'], 'string', 'max' => 522],
             [['staff_number'], 'string', 'max' => 7],
             [['type', 'semester'], 'string', 'max' => 10],
-            [['department_office'], 'string', 'max' => 100],
+            [['in_department_office'], 'string', 'max' => 100],
             [['publication_title', 'publisher', 'consultancy_name', 'other', 'name_participants_involved'], 'string', 'max' => 255],
             [['project_duration'], 'string', 'max' => 50],
             [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],
@@ -102,10 +114,17 @@ class Activities extends \yii\db\ActiveRecord
             'name_students' => 'Name of Students Involve (credited)',
             'semester' => 'Which Semester',
             'year' => 'year',
-            'program_name' => 'Name of the programme (SMNC)',
-            'number_of_staff' => 'Number of Staff ',
-            'staffs_name' => 'Name of Staff Involve',
-            'department_office' => 'Department Office',
+            'non_type' => 'Type',
+            'non_number_students' => 'Number of students for Credited (Inbound & Outbound)',
+            'non_name_students' => 'Name of Students Involve (credited)',
+            'non_semester' => 'Which Semester',
+            'non_year' => 'year',
+            'non_program_name' => 'Name of the programme (SMNC)',
+            'in_number_of_staff' => 'Number of Staff ',
+            'in_staffs_name' => 'Name of Staff Involve',
+            'in_department_office' => 'Department Office',
+            'out_number_of_staff' => 'Number of Staff ',
+            'out_staffs_name' => 'Name of Staff Involve',
             'scwt_name_of_program' => 'Name of the programme',
             'date_of_program' => 'Date Of Program',
             'program_venue' => 'Venue of the programme',

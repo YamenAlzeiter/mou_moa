@@ -43,6 +43,7 @@ if(!Yii::$app->user->isGuest){
     'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
     'centerVertical' => true,
     'scrollable' => true,
+    'footer' =>  '&nbsp;',
 ]);
 
 echo "<div id='modalContent'></div>";

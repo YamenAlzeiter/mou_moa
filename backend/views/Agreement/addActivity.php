@@ -54,7 +54,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
         </div>
         <div class = "col-lg-4">
-            <?= $form->field($model, 'number_students')->textInput(['type' => 'date', 'placeholder' => ''])?>
+            <?= $form->field($model, 'year')->textInput(['type' => 'date', 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-4">
 
@@ -71,21 +71,21 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     <div class = "row align-items-center">
         <div class = "col-lg-2"><?= $form->field($model, 'type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?></div>
         <div class = "col-lg-6">
-            <?= $form->field($model, 'number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'non_number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
         <div class="col-lg-4">
-            <?= $form->field($model, 'name_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'non_name_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
     <div class = "row">
         <div class = "col-lg-4">
-            <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
+            <?= $form->field($model, 'non_semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
         </div>
         <div class = "col-lg-4">
-            <?= $form->field($model, 'number_students')->textInput(['type' => 'date', 'placeholder' => ''])?>
+            <?= $form->field($model, 'non_year')->textInput(['type' => 'date', 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-4">
-            <?= $form->field($model, 'program_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'non_program_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
 
@@ -99,10 +99,10 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     <h2 class="my-4">Staff Mobility (Inbound)</h2>
     <div class = "row align-items-center">
         <div class = "col-lg-6">
-            <?= $form->field($model, 'number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'in_number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-6">
-            <?= $form->field($model, 'staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'in_staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
     <div class="mb-4 text-end">
@@ -114,10 +114,10 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     <h2 class="my-4">Staff Mobility (Outbound)</h2>
     <div class = "row align-items-center">
         <div class = "col-lg-6">
-            <?= $form->field($model, 'number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'out_number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-6">
-            <?= $form->field($model, 'staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
+            <?= $form->field($model, 'out_staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
     <div class="mb-4 text-end">

@@ -95,6 +95,29 @@ class m240315_030854_create_moua_table extends Migration
             EXECUTE FUNCTION before_insert_agreement();
         ");
 
+        $this->execute("
+            CREATE OR REPLACE FUNCTION clear_draft_fields() 
+            RETURNS TRIGGER AS $$
+            BEGIN
+                IF NEW.status = 81 THEN
+                    NEW.doc_applicant := '';
+                    NEW.doc_draft := '';
+                    NEW.doc_newer_draft := '';
+                END IF;
+                RETURN NEW;
+            END;
+            $$ LANGUAGE plpgsql;
+        ");
+
+        // Create the trigger
+        $this->execute("
+            CREATE TRIGGER clear_files_on_status_81
+            BEFORE UPDATE ON agreement
+            FOR EACH ROW 
+            WHEN (NEW.status = 81 AND OLD.status <> 81) -- Trigger only on change TO 81
+            EXECUTE FUNCTION clear_draft_fields();
+        ");
+
     }
 
     /**

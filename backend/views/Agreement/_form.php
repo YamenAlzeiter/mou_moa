@@ -10,38 +10,40 @@ use yii\helpers\Html;
 /** @var yii\bootstrap5\ActiveForm $form */
 $templateFileInput = '<div class="col align-items-center"><div class="col-md-2 col-form-label">{label}</div><div class="col-md">{input}</div>{error}</div>';
 $approveMap = [
-    10 => 1, // init -> accept OSC
-    1 => 11, // OSC -> OLA approve OLA
-    15 => 1, // OSC -> OLA approve OLA
+    10 => 1,  // init -> accept OSC
+    1 => 11,  // OSC -> OLA approve OLA
+    15 => 1,  // OSC -> OLA approve OLA
     21 => 31, // OLA -> / approve OLA
     31 => 41, // OLA -> / approve OLA
     61 => 81,
+
 ];
 $notCompleteMap = [
-    10 => 2, // OSC -> Applicant
-    1 => 12, // OLA -> Applicant
-    15 => 2, // OSC -> OLA approve OLA
+    10 => 2,  // OSC -> Applicant
+    1 => 12,  // OLA -> Applicant
+    15 => 2,  // OSC -> OLA approve OLA
     21 => 33, // OLA -> Applicant
     31 => 43, // OLA -> Applicant
-    61 => 51,
+    61 => 72, // OLA -> OSC
 ];
 $rejectMap = [
     21 => 32, // OLA -> Applicant
     31 => 42, // OLA -> Applicant
 ];
 
-if ($model->status != 41 && $model->status != 51) {
-
+if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $model->status != 81) {
+    $tag = ($model->status == 21 || $model->status == 31) ? 'KIV' : 'Not Complete';
     $options = [
-        $approveMap[$model->status] => 'Recommended', // If $approveMap[$model->status] is set, use it; otherwise, use 'Recommended'
-        ($model->status == 10 || $model->status == 1) ? $notCompleteMap[$model->status] = 'Not Complete' : $notCompleteMap[$model->status] = 'KIV',
+        $approveMap[$model->status] => 'Recommended', $notCompleteMap[$model->status] => $tag,
     ];
-
-
     if ($model->status == 21 || $model->status == 31) {
-        // Add Rejected option directly to the array
-        $options[$rejectMap[$model->status]] = 'Not Recommended';
+        $options += [
+            $rejectMap[$model->status] => ' Not Recommended'
+        ];
+
     }
+
+    var_dump($options);
 }
 
 ?>
@@ -58,16 +60,27 @@ if ($model->status != 41 && $model->status != 51) {
     <?php elseif ($model->status == 51) : ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => 61])->label(false) ?>
         <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?php elseif ($model->status == 72) : ?>
+        <?= $form->field($model, 'status')->hiddenInput(['value' => 61])->label(false) ?>
+        <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?php elseif ($model->status == 81): ?>
+        <div class="row">
+            <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type'=>'date'])?></div>
+            <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type'=>'date'])?></div>
+        </div>
+    <div class="row">
+        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        </div>
     <?php else: ?>
         <div class = "mb-2">
             <?= $form->field($model, 'status')->radioList($options, [
-                    'item' => function ($index, $label, $name, $checked, $value) {
-                        $class = 'border-dark p-4 border rounded-4';
-                        return '<label class="border-dark-light px-4 py-5 w-25 border rounded-4  fs-4">'.Html::radio($name,
-                                $checked,
-                                ['id' => "is".$value, 'value' => $value, 'class' => 'mx-2']).$label.'</label>';
-                    }
-                ])->label(false); ?>
+                'class' => 'gap-2 row', // Use flexbox
+                'item' => function ($index, $label, $name, $checked, $value) {
+                    return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">'.Html::radio($name,
+                            $checked, ['id' => "is".$value, 'value' => $value, 'class' => 'mx-2']).$label.'</label>';
+                }
+            ])->label(false); ?>
         </div>
         <?php if ($model->status == 61): ?>
             <div class = "doc-approved mb-4 d-none">
@@ -81,26 +94,36 @@ if ($model->status != 41 && $model->status != 51) {
             ])->label(false); ?>
         </div>
     <?php endif; ?>
+
+
     <div class = "d-flex flex-row gap-2 mb-2 justify-content-end">
         <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
     </div>
-
-
     <?php ActiveForm::end(); ?>
 
 
     <script>
-        $("#is2, #is12, #is32, #is42, #is33, #is43, #is51").on("change", function () {
-            console.log('here is eme1')
+        $("#is2, #is12, #is42, #is43, #is51").on("change", function () {
+
             if (this.checked) {
                 $(".not-complete").removeClass('d-none');
+            }
+        });
+        $("#is1, #is11, #is31, #is41").on("change", function () {
+
+            if (this.checked) {
+                $(".not-complete").addClass('d-none');
+            }
+        });
+        $(" #is72").on("change", function () {
+
+            if (this.checked) {
                 $(".doc-approved").addClass('d-none');
             }
         });
-        $("#is1, #is11, #is31, #is41, #is81").on("change", function () {
-            console.log('here is eme')
+        $(" #is81").on("change", function () {
+
             if (this.checked) {
-                $(".not-complete").addClass('d-none');
                 $(".doc-approved").removeClass('d-none');
             }
         });
