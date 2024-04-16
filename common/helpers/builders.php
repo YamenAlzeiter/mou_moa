@@ -15,7 +15,7 @@ class builders
         $textClass = $statusHelper->statusDotClass($status);
         $tag = $statusHelper->statusTag($status);
         $description = $statusHelper->statusDescription($status);
-
+        $title = "<p class='title_tool_tip'>$description</p>";
         return <<<HTML
                     <div class='$padgeClass status-w $options'>
                         <p class="m-0 fs-4">$tag</p>
@@ -23,13 +23,15 @@ class builders
                            data-bs-toggle='tooltip'
                            data-bs-placement='bottom'
                            data-bs-html='true'
-                           title='$description'></i>
+                           title="  $title  "></i>
                     </div>
                 HTML;
     }
 
     public function actionBuilder($model, $type , $modal_id ="#modal")
     {
+
+
         $icon = [
             'view'     => 'text-dark ti-eye              ',
             'delete'   => 'text-danger ti-trash             ',
@@ -54,8 +56,9 @@ class builders
             $url = 'add-activity';
         }else $url = $type;
 
+        $title = "<p class='title_tool_tip'>$type</p>";
         return Html::button(
-            '<i class="ti fs-7 ' . $icon[$type] . '" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="' . $type . '"></i>',
+            '<i class="ti fs-7 ' . $icon[$type] . '" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="' . $title . '"></i>',
             [
                 'value' => Url::to([$url, 'id' => $model->id]),
                 'class' => 'btn-action',

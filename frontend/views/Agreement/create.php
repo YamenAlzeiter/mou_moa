@@ -9,7 +9,7 @@ use yii\helpers\Html;
 /** @var common\models\Agreement $model */
 
 $this->title = 'Create';
-$templateFileInput = '<div class="col align-items-center"><div class="col-md-2 col-form-label">{label}</div><div class="col-md">{input}</div>{error}</div>';
+$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
 ?>
 <?php $form = ActiveForm::begin([
     'fieldConfig' => [
@@ -17,53 +17,55 @@ $templateFileInput = '<div class="col align-items-center"><div class="col-md-2 c
     ],
 ]); ?>
 <div class="row">
-    <div class="col-4">
-        <?= $form->field($model, 'agreement_type')->dropDownList(['moua' => 'MOU (Academic)', 'mou' => 'MOU (Non-Academic)', 'moaa' => 'MOA (Academic)', 'MOA' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
+    <div class="col-md-4">
+        <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
     </div>
-    <div class="col-8">
+    <div class="col-md-8">
         <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
 </div>
 
 
 <div class = "row">
-    <div class = "col">
+    <div class = "col-md">
         <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder'=>'']) ?>
     </div>
-    <div class = "col">
+    <div class = "col-md">
         <?= $form->field($model, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         <?= $form->field($model, 'col_email')->textInput(['type => email', 'maxlength' => true, 'placeholder' => '']) ?>
     </div>
 </div>
 <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6]) ?>
 
-<?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
 
+<div class="row">
+    <div class="col-md-8">
+        <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+    </div>
+    <div class="col-md-4">
+        <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+    </div>
+</div>
 <h4>Person In Charge Details</h4>
 
 <div class = "row">
-    <div class = "col">
-        <?= $form->field($model, 'pi_name')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-
+    <div class = "col-md">
+        <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
+        <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false)?>
+        <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
         <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
-    <div class = "col">
-        <?= $form->field($model, 'pi_kulliyyah')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag','kcdio'), ['prompt' => 'Select KCDIO']) ?>
-
-        <?= $form->field($model, 'pi_email')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-    </div>
-</div>
 <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
 <div class = "row">
-    <div class = "col">
+    <div class = "col-md">
         <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
 
-    <div class = "col">
+    <div class = "col-md">
         <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
-    <div class = "col">
+    <div class = "col-md">
             <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select one']) ?>
     </div>
 </div>

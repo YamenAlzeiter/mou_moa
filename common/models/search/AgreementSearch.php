@@ -101,12 +101,13 @@ class AgreementSearch extends Agreement
 
 
         if ($this->applications === 'new_applications') {
-            $query->andWhere(['<>', 'status', 81]);
+            $query->andWhere(['<>', 'status', 100]);
         } elseif ($this->applications === 'active_applications') {
-            $query->andWhere(['status' => 81]);
+            $query->andWhere(['OR', ['status' => 100], ['status' => 91]]);
         } elseif($this->applications === 'expired_applications'){
-            $query->andWhere(['status' => 83]);
+            $query->andWhere(['OR', ['status' => 102], ['status' => 92]]);
         }
+
 
         return $dataProvider;
     }

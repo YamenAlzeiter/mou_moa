@@ -23,6 +23,11 @@ use yii\widgets\Pjax;
         'dataProvider' => $dataProvider,
 //    'filterModel' => $searchModel,
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
+        'rowOptions' => function($model){
+            if($model->status == 1 || $model->status == 21 || $model->status == 31 || $model->status == 41 || $model->status == 61){
+                return ['class' => 'need-action fw-bolder'];
+            }
+        },
         'columns' => [
             'id',
             'col_organization',

@@ -25,10 +25,17 @@ use yii\widgets\Pjax;
 //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
+        'rowOptions' => function($model){
+            if($model->status == 10 || $model->status == 51 || $model->status == 15 || $model->status == 72 || $model->status == 81){
+                return ['class' => 'need-action fw-bolder'];
+            }
+        },
         'columns' => [
             'id',
             'col_organization',
             'country',
+            'sign_date',
+            'end_date',
             'agreement_type',
             [
                 'label' => 'Status',

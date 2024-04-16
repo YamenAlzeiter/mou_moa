@@ -46,7 +46,12 @@ modal::end();
     <?= GridView::widget([
         'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
-        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '], 'summary' => '',
+        'rowOptions' => function($model){
+        if($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 11){
+            return ['class' => 'need-action fw-bolder'];
+        }
+        },
         'columns' => [
             'id',
             'col_organization',
@@ -90,7 +95,7 @@ modal::end();
                     },
                     'addActivity' => function ($url, $model, $key) {
                         $build = new builders();
-                        if($model->status == 81) {
+                        if($model->status == 100) {
                             return $build->actionBuilder($model, 'Add Activity',);
                         } else return null;
                     },

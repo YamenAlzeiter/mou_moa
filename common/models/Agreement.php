@@ -74,25 +74,13 @@ class Agreement extends ActiveRecord
     public function rules()
     {
         return [
-            [
-                ['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf'
-            ],
-            [
-                [
-                    'finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address',
-                    'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm',
-                    'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email',
-                    'company_profile', 'grant_fund', 'member', 'transfer_to', 'agreement_type'
-                ], 'required', 'on' => 'uploadCreate'
-            ], [['pi_email', 'col_email'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
+            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf'],
+            [['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member', 'transfer_to', 'agreement_type', 'country'], 'required', 'on' => 'uploadCreate'],
+            [['pi_email', 'col_email'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
-            [['status'], 'default', 'value' => null], [['status'], 'integer'], [
-                [
-                    'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name',
-                    'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft',
-                    'doc_re_draft', 'doc_final', 'doc_extra', 'transfer_to', 'agreement_type', 'country'
-                ], 'string', 'max' => 522
-            ], [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
+            [['status'], 'default', 'value' => null], [['status'], 'integer'],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
+            [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
 
@@ -105,18 +93,42 @@ class Agreement extends ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID', 'col_organization' => 'Organization', 'col_name' => 'Name', 'col_address' => 'Address',
-            'col_contact_details' => 'Contact Details', 'col_collaborators_name' => 'Collaborators Name',
-            'col_wire_up' => 'Wire Up', 'col_phone_number' => 'Phone Number', 'col_email' => 'Email',
-            'pi_name' => 'Name', 'pi_kulliyyah' => 'Kulliyyah', 'pi_phone_number' => 'Phone Number',
-            'pi_email' => 'Email', 'project_title' => 'Project Title', 'grant_fund' => 'Grant Fund',
-            'sign_date' => 'Sign Date', 'end_date' => 'End Date', 'member' => 'Member', 'proposal' => 'proposal',
-            'status' => 'Status', 'ssm' => 'SSM', 'company_profile' => 'Company Profile', 'mcom_date' => 'MCOM Date',
-            'meeting_link' => 'Meeting Link', 'doc_applicant' => 'Document Applicant', 'doc_draft' => 'Document Draft',
-            'doc_newer_draft' => 'Document Newer Draft', 'doc_re_draft' => 'Document Re-Draft',
-            'doc_final' => 'Document Final', 'doc_extra' => 'Document Extra', 'reason' => 'Reason',
-            'transfer_to' => 'direction', 'agreement_type' => 'type', 'created_at' => 'Created At',
+            'id' => 'ID',
+            'col_organization' => 'Organization',
+            'col_name' => 'Name',
+            'col_address' => 'Address',
+            'col_contact_details' => 'Contact Details',
+            'col_collaborators_name' => 'Collaborators Name',
+            'col_wire_up' => 'Wire Up',
+            'col_phone_number' => 'Phone Number',
+            'col_email' => 'Email',
+            'pi_name' => 'Name',
+            'pi_kulliyyah' => 'Kulliyyah',
+            'pi_phone_number' => 'Phone Number',
+            'pi_email' => 'Email',
+            'project_title' => 'Project Title',
+            'grant_fund' => 'Grant Fund',
+            'sign_date' => 'Sign Date',
+            'end_date' => 'End Date',
+            'member' => 'Member',
+            'proposal' => 'proposal',
+            'status' => 'Status',
+            'ssm' => 'SSM',
+            'company_profile' => 'Company Profile',
+            'mcom_date' => 'MCOM Date',
+            'meeting_link' => 'Meeting Link',
+            'doc_applicant' => 'Document Applicant',
+            'doc_draft' => 'Document Draft',
+            'doc_newer_draft' => 'Document Newer Draft',
+            'doc_re_draft' => 'Document Re-Draft',
+            'doc_final' => 'Document Final',
+            'doc_extra' => 'Document Extra',
+            'reason' => 'Reason',
+            'transfer_to' => 'direction',
+            'agreement_type' => 'type',
+            'created_at' => 'Created At',
             'updated_at' => 'Updated At',
+            'country' => 'Country'
         ];
     }
 
@@ -144,7 +156,6 @@ class Agreement extends ActiveRecord
     {
         if ($this->isAttributeChanged('status') || $this->isNewRecord) {
             $this->updated_at = new Expression('NOW()');
-
         }
         return parent::beforeSave($insert);
     }
@@ -153,14 +164,16 @@ class Agreement extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        // Handle status log creation based on specific conditions
-        $this->createStatusLogIfStatusChanged($changedAttributes);
-
         //delete draft files when status become 81 AKA ACTV
         if($this->status == 81) $this->deleteDrafts();
+        if($this->status == 21) $this->increaseMCOMDate();
     }
 
-
+    protected function increaseMCOMDate(){
+        $mcom = McomDate::findOne(['date' => $this->mcom_date]);
+        $mcom->counter++;
+        $mcom->save();
+    }
     protected function deleteDrafts()
     {
         $fileLocations = [
@@ -178,51 +191,6 @@ class Agreement extends ActiveRecord
             }
         }
     }
-    protected function createStatusLogIfStatusChanged(array $changedAttributes)
-    {
 
-        if (!isset($changedAttributes['status']) && !$this->status == 10) {
-            return; // No status change, nothing to log
-        }
-
-        if (isset($changedAttributes['status'])) {
-            //check if new application initiated
-            $isInit = !isset($changedAttributes['status']) && $this->status == 10;
-
-            $oldStatus = $isInit ? 0 : $changedAttributes['status'];
-            $newStatus = $this->status;
-
-
-            if ($oldStatus == $newStatus) {
-                return; // Status hasn't changed, no need to log
-            }
-
-            $reasonMap = [
-                // Old Status => New Status (requires reason)
-                10 => 2, //transition from 10 to 2 requires reason
-                1 => 12, // Transition from 1 to 12 requires reason
-                21 => [32, 33], 31 => [42, 43], 82 => true, // Status 82 always requires reason
-                33 => true, // Status 33 always requires reason
-                43 => true, // Status 43 always requires reason
-            ];
-
-            $needsReason = isset($reasonMap[$oldStatus]);
-            $message = $needsReason ? $this->reason : null;
-
-            $message = $isInit ? 'New Application Submitted' : $message;
-
-            $this->createStatusLog($oldStatus, $newStatus, $message);
-        }
-    }
-
-    protected function createStatusLog($oldStatus, $newStatus, $message)
-    {
-        $log = new Log();
-        $log->agreement_id = $this->id;
-        $log->old_status = $oldStatus;
-        $log->new_status = $newStatus;
-        $log->message = $message;
-        $log->save();
-    }
 
 }

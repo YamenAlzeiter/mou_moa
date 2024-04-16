@@ -99,10 +99,19 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
 
 <?php elseif ($model->status == 11):?>
 
-    <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array)  McomDate::find()
-        ->where(['<', 'counter', 20])
-        ->andWhere(['>', 'date', $currentDate])
-        ->all(), 'date', 'date'),['prompt' => 'Select a Date']) ?>
+    <?= $form->field($model, 'mcom_date')->dropDownList(
+        ArrayHelper::map(McomDate::find()
+            ->where(['<', 'counter', 20])
+            ->andWhere(['>', 'date', $currentDate])
+            ->all(),
+            'date',
+            function($model) {
+                return  'Date: '. ' ' .$model->date . ', available: ' . ' ' . ( 20 - $model->counter)   ;
+            }
+        ),
+        ['prompt' => 'Select a Date']
+    ) ?>
+
 
 <?php endif;?>
 

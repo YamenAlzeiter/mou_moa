@@ -47,8 +47,8 @@ use yii\widgets\Pjax;
                             // If $model->message is empty, return a disabled icon or any alternative content
                             return '<i class="ti ti-message-circle fs-7 disabled-icon text-gray"></i>';
                         } else {
-                            // If $model->message is not empty, return the regular icon with tooltip
-                            return '<i class="cursor-pointer ti ti-message-circle fs-7 fw-semibold text-dark" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="'.htmlspecialchars($model->message).'"></i>';
+                            $title = "<p class='title_tool_tip'>$model->message</p>";
+                            return '<i class="cursor-pointer ti ti-message-circle fs-7 fw-semibold text-dark" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="'.$title.'"></i>';
                         }
                     },
                 ],

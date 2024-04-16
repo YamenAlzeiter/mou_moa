@@ -18,6 +18,9 @@ body{
 .btn-crete:hover{
     background: #0a3622;
 }
+.need-action{
+    --bs-table-striped-bg: #FEF2F2 !important;
+}
 
 .table-header-flex > thead > tr > th > a {
     display: flex;

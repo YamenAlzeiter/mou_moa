@@ -13,7 +13,9 @@ body{
     width: 50px;
     border: 0;
 }
-
+.need-action{
+    --bs-table-striped-bg: #FEF2F2 !important;
+}
 .table-header-flex > thead > tr > th > a {
     display: flex;
     justify-content: space-between;
