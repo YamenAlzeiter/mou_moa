@@ -16,19 +16,36 @@ use yii\widgets\Pjax;
 
 
 
-<?= $this->render('_search', ['model' => $searchModel]); ?>
+<div class="d-flex align-items-end justify-content-between">
+    <?= $this->render('_search', ['model' => $searchModel]); ?>
+    <?= Html::button(
+        '<i class="ti fs-5 ti-table" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="Import records"></i> Import Records',
+        [
+            'value' => Url::to(['import']), // Replace with your actual route
+            'class' => 'btn btn-success fs-5',
+            'id' => 'modelButton',
+            'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value'), function() {
+            // Append the HTML snippet to the modal content
+            $('#modalContent').append(''); 
+            
+            // Set the modal title
+            $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">Bulk Import</h1>'); 
+        });"
+        ]
+    ); ?>
+
+</div>
 
 
 <div class="table-responsive">
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
-//        'filterModel' => $searchModel,
-//        'dataColumnClass' => 'common\helpers\customColumClass',
+        //        'filterModel' => $searchModel,
+        //        'dataColumnClass' => 'common\helpers\customColumClass',
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
         'rowOptions' => function($model){
-            if($model->status == 10 || $model->status == 51 || $model->status == 15 || $model->status == 72 || $model->status == 81){
-                return ['class' => 'need-action fw-bolder'];
-            }
+            $build = new builders();
+            return $build->tableProbChanger($model->status, 'OSC') ? ['class' => 'need-action fw-bold'] : [];
         },
         'columns' => [
             'id',
@@ -60,9 +77,7 @@ use yii\widgets\Pjax;
                     },
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
-                        if($model->status == 10 || $model->status == 51 || $model->status == 15 || $model->status == 72 || $model->status == 81) {
-                            return $build->actionBuilder($model, 'update',);
-                        } else return null;
+                        return $build->tableProbChanger($model->status, 'OSC') ?  $build->actionBuilder($model, 'update',): null;
                     }
                 ],
             ],

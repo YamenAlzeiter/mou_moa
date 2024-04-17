@@ -8,13 +8,16 @@ body{
     background: transparent;
     border: 0;
 }
+.table-striped > tbody > tr.need-action {
+    --bs-table-striped-bg: #FEFDF2 !important;
+    --bs-table-bg: #FEFDF2 !important;
+    border-top: 1px black solid;
+    border-bottom: 1px black solid
+}
 .btn-create{
     height: 50px;
     width: 50px;
     border: 0;
-}
-.need-action{
-    --bs-table-striped-bg: #FEF2F2 !important;
 }
 .table-header-flex > thead > tr > th > a {
     display: flex;

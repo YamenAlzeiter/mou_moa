@@ -56,8 +56,8 @@ class m240315_030854_create_moua_table extends Migration
             'doc_draft' => $this->string(522),
             'doc_newer_draft' => $this->string(522),
             'doc_re_draft' => $this->string(522),
-
             'doc_final' => $this->string(522),
+            'doc_executed' => $this->string(522),
             //in case extra one needed
             'doc_extra' => $this->string(522),
             //messages

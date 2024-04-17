@@ -61,17 +61,6 @@ if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $mod
     <?php elseif ($model->status == 72) : ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => 61])->label(false) ?>
         <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-    <?php elseif ($model->status == 81): ?>
-        <div class="row">
-            <?= $form->field($model, 'status')->hiddenInput(['value' => 91])->label(false) ?>
-            <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type'=>'date'])?></div>
-            <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type'=>'date'])?></div>
-        </div>
-    <div class="row">
-        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
-        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
-        </div>
-        <?= $form->field($model, 'oscDraft', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
     <?php else: ?>
         <div class = "mb-2">
             <?= $form->field($model, 'status')->radioList($options, [

@@ -8,6 +8,15 @@ use yii\helpers\Url;
 
 class builders
 {
+    public function tableProbChanger($status, $viewer){
+        switch ($viewer){
+            case 'Applicant'         : return in_array($status, [2, 12, 33, 43, 81, 11]);
+            case 'ApplicantMCOM'     : return in_array($status, [11]);
+            case 'ApplicantActivity' : return in_array($status, [100, 91]);
+            case 'OSC'               : return in_array($status, [10, 51, 15, 72]);
+            case 'OLA'               : return in_array($status, [1, 21, 31, 41, 61]);
+        }
+    }
     public function pillBuilder($status, $options = "")
     {
         $statusHelper = new statusLable();

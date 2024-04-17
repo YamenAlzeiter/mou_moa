@@ -258,11 +258,12 @@ class AgreementController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post())) {
 
-            $model->status = $this->request->post('checked');
 
+            $model->status = $this->request->post('checked');
             if ($model->save(false)) {
                 $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
-                $this->sendEmail($model, 6);
+                $this->fileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'doc_executed');
+                if($model->status == 15) $this->sendEmail($model, 6);
                 return $this->redirect(['index']);
             }
 

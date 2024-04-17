@@ -6,6 +6,7 @@ use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
 use common\models\EmailTemplate;
+use common\models\Import;
 use common\models\Kcdio;
 use common\models\Log;
 use common\models\search\AgreementSearch;
@@ -39,7 +40,7 @@ class AgreementController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities'],
+                        'actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities', 'import'],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
                     ],
@@ -66,8 +67,11 @@ class AgreementController extends Controller
 
         $type = Yii::$app->user->identity->type;
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
-     if ($type != 'OLA')
+     if ($type != 'OLA'){
          $dataProvider->query->andWhere(['transfer_to' => $type]);
+     }
+
+
         $dataProvider->pagination = [
             'pageSize' => 11,
         ];
@@ -157,12 +161,12 @@ class AgreementController extends Controller
             $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
             if ($model->save()){
 
-                    if(    $model->status == 1  || $model->status == 2
-                        || $model->status == 12 || $model->status == 11
-                        || $model->status == 32 || $model->status == 33
-                        || $model->status == 42 || $model->status == 43
-                        || $model->status == 51 || $model->status == 41
-                        || $model->status == 72 || $model->status == 81){
+                if(    $model->status == 1  || $model->status == 2
+                    || $model->status == 12 || $model->status == 11
+                    || $model->status == 32 || $model->status == 33
+                    || $model->status == 42 || $model->status == 43
+                    || $model->status == 51 || $model->status == 41
+                    || $model->status == 72 || $model->status == 81){
                     $this->sendEmail($model, ($model->status != 2 && $model->status != 1) );
                 }
                 return $this->redirect(['index']);
@@ -347,13 +351,42 @@ class AgreementController extends Controller
         return ['html' => $options];
     }
 
-    public function actionImportExcel()
+    public function actionImport(){
+        $model = new Import();
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $file = UploadedFile::getInstance($model, 'importedFile');
+            if ($file) {
+
+                $baseUploadPath = Yii::getAlias('@common/uploads');
+                $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
+                $fileName = 'import_'.'.'.$file->extension;
+                $filePath = $baseUploadPath.'/'.$model->id.'/'.$fileName;
+
+                // Create directory if not exists
+                if (!file_exists(dirname($filePath))) {
+                    mkdir(dirname($filePath), 0777, true);
+                }
+
+                $file->saveAs($filePath);
+
+            }
+            if ($model->save()){
+                $model->type == "Agreement" ? $this->importExcel($filePath, $model) : $this->importExcelActivity($filePath);
+                return $this->redirect(['index']);
+            }
+
+        }
+        return $this->renderAjax('import', ['model' => $model]);
+
+    }
+
+    public function importExcel($filePath, $model)
     {
 
-        $inputFile = Yii::getAlias('@backend/uploads/moumoa.xlsx');
-        $to = 'IO';
+        $to = $model->import_from;
         try {
-            $spreadsheet = IOFactory::load($inputFile);
+            $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
             unset($sheetData[1]);
 
@@ -389,8 +422,6 @@ class AgreementController extends Controller
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
-            // You can redirect the user to another page or render a view here
-            return $this->redirect(['index']); // Redirect to index or wherever you want
         } catch (Exception $e) {
             var_dump($e);
           die();
@@ -403,9 +434,8 @@ class AgreementController extends Controller
         return str_replace(["\r\n", "\n", "\r"], "</br>", $value);
     }
 
-    public function actionImportExcelActivity()
+    public function importExcelActivity($filePath)
     {
-        $inputFile = Yii::getAlias('@backend/uploads/activity.xlsx');
         $input_string = "ALUMNI - International Islamic Fiqh Academy, Saudi Arabia (19/09/2025)";
         $parts = explode('-', $input_string);
 
@@ -418,7 +448,7 @@ class AgreementController extends Controller
 
 
         try {
-            $spreadsheet = IOFactory::load($inputFile);
+            $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
             unset($sheetData[1]);
 

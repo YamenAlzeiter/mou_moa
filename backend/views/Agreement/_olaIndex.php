@@ -24,9 +24,8 @@ use yii\widgets\Pjax;
 //    'filterModel' => $searchModel,
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
         'rowOptions' => function($model){
-            if($model->status == 1 || $model->status == 21 || $model->status == 31 || $model->status == 41 || $model->status == 61){
-                return ['class' => 'need-action fw-bolder'];
-            }
+            $build = new builders();
+            return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder']: [];
         },
         'columns' => [
             'id',
@@ -60,13 +59,9 @@ use yii\widgets\Pjax;
                     },
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
-                        if($model->status == 1 ||
-                            $model->status == 21 || $model->status == 31 ||
-                            $model->status == 41 || $model->status == 61) {
-                            return $build->actionBuilder($model, 'update');
-                        } else {
-                            return null;
-                        }
+
+                            return $build->tableProbChanger($model->status, 'OLA') ? $build->actionBuilder($model, 'update'): null;
+
                     },
                 ],
             ],

@@ -17,8 +17,6 @@ $this->title = 'Agreements';
 ?>
 
 
-
-
 <?php modal::begin([
     'title' => '',
     'id' => 'modal',
@@ -48,7 +46,7 @@ modal::end();
 //        'dataColumnClass' => 'common\helpers\customColumClass',
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '], 'summary' => '',
         'rowOptions' => function($model){
-        if($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 11){
+        if($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 11 || $model->status == 81){
             return ['class' => 'need-action fw-bolder'];
         }
         },
@@ -74,30 +72,19 @@ modal::end();
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
-                        if ($model->status == null || $model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43) {
-                            return $build->actionBuilder($model, 'update');
-                        } else {
-                            return null;
-                        }
+                        return $build->tableProbChanger($model->status, 'Applicant') ? $build->actionBuilder($model, 'update') : null;
                     }, 'MCOMDate' => function ($url, $model, $key) {
                         $build = new builders();
-                        if ($model->status == 11) {
-                            return $build->actionBuilder($model, 'MCOM Date');
-                        } else {
-                            return null;
-                        }
+                        return $build->tableProbChanger($model->status, 'ApplicantMCOM') ? $build->actionBuilder($model, 'MCOM Date') : null;
+                    },'addActivity' => function ($url, $model, $key) {
+                        $build = new builders();
+                        return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'Add Activity',) : null;
                     }, 'view' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->actionBuilder($model, 'view');
                     }, 'log' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->actionBuilder($model, 'log');
-                    },
-                    'addActivity' => function ($url, $model, $key) {
-                        $build = new builders();
-                        if($model->status == 100) {
-                            return $build->actionBuilder($model, 'Add Activity',);
-                        } else return null;
                     },
                 ],
             ],

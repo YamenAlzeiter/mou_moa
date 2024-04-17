@@ -41,7 +41,13 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 <section id = "section-1" class = "form-section d-none">
     <h2 class="my-4">Student Mobility for Credited</h2>
     <div class = "row align-items-center">
-        <div class = "col-lg-2"><?= $form->field($model, 'type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?></div>
+        <div class = "col-lg-2">
+            <?= $form->field($model, 'type', ['template' => $templateRadio,  'labelOptions' => ['class' => 'form-label']])
+                ->inline(true)->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound']);
+            ?>
+
+
+        </div>
         <div class = "col-lg-6">
             <?= $form->field($model, 'number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
@@ -51,7 +57,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     </div>
     <div class = "row">
         <div class = "col-lg-4">
-            <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
+            <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3'], ['prompt' => 'Select Semester']) ?>
         </div>
         <div class = "col-lg-4">
             <?= $form->field($model, 'year')->textInput(['type' => 'date', 'placeholder' => ''])?>
@@ -69,7 +75,10 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 <section id = "section-2" class = "form-section d-none">
     <h2 class="my-4">Student Mobility for Non-Credited</h2>
     <div class = "row align-items-center">
-        <div class = "col-lg-2"><?= $form->field($model, 'type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?></div>
+        <div class = "col-lg-2">
+            <?= $form->field($model, 'non_type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])
+                     ->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?>
+        </div>
         <div class = "col-lg-6">
             <?= $form->field($model, 'non_number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
@@ -235,7 +244,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 
 
     $(document).ready(function() {
-        var sectionMap = {
+        const sectionMap = { // Use const for constant data
             'Student Mobility for Credited': '1',
             'Student Mobility Non-Credited': '2',
             'Staff Mobility (Inbound)': '3',
@@ -249,28 +258,30 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         };
 
         $('#activities-activity_type').change(function() {
-            var selectedOption = $(this).val();
-            var sectionNumber = sectionMap[selectedOption];
-            updateSection('section-' + sectionNumber)
+            const selectedOption = $(this).val();
+            const sectionNumber = sectionMap[selectedOption];
+
+            // Reset previous section (more efficient than a general reset)
+            const prevSection = $('.form-section:not(.d-none)');
+            prevSection.addClass('d-none');
+            prevSection.find('input, select, textarea').prop('required', false);
+            prevSection.find('input, select, textarea').val('');  // Clear values
+            prevSection.find('input[type="radio"], input[type="checkbox"]').prop('checked', false); // Reset checkboxes/radios
+
+            // Show selected section
+            const currentSection = $('#section-' + sectionNumber);
+            currentSection.removeClass('d-none');
+            currentSection.find('input, select, textarea').prop('required', true);
+
+            // Input Validation Event Listener - attach to new section's inputs
+            currentSection.find('input').on('blur', function() {
+                const isEmpty = $(this).val().trim() === '';
+                $(this).toggleClass('is-invalid', isEmpty);
+            });
         });
     });
 
-    function updateSection(sectionIdSelector) {
-        $('.form-section').addClass('d-none');
 
-        $('#' + sectionIdSelector).removeClass('d-none');
-        $('#' + sectionIdSelector).find('input').prop('required', true);
-
-        // Add event listener for blur on input fields
-        $('#' + sectionIdSelector).find('input').on('blur', function() {
-            // Check if the input field is empty
-            if ($(this).val().trim() === '') {
-                $(this).addClass('is-invalid'); // Add is-invalid class
-            } else {
-                $(this).removeClass('is-invalid'); // Remove is-invalid class if it's not empty
-            }
-        });
-    }
 
 
 </script>

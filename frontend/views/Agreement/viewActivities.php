@@ -41,6 +41,10 @@ foreach ($model as $activity) {
                     'label' => 'Semester',
                     'value' => $activity->semester,
                 ],
+                [
+                    'label' => 'Year',
+                    'value' => $activity->year
+                ]
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
 
@@ -52,23 +56,27 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Type',
-                    'value' => $activity->type,
+                    'value' => $activity->non_type,
                 ],
                 [
                     'label' => 'Number of Students',
-                    'value' => $activity->number_students,
+                    'value' => $activity->non_number_students,
                 ],
                 [
                     'label' => 'Name of Students',
-                    'value' => $activity->name_students,
+                    'value' => $activity->non_name_students,
                 ],
                 [
                     'label' => 'Semester',
-                    'value' => $activity->semester,
+                    'value' => $activity->non_semester,
+                ],
+                [
+                    'label' => 'Year',
+                    'value' => $activity->non_year,
                 ],
                 [
                     'label' => 'Program Name',
-                    'value' => $activity->program_name,
+                    'value' => $activity->non_program_name,
                 ],
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
@@ -79,15 +87,14 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Number of Staff',
-                    'value' => $activity->number_of_staff,
+                    'value' => $activity->in_number_of_staff,
                 ],
                 [
                     'label' => 'Staff Name',
-                    'value' => $activity->staffs_name,
-                ],
-                [
+                    'value' => $activity->in_staffs_name,
+                ], [
                     'label' => 'Department Office',
-                    'value' => $activity->department_office,
+                    'value' => $activity->in_department_office,
                 ],
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
@@ -98,16 +105,13 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Number of Staff',
-                    'value' => $activity->number_of_staff,
+                    'value' => $activity->out_number_of_staff,
                 ],
                 [
                     'label' => 'Staff Name',
-                    'value' => $activity->staffs_name,
+                    'value' => $activity->out_staffs_name,
                 ],
-                [
-                    'label' => 'Department Office',
-                    'value' => $activity->department_office,
-                ],
+
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }elseif($activity->activity_type === 'Seminar/Conference/Workshop/Training'){

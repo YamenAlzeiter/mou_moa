@@ -45,6 +45,7 @@ use yii\helpers\FileHelper;
  * @property string|null $doc_re_draft
  * @property string|null $doc_final
  * @property string|null $doc_extra
+ * @property string|null $doc_executed
  * @property string|null $reason
  * @property string|null $transfer_to
  * @property Activities[] $activities
@@ -79,7 +80,7 @@ class Agreement extends ActiveRecord
             [['pi_email', 'col_email'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
             [['status'], 'default', 'value' => null], [['status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'doc_executed', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
@@ -123,6 +124,7 @@ class Agreement extends ActiveRecord
             'doc_re_draft' => 'Document Re-Draft',
             'doc_final' => 'Document Final',
             'doc_extra' => 'Document Extra',
+            'doc_executed' => 'Document Executed',
             'reason' => 'Reason',
             'transfer_to' => 'direction',
             'agreement_type' => 'type',

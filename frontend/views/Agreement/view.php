@@ -121,6 +121,7 @@ modal::end();
     <?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
     <?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
     <?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_re_draft, 'Draft'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_final, 'Final Draft'); ?>
     <?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
+    <?php echo $build->downloadLinkBuilder($model->doc_executed, 'Executed Agreement'); ?>
 </div>

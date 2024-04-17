@@ -18,10 +18,12 @@ body{
 .btn-crete:hover{
     background: #0a3622;
 }
-.need-action{
-    --bs-table-striped-bg: #FEF2F2 !important;
+.table-striped > tbody > tr.need-action {
+    --bs-table-striped-bg: #FEFDF2 !important;
+    --bs-table-bg: #FEFDF2 !important;
+    border-top: 1px black solid;
+    border-bottom: 1px black solid
 }
-
 .table-header-flex > thead > tr > th > a {
     display: flex;
     justify-content: space-between;
