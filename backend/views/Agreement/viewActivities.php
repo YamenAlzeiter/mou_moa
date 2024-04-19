@@ -14,7 +14,7 @@ use common\models\Activities;
 
 foreach ($model as $activity) {
 
-    $title = "<p class='title_tool_tip'>Created By: " .$activity->name. "</p><p class='title_tool_tip'>Staff Number: " . $activity->name . "</p>";
+    $title = "<p>Created By: " .$activity->name. " </p> <p> Number: " . $activity->staff_number . "</p>";
     // Check activity type and render content accordingly
     if ($activity->activity_type === 'Student Mobility for Credited') {
         
@@ -35,7 +35,8 @@ foreach ($model as $activity) {
                 ],
                 [
                     'label' => 'Name of Students',
-                    'value' => $activity->name_students,
+                    'value' => nl2br($activity->name_students),
+                    'format' => 'raw'
                 ],
                 [
                     'label' => 'Semester',
@@ -52,23 +53,20 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Type',
-                    'value' => $activity->type,
+                    'value' => $activity->non_type,
                 ],
                 [
                     'label' => 'Number of Students',
-                    'value' => $activity->number_students,
+                    'value' => $activity->non_number_students,
                 ],
                 [
                     'label' => 'Name of Students',
-                    'value' => $activity->name_students,
-                ],
-                [
-                    'label' => 'Semester',
-                    'value' => $activity->semester,
+                    'value' => nl2br($activity->non_name_students),
+                    'format' => 'raw'
                 ],
                 [
                     'label' => 'Program Name',
-                    'value' => $activity->program_name,
+                    'value' => $activity->non_program_name,
                 ],
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
@@ -79,15 +77,15 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Number of Staff',
-                    'value' => $activity->number_of_staff,
+                    'value' => $activity->in_number_of_staff,
                 ],
                 [
                     'label' => 'Staff Name',
-                    'value' => $activity->staffs_name,
+                    'value' => $activity->in_staffs_name,
                 ],
                 [
                     'label' => 'Department Office',
-                    'value' => $activity->department_office,
+                    'value' => $activity->in_department_office,
                 ],
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
@@ -98,15 +96,11 @@ foreach ($model as $activity) {
             'attributes' => [
                 [
                     'label' => 'Number of Staff',
-                    'value' => $activity->number_of_staff,
+                    'value' => $activity->out_number_of_staff,
                 ],
                 [
                     'label' => 'Staff Name',
-                    'value' => $activity->staffs_name,
-                ],
-                [
-                    'label' => 'Department Office',
-                    'value' => $activity->department_office,
+                    'value' => $activity->out_staffs_name,
                 ],
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);

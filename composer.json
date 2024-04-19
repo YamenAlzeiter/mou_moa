@@ -21,8 +21,7 @@
         "mihaildev/yii2-ckeditor": "*",
         "itstructure/yii2-ckeditor": "~1.1.6",
         "phpoffice/phpspreadsheet": "^2.0",
-        "perminder-klair/yii2-dropzone": "dev-master"
-
+        "nesbot/carbon": "^2.72"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

@@ -50,7 +50,7 @@ class statusLable
             91 =>  ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
             100 => ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
             92 =>  ['badge' => 'bg-danger-subtle  text-success', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
-            102 => ['badge' => 'bg-danger-subtle  text-success', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+            102 => ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
         ];
 
         $default = ['badge' => 'bg-danger-subtle text-danger', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];
@@ -64,7 +64,7 @@ class statusLable
 
     public function statusBadgeClass($status)
     {
-        return 'badge fw-bolder fs-7 d-inline-flex align-items-center justify-content-between mw-pill rounded-2 ' . $this->getStatusClasses($status, 'badge');
+        return 'badge fw-bolder fs-7 gap-2 d-inline-flex align-items-center justify-content-between mw-pill rounded-2 ' . $this->getStatusClasses($status, 'badge');
     }
 
     public function statusDotClass($status)

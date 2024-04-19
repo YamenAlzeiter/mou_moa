@@ -46,9 +46,10 @@ modal::end();
 //        'dataColumnClass' => 'common\helpers\customColumClass',
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '], 'summary' => '',
         'rowOptions' => function($model){
-        if($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 11 || $model->status == 81){
-            return ['class' => 'need-action fw-bolder'];
-        }
+            $build = new builders();
+            return $build->tableProbChanger($model->status, 'Applicant')
+                || $build->tableProbChanger($model->status, 'MCOM')
+                 ? ['class' => 'need-action fw-bold']: [];
         },
         'columns' => [
             'id',

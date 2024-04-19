@@ -1,21 +1,34 @@
 <?php
 
 use common\helpers\builders;
-use common\models\Agreement;
+use yii\bootstrap5\Modal;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
-use yii\helpers\Url;
-use yii\widgets\Pjax;
-
 
 /** @var yii\web\View $this */
 /** @var common\models\search\AgreementSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 ?>
 
+<?php modal::begin([
+    'title' => '',
+    'id' => 'modal',
+    'size' => 'modal-xl',
+    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
+    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
+    'centerVertical' => true,
+    'scrollable' => true,
+    'footer' =>  '&nbsp;',
+]);
 
+echo "<div id='modalContent'></div>";
 
-<?= $this->render('_search', ['model' => $searchModel]); ?>
+modal::end();
+?>
+
+<div class="mt-5">
+    <?= $this->render('_search', ['model' => $searchModel]); ?>
+</div>
 
 <div class="table-responsive">
 
@@ -36,6 +49,8 @@ use yii\widgets\Pjax;
             ],
             'country',
             'pi_kulliyyah',
+            'sign_date',
+            'end_date',
             'agreement_type',
             [
                 'label' => 'Status',
@@ -48,21 +63,11 @@ use yii\widgets\Pjax;
             ],
             [
                 'class' => ActionColumn::className(),
-                'template' => '{update}{view}{log}',
+                'template' => '{view}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->actionBuilder($model, 'view');
-                    },
-                    'log' => function ($url, $model, $key) {
-                        $build = new builders();
-                        return $build->actionBuilder($model, 'log');
-                    },
-                    'update' => function ($url, $model, $key) {
-                        $build = new builders();
-
-                            return $build->tableProbChanger($model->status, 'OLA') ? $build->actionBuilder($model, 'update'): null;
-
                     },
                 ],
             ],

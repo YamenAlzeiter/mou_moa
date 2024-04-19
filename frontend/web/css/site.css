@@ -70,13 +70,11 @@ body{
 .mw-pill{
     min-width: 5.5rem;
 }
-.title_tool_tip{
+
+.tooltip-inner > p{
     margin-bottom: 0;
-    font-size: 16px;
 }
-.tooltip-inner {
-    max-width: 250px !important;
-}
+
 .add-btn{
     position: absolute;
     bottom: 3.5rem;

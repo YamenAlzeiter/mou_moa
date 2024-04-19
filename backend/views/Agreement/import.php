@@ -25,17 +25,19 @@ $templateFileInput = '<div class="col align-items-center">
 ]); ?>
 <h3>INSTRUCTION</h3>
 <ul>
-    <li>instructions of how to use import</li>
-    <li>maybe provide staff with template or example</li>
-    <li>instruction</li>
-    <li>instruction</li>
+    <li>Choose between Activity or Agreement</li>
+    <li>if you're importing activities, you should follow this <a href="">Template</a></li>
+    <li>if you're importing Agreement, you should follow this <a href="">Template</a></li>
+    <li>Use consistent date formatting (DD/MM/YYYY) throughout your document. Dates that renew after a period or are open-ended may cause errors.</li>
 </ul>
 <div class="row">
     <div class="col-md">
         <?= $form->field($model, 'type')->dropDownList(['Activity' => 'Activity', 'Agreement' => 'Agreement'], ['prompt' => 'Select an Option'])?>
+
         </div>
     <div class="col-md">
-        <?= $form->field($model,'import_from')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'Select an Option'])?>
+        <?= $form->field($model, 'import_from')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false)?>
+<!--        --><?php //= $form->field($model,'import_from')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'Select an Option'])?>
     </div>
     </div>
 <?= $form->field($model, 'importedFile', ['template' => $templateFileInput])->fileInput()->label('Document')->label(false) ?>

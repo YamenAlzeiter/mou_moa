@@ -10,7 +10,7 @@ class builders
 {
     public function tableProbChanger($status, $viewer){
         switch ($viewer){
-            case 'Applicant'         : return in_array($status, [2, 12, 33, 43, 81, 11]);
+            case 'Applicant'         : return in_array($status, [2, 12, 33, 43, 81, 110]);
             case 'ApplicantMCOM'     : return in_array($status, [11]);
             case 'ApplicantActivity' : return in_array($status, [100, 91]);
             case 'OSC'               : return in_array($status, [10, 51, 15, 72]);
@@ -24,7 +24,7 @@ class builders
         $textClass = $statusHelper->statusDotClass($status);
         $tag = $statusHelper->statusTag($status);
         $description = $statusHelper->statusDescription($status);
-        $title = "<p class='title_tool_tip'>$description</p>";
+        $title = "$description";
         return <<<HTML
                     <div class='$padgeClass status-w $options'>
                         <p class="m-0 fs-4">$tag</p>
@@ -32,7 +32,7 @@ class builders
                            data-bs-toggle='tooltip'
                            data-bs-placement='bottom'
                            data-bs-html='true'
-                           title="  $title  "></i>
+                           title=" $title  "></i>
                     </div>
                 HTML;
     }

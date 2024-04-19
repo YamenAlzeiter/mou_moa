@@ -274,6 +274,21 @@ $modal-show-transform:              none;
 $modal-transition:                  transform .3s ease-out;
 $modal-scale-transform:             scale(1.02);
 
+//tool tip
+
+$tooltip-font-size:                 map-get($font-sizes, 4);
+$tooltip-max-width:                 500px;
+$tooltip-color:                     $white;
+$tooltip-bg:                        $black;
+$tooltip-border-radius:             $border-radius;
+$tooltip-opacity:                   .9;
+$tooltip-padding-y:                 $spacer * .25;
+$tooltip-padding-x:                 $spacer * .5;
+$tooltip-margin:                    0;
+
+$tooltip-arrow-width:               .8rem;
+$tooltip-arrow-height:              .4rem;
+$tooltip-arrow-color:               $tooltip-bg;
 
 
 @import "../../../vendor/bower-asset/bootstrap/scss/bootstrap";

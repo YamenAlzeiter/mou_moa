@@ -30,21 +30,58 @@ class AgreementController extends Controller
     {
         return [
             'access' => [
-                'class' => AccessControl::class, 'rules' => [
+                'class' => AccessControl::class,
+                'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'view', 'create', 'downloader', 'log', 'view-activities', 'add-activity'
-                        ], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity'
+                        ],
+                        'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
                     ],
+                    [
+                        'actions' => ['public-index', 'view-activities', 'view'],
+                        'allow' => true,
+                    ],
+
                 ],
-            ], 'verbs' => [
-                'class' => VerbFilter::class, 'actions' => [
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => [
                     'logout' => ['post'],
                 ],
             ],
         ];
     }
 
+
+    /**
+     * Lists all Agreement models.
+     *
+     * @return string
+     * @return Response
+     */
+    public function actionPublicIndex()
+    {
+        $searchModel = new AgreementSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
+
+
+        $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
+
+        $dataProvider->query->andWhere(['status' => 100])->orWhere(['status' => 91]);
+        $dataProvider->pagination = [
+            'pageSize' => 11,
+        ];
+        if (Yii::$app->user->isGuest) {
+            return $this->render('publicIndex', [
+                'searchModel' => $searchModel, 'dataProvider' => $dataProvider,
+            ]);
+        } else {
+            return $this->redirect('agreement/index');
+        }
+    }
 
     /**
      * Lists all Agreement models.
@@ -70,38 +107,8 @@ class AgreementController extends Controller
         } else {
             return throw new ForbiddenHttpException("You need to login in order to have access to this page");
         }
-
-        //---updates the grid view asynchronously, in case database table updated---\\
-
-//            if(Yii::$app->request->isAjax){
-//                Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-//                return ['content' => $this->renderAjax('index', [
-//                    'searchModel' => $searchModel,
-//                    'dataProvider' => $dataProvider,
-//                ])];
-//            }
-
     }
 
-    /**
-     * Checks for updates in the database and sends a JSON response indicating if updates are available.
-     *
-     * This action is typically used for asynchronous updates in the client-side (browser). It's triggered
-     * periodically (e.g., using polling) to check if there have been any changes in the relevant database
-     * table.
-     *
-     * commented because it might be heavy for the server
-     *
-     * @return Response A JSON response containing a single key-value pair:
-     *   - `hasUpdates`: (bool) Indicates whether there are new updates in the database.
-     */
-
-//    public function actionCheckForUpdates()
-//    {
-//        $hasUpdates = true;
-//
-//        return $this->asJson(['hasUpdates' => $hasUpdates]);
-//    }
 
     /**
      * Displays a single Agreement model.
@@ -112,16 +119,14 @@ class AgreementController extends Controller
     public function actionView($id)
     {
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
-        if (!Yii::$app->user->isGuest) {
+
             if (!Yii::$app->request->isAjax) {
                 return throw new ForbiddenHttpException('You are not authorized  to access this page!');
             }
             return $this->renderAjax('view', [
                 'model' => $this->findModel($id), 'haveActivity' => $haveActivity
             ]);
-        } else {
-            return throw new ForbiddenHttpException("You need to login in order to have access to this page");
-        }
+
 
     }
 
@@ -151,7 +156,7 @@ class AgreementController extends Controller
     {
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => 99,
             ], 'sort' => [
                 'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
             ],
@@ -182,14 +187,12 @@ class AgreementController extends Controller
     public function actionViewActivities($id)
     {
         $model = Activities::find()->where(['agreement_id' => $id])->all();
-        if (!Yii::$app->user->isGuest) {
+
 
             return $this->renderAjax('viewActivities', [
                 'model' => $model,
             ]);
-        } else {
-            return throw new ForbiddenHttpException("You need to login in order to have access to this page");
-        }
+
 
     }
 
@@ -255,11 +258,12 @@ class AgreementController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-
+        $oldStatus = $model->status;
         if ($this->request->isPost && $model->load($this->request->post())) {
 
 
-            $model->status = $this->request->post('checked');
+            $model->status = $oldStatus != 110 ? $this->request->post('checked'): $model->status;
+
             if ($model->save(false)) {
                 $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
                 $this->fileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'doc_executed');

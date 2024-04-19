@@ -66,9 +66,11 @@ body{
     margin-bottom: 0;
     font-size: 16px;
 }
-.tooltip-inner {
-    max-width: 250px !important;
+
+.tooltip-inner > p{
+    margin-bottom: 0;
 }
+
 main > .container, main > .container-fluid
 {
     padding: 75px 15px 20px;

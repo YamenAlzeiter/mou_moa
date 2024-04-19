@@ -22,11 +22,11 @@ class m240320_043149_create_activities_table extends Migration
             'activity_type' => $this->string(522),
 
             //Student Mobility for Credited
-            'type'            => $this->string(10),
-            'number_students' => $this->integer(3),
-            'name_students'   => $this->text    (),
-            'semester'        => $this->string(10),
-            'year'            => $this->string    (),
+            'type'              => $this->string(10),
+            'number_students'   => $this->integer(3),
+            'name_students'     => $this->text    (),
+            'semester'          => $this->string(10),
+            'year'              => $this->string    (),
 
             //Student Mobility for Non_Credited
             'non_type'            => $this->string(10),
@@ -37,27 +37,27 @@ class m240320_043149_create_activities_table extends Migration
             'non_program_name'    => $this->string(522), //only for non-Credited
 
             //Staff Mobility (Inbound)
-            'in_number_of_staff' => $this->integer(3),
-            'in_staffs_name' => $this->text(),
-            'in_department_office' => $this->string(100),
+            'in_number_of_staff'    => $this->integer(3),
+            'in_staffs_name'        => $this->text(),
+            'in_department_office'  => $this->string(100),
 
             //Staff Mobility (Outbound)
-            'out_number_of_staff' => $this->integer(3),
-            'out_staffs_name' => $this->text(),
+            'out_number_of_staff'   => $this->integer(3),
+            'out_staffs_name'       => $this->text(),
 
             //Seminar/Conference/Workshop/Training
-            'scwt_name_of_program' => $this->string(522),
-            'date_of_program' => $this->date(),
-            'program_venue' => $this->string(522),
-            'participants_number' =>$this->integer(3),
-            'name_participants_involved' => $this->string(),
+            'scwt_name_of_program'      => $this->string(522),
+            'date_of_program'           => $this->date(),
+            'program_venue'             => $this->string(522),
+            'participants_number'       =>$this->integer(3),
+            'name_participants_involved'=> $this->string(),
 
             //Research
             'research_title' => $this->text(),
 
             //Publication
             'publication_title' => $this->string(),
-            'publisher' => $this->string(),
+            'publisher'         => $this->string(),
 
             //Consultancy
             'consultancy_name' => $this->string(),

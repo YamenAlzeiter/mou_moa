@@ -51,8 +51,7 @@ use yii\widgets\Pjax;
             'id',
             'col_organization',
             'country',
-            'sign_date',
-            'end_date',
+            'pi_kulliyyah',
             'agreement_type',
             [
                 'label' => 'Status',

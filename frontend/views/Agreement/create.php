@@ -19,6 +19,7 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 <div class="row">
     <div class="col-md-4">
         <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
+
     </div>
     <div class="col-md-8">
         <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
@@ -66,7 +67,7 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
         <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
     <div class = "col-md">
-            <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select one']) ?>
+            <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select OSC']) ?>
     </div>
 </div>
 
