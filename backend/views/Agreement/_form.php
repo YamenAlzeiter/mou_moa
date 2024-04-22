@@ -1,6 +1,7 @@
 <?php
 
 
+use coderius\pell\Pell;
 use Itstructure\CKEditor\CKEditor;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
@@ -78,9 +79,11 @@ if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $mod
             </div>
         <?php endif; ?>
         <div class = "not-complete mb-4 d-none">
-            <?= $form->field($model, 'reason')->widget(CKEditor::className(), [
-                'preset' => 'basic', 'options' => ['value' => ''],
-            ])->label(false); ?>
+
+            <?= Pell::widget([
+    'model' => $model,
+    'attribute' => 'reason',
+]);?>
         </div>
     <?php endif; ?>
 

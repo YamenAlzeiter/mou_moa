@@ -27,6 +27,14 @@ use yii\helpers\FileHelper;
  * @property string|null $pi_phone_number
  * @property string|null $country
  * @property string|null $pi_email
+ * @property string|null $pi_name_extra
+ * @property string|null $pi_kulliyyah_extra
+ * @property string|null $pi_phone_number_extra
+ * @property string|null $pi_email_extra
+ * @property string|null $pi_name_extra2
+ * @property string|null $pi_kulliyyah_extra2
+ * @property string|null $pi_phone_number_extra2
+ * @property string|null $pi_email_extra2
  * @property string|null $project_title
  * @property string|null $grant_fund
  * @property string|null $sign_date
@@ -76,11 +84,19 @@ class Agreement extends ActiveRecord
     {
         return [
             [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf'],
-            [['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title', 'proposal', 'col_phone_number', 'col_email', 'pi_phone_number', 'pi_email', 'company_profile', 'grant_fund', 'member', 'transfer_to', 'agreement_type', 'country'], 'required', 'on' => 'uploadCreate'],
-            [['pi_email', 'col_email'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
+            [['finalDraft', 'oscDraft', 'olaDraft', 'fileUpload', 'col_organization',
+                'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name',
+                'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'project_title',
+                'proposal', 'col_phone_number', 'col_email', 'pi_phone_number',
+                'pi_email', 'company_profile', 'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'pi_phone_number_extra', 'pi_email_extra',
+                'pi_name_extra', 'pi_kulliyyah_extra'],
+                'required', 'on' => 'uploadCreate'],
+
+            [['pi_email', 'col_email', 'pi_email_extra', 'pi_email_extra2'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
             [['status'], 'default', 'value' => null], [['status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'doc_executed', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'doc_executed', 'transfer_to', 'agreement_type', 'country', 'pi_name_extra'        , 'pi_kulliyyah_extra'   ,  'pi_phone_number_extra', 'pi_email_extra'       , 'pi_name_extra2', 'pi_kulliyyah_extra2', 'pi_phone_number_extra2', 'pi_email_extra2'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
@@ -107,6 +123,17 @@ class Agreement extends ActiveRecord
             'pi_kulliyyah' => 'Champion',
             'pi_phone_number' => 'Phone Number',
             'pi_email' => 'Email',
+
+            'pi_name_extra' => 'Name',
+            'pi_kulliyyah_extra' => 'Champion',
+            'pi_phone_number_extra' => 'Phone Number',
+            'pi_email_extra' => 'Email',
+
+            'pi_name_extra2' => 'Name',
+            'pi_kulliyyah_extra2' => 'Champion',
+            'pi_phone_number_extra2' => 'Phone Number',
+            'pi_email_extra2' => 'Email',
+
             'project_title' => 'Project Title',
             'grant_fund' => 'Grant Fund',
             'sign_date' => 'Sign Date',
@@ -131,6 +158,7 @@ class Agreement extends ActiveRecord
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'country' => 'Country'
+
         ];
     }
 

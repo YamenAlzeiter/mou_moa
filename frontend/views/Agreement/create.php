@@ -51,13 +51,16 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 <h4>Person In Charge Details</h4>
 
 <div class = "row">
-    <div class = "col-md">
-        <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
-        <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false)?>
-        <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
+    <div class="col-md poc">
+        <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false) ?>
+        <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false) ?>
+        <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false) ?>
         <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
     </div>
-<?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
+</div>
+
+<div id="extra-pi-fields-container"></div> <button class="btn btn-lg btn-dark text-capitalize mb-3" onclick="handleAdd()" data-clicks="0">Add person in charge</button>
+    <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
 <div class = "row">
     <div class = "col-md">
         <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
@@ -88,4 +91,56 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
     <?= Html::submitButton('Submit', ['class' => 'btn btn-success', 'name'=>'checked', 'value'=> 10]) ?>
     <?php ActiveForm::end(); ?>
 </div>
+<script>
+    let clicks = 0;
+
+    function handleAdd() {
+        event.preventDefault(); // Prevent default form submission for now
+        if (clicks >= 2) {
+            alert("You can only add 2 additional people in charge.");
+            return;
+        }
+
+        const newRow = document.createElement('div');
+        newRow.classList.add('row'); // Add the "row" class
+
+        switch (clicks + 1) {
+            case 1:
+                newRow.innerHTML = `
+                <div class="col-md">
+                    <?= $form->field($model, 'pi_name_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_kulliyyah_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                </div>
+                <div class="col-md">
+                    <?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true]) ?>
+                </div>
+            `;
+                break;
+            case 2:
+                newRow.innerHTML = `
+                <div class="col-md">
+                    <?= $form->field($model, 'pi_name_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_kulliyyah_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                </div>
+                <div class="col-md">
+                    <?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true]) ?>
+                </div>
+            `;
+                break;
+        }
+
+        $('#extra-pi-fields-container').append(newRow);
+        clicks++;
+    }
+
+    // Basic form validation check
+    $('#yourFormId').on('submit', function(event) {
+        if ($(this).find('input[required]').filter(function() { return this.value === '' }).length > 0) {
+            event.preventDefault();
+            alert('Please fill in all the required fields');
+        }
+    });
+</script>
 

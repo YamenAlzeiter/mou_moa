@@ -80,6 +80,32 @@ modal::end();
             <?= $view->renderer($model->pi_email, 'Email Address', true) ?>
         </div>
     </div>
+<?php if($model->pi_name_extra != null):?>
+        <h4>1. Person In Charge Details</h4>
+        <div class = "row">
+            <div class = "col-md-6">
+                <?= $view->renderer($model->pi_name_extra, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_extra, 'Kulliyyah') ?>
+            </div>
+            <div class = "col-md-6">
+                <?= $view->renderer($model->pi_phone_number_extra, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_extra, 'Email Address', true) ?>
+            </div>
+        </div>
+    <?php endif;?>
+    <?php if($model->pi_name_extra2 != null):?>
+        <h4>2. Person In Charge Details</h4>
+        <div class = "row">
+            <div class = "col-md-6">
+                <?= $view->renderer($model->pi_name_extra2, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_extra2, 'Kulliyyah') ?>
+            </div>
+            <div class = "col-md-6">
+                <?= $view->renderer($model->pi_phone_number_extra2, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_extra2, 'Email Address', true) ?>
+            </div>
+        </div>
+    <?php endif;?>
 <?php endif; ?>
 
     <!--section additional details-->

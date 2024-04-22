@@ -96,7 +96,14 @@ class AgreementController extends Controller
         $type = Yii::$app->user->identity->type;
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
-        $dataProvider->query->andWhere(['pi_kulliyyah' => $type]);
+        $dataProvider->query->andWhere(
+            ['or',
+                ['pi_kulliyyah' => $type],
+                ['pi_kulliyyah_extra' => $type],
+                ['pi_kulliyyah_extra2' => $type]
+            ]
+        );
+
         $dataProvider->pagination = [
             'pageSize' => 11,
         ];

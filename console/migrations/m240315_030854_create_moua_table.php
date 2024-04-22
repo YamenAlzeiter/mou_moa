@@ -31,6 +31,16 @@ class m240315_030854_create_moua_table extends Migration
             'pi_phone_number' => $this->string(512),
             'pi_email' => $this->string(512),
 
+            'pi_name_extra' => $this->string(522),
+            'pi_kulliyyah_extra' => $this->string(522),
+            'pi_phone_number_extra' => $this->string(512),
+            'pi_email_extra' => $this->string(512),
+
+            'pi_name_extra2' => $this->string(522),
+            'pi_kulliyyah_extra2' => $this->string(522),
+            'pi_phone_number_extra2' => $this->string(512),
+            'pi_email_extra2' => $this->string(512),
+
             //research/ project
             'project_title' => $this->text(),
             'grant_fund' => $this->string(),

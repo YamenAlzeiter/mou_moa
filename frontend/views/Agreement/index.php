@@ -38,7 +38,16 @@ modal::end();
 
 <?php Pjax::begin(); ?>
 
-<?php echo $this->render('_search', ['model' => $searchModel]); ?>
+<div class="d-flex align-items-end justify-content-between">
+    <?= $this->render('_search', ['model' => $searchModel]); ?>
+    <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i> Add New Record', [
+        'value' => Url::to(['create']),
+        'class' => 'btn btn-lg btn-success shadow',
+        'id' => 'modalButton',
+        'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
+    ]); ?>
+
+</div>
 
 <div class="table-responsive">
     <?= GridView::widget([
@@ -53,7 +62,10 @@ modal::end();
         },
         'columns' => [
             'id',
-            'col_organization',
+            [
+                'attribute' => 'col_organization',
+                'contentOptions' => ['class' => 'truncate'],
+            ],
             [
                 'attribute' => 'created_at',
                 'label' => 'Date',
@@ -98,15 +110,6 @@ modal::end();
 </div>
 
 <?php Pjax::end(); ?>
-
-
-
-<?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i>', [
-    'value' => Url::to(['create']),
-    'class' => 'rounded-circle btn-create add-btn shadow',
-    'id' => 'modalButton',
-    'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
-]); ?>
 
 
 <!-- Enables automatic updates of the GridView every 5 seconds -->

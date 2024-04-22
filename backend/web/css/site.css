@@ -2,7 +2,18 @@
 body{
     font-family: 'Poppins', sans-serif !important;
 }
+.truncate {
+    max-width: 15rem !important;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
 
+.truncate:hover{
+    overflow: visible;
+    white-space: normal;
+    width: auto;
+}
 .btn-action{
     padding: 3px;
     background: transparent;

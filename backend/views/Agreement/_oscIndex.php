@@ -49,7 +49,11 @@ use yii\widgets\Pjax;
         },
         'columns' => [
             'id',
-            'col_organization',
+
+            [
+                'attribute' => 'col_organization',
+                'contentOptions' => ['class' => 'truncate'],
+            ],
             'country',
             'pi_kulliyyah',
             'agreement_type',

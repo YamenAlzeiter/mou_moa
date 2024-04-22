@@ -42,7 +42,10 @@ modal::end();
         },
         'columns' => [
             'id',
-            'col_organization',
+            [
+                'attribute' => 'col_organization',
+                'contentOptions' => ['class' => 'truncate'],
+            ],
             [
                 'attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/m/y'],
                 'enableSorting' => false,

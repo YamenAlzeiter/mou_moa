@@ -105,9 +105,7 @@ class AgreementController extends Controller
     {
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
         if (!Yii::$app->user->isGuest) {
-            if (!Yii::$app->request->isAjax) {
-                return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-            }
+
             return $this->renderAjax('view', [
                 'model' => $this->findModel($id), 'haveActivity' => $haveActivity
             ]);
@@ -253,23 +251,43 @@ class AgreementController extends Controller
 
         $body = $mail->body;
 
+        $poc1 = $model->pi_email_extra != '' ? $model->pi_email_extra : '';
+        $poc2 = $model->pi_email_extra2 != '' ? $model->pi_email_extra2 : '';
+
         $body = str_replace('{recipientName}', $model->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
 //        $body = str_replace('{link}', $viewLink, $body);
 
+        // Initialize the CC array
+        $ccRecipients = [];
+
+        // Add CCs if needed
+        if ($needCC) {
+            $osc = Admin::find()->where(['type' => 'IO'])->all();
+            foreach ($osc as $admin) {
+                $ccRecipients[] = $admin->email;
+            }
+        }
+
+        // Handle optional CCs
+        if ($model->pi_email_extra != '') {
+            $ccRecipients[] = $model->pi_email_extra;
+        }
+        if ($model->pi_email_extra2 != '') {
+            $ccRecipients[] = $model->pi_email_extra2;
+        }
+
+        // Compose and send the email
         $mailer = Yii::$app->mailer->compose([
             'html' => '@backend/views/email/emailTemplate.php'
         ], [
             'subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body
-        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->status == 1 ? $ola->email : $model->pi_email)->setSubject($mail->subject);
+        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
+            ->setTo($model->status == 1 ? $ola->email : $model->pi_email)
+            ->setSubject($mail->subject);
 
-        if ($needCC) {
-            foreach ($osc as $admin) {
-                $ccRecipients[] = $admin->email;
-            }
 
-            $mailer->setCc($ccRecipients);
-        }
+        $mailer->setCc($ccRecipients);
 
         $mailer->send();
     }
@@ -447,8 +465,9 @@ class AgreementController extends Controller
 
     public function importExcelActivity($filePath)
     {
+
         $input_string = "ALUMNI - International Islamic Fiqh Academy Saudi Arabia (19/09/2025)";
-        $input_string = "KLM - University of Echahid Hamma Lakhdar,Eloued, Algeria (07/11/2018)";
+
         $parts = explode('-', $input_string);
 
         // Extracting the desired part
@@ -536,49 +555,49 @@ class AgreementController extends Controller
 
             // Perform batch insert
             Yii::$app->db->createCommand()->batchInsert('activities', [
-                'agreement_id'              ,
+                'agreement_id'              ,//agreement_ID
 
-                'name'                      ,
-                'staff_number'              ,
-                'kcdio'                     ,
-                'activity_type'             ,
+                'name'                      ,//row c
+                'staff_number'              ,//row d
+                'kcdio'                     ,//row e
+                'activity_type'             ,//row g
 
-                'type'                      ,
-                'number_students'           ,
-                'name_students'             ,
-                'semester'                  ,
-                'year'                      ,
+                'type'                      ,//row i
+                'number_students'           ,//row j
+                'name_students'             ,//credited name of students
+                'semester'                  ,//row l
+                'year'                      ,//row m
 
-                'non_type'                  ,
-                'non_number_students'       ,
-                'non_name_students'         ,
-                'non_program_name'          ,
+                'non_type'                  ,//row p
+                'non_number_students'       ,//row q
+                'non_name_students'         ,//non credited name of student
+                'non_program_name'          ,//row s
 
-                'in_number_of_staff'        ,
-                'in_staffs_name'            ,
-                'in_department_office'      ,
+                'in_number_of_staff'        ,//row v
+                'in_staffs_name'            ,//row w
+                'in_department_office'      ,//row x
 
-                'out_number_of_staff'       ,
-                'out_staffs_name'           ,
+                'out_number_of_staff'       ,//row aa
+                'out_staffs_name'           ,//row ab
 
-                'scwt_name_of_program'      ,
-                'date_of_program'           ,
-                'program_venue'             ,
-                'participants_number'       ,
-                'name_participants_involved',
+                'scwt_name_of_program'      ,//row ae
+                'date_of_program'           ,//row af
+                'program_venue'             ,//row ag
+                'participants_number'       ,//row ah
+                'name_participants_involved',//row ai
 
-                'research_title'            ,
+                'research_title'            ,//row al
 
-                'publication_title'         ,
-                'publisher'                 ,
+                'publication_title'         ,//row ao
+                'publisher'                 ,//row ap
 
-                'consultancy_name'          ,
-                'project_duration'          ,
+                'consultancy_name'          ,//row as
+                'project_duration'          ,//row at
 
-                'other'                     ,
-                'date'                      ,
+                'other'                     ,//row aw
+                'date'                      ,//row ax
 
-                'justification'             ,
+                'justification'             ,//row ba
 
                 ], $batchData)->execute();
 

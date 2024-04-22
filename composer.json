@@ -18,10 +18,9 @@
         "yiisoft/yii2": "~2.0.45",
         "yiisoft/yii2-bootstrap5": "~2.0.4",
         "yiisoft/yii2-symfonymailer": "~2.0.3",
-        "mihaildev/yii2-ckeditor": "*",
-        "itstructure/yii2-ckeditor": "~1.1.6",
         "phpoffice/phpspreadsheet": "^2.0",
-        "nesbot/carbon": "^2.72"
+        "nesbot/carbon": "^2.72",
+        "coderius/yii2-pell-widget": "~1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
