@@ -7,6 +7,7 @@ use backend\assets\AppAsset;
 use common\widgets\Alert;
 use yii\bootstrap5\Breadcrumbs;
 use yii\bootstrap5\Html;
+use yii\bootstrap5\Modal;
 use yii\bootstrap5\Nav;
 use yii\bootstrap5\NavBar;
 use yii\web\JqueryAsset;
@@ -38,14 +39,21 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => 'Agreements', 'url' => ['/agreement/index']],
+        ['label' => 'Agreements', 'url' => ['/agreement/index'],    'active' => in_array(\Yii::$app->controller->id, ['agreement']),],
     ];
     if (Yii::$app->user->isGuest) {
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
-    }     
+    }
+    if(Yii::$app->user->identity->type == "admin") {
+//        $menuItems[] = ['label' => 'Admin', 'url' => ['/admin']];
+        $menuItems[] = ['label' => 'Email Template', 'url' => ['/email-template'],    'active' => in_array(\Yii::$app->controller->id, ['email-template']),];
+        $menuItems[] = ['label' => 'Status', 'url' => ['/status'],    'active' => in_array(\Yii::$app->controller->id, ['status']),];
+        $menuItems[] = ['label' => 'KCDIO', 'url' => ['/kcdio'],    'active' => in_array(\Yii::$app->controller->id, ['kcdio']),];
+    }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],
         'items' => $menuItems,
+
     ]);
     if (Yii::$app->user->isGuest) {
         echo Html::tag('div',Html::a('Login',['/site/login'],['class' => ['btn btn-light login text-decoration-none']]),['class' => ['d-flex']]);
@@ -82,6 +90,21 @@ $this->registerJs(<<<JS
     });
 JS
 );
+?>
+<?php modal::begin([
+    'title' => '',
+    'id' => 'modal',
+    'size' => 'modal-xl',
+    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
+    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
+    'centerVertical' => true,
+    'scrollable' => true,
+    'footer' =>  '&nbsp;',
+]);
+
+echo "<div id='modalContent'></div>";
+
+modal::end();
 ?>
 </body>
 </html>

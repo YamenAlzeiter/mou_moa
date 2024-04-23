@@ -1,6 +1,8 @@
 <?php
 
+use common\helpers\builders;
 use common\models\Status;
+use yii\bootstrap5\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -9,37 +11,34 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Statuses';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'Status';
 ?>
 <div class="status-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Create Status', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
-
     <?php Pjax::begin(); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'status',
             'tag',
             'description',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Status $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => function ($url, $model, $key) {
+                        $build = new builders();
+
+                        return $build->buttonWithoutStatus($model, 'update', 'Update');
+
+                    },
+                ],
             ],
         ],
     ]); ?>
 
+
     <?php Pjax::end(); ?>
 
 </div>
+

@@ -30,23 +30,11 @@ if(!Yii::$app->user->isGuest){
             'searchModel' => $searchModel
         ]);
     }
+    elseif ($type == "admin"){
+        echo $this->render('_admin', [
+            'dataProvider' => $dataProvider,
+            'searchModel' => $searchModel
+        ]);
+    }
 }
-?>
-
-
-    <!--modal view IO/RMC/OIL-->
-<?php modal::begin([
-    'title' => '',
-    'id' => 'modal',
-    'size' => 'modal-xl',
-    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
-    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
-    'centerVertical' => true,
-    'scrollable' => true,
-    'footer' =>  '&nbsp;',
-]);
-
-echo "<div id='modalContent'></div>";
-
-modal::end();
 ?>

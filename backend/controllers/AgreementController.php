@@ -42,7 +42,7 @@ class AgreementController extends Controller
                     [
                         'actions' => [
                             'index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel',
-                            'import-excel-activity', 'view-activities', 'import'
+                            'import-excel-activity', 'view-activities', 'import', 'mcom'
                         ], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],
                     ],
                 ],
@@ -65,12 +65,13 @@ class AgreementController extends Controller
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         $type = Yii::$app->user->identity->type;
+
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
         // Define the statuses to be always on top
-        $type != "OLA" ? $topStatuses = [10, 51, 15, 72] : $topStatuses = [1, 21, 31, 41, 61] ;
+        $type != "OLA" ? $topStatuses = [10, 51, 15, 72] : $topStatuses = [1, 21, 31, 41, 61];
 
-        if ($type != 'OLA') {
+        if ($type != 'OLA' && $type != 'admin') {
             $dataProvider->query->andWhere(['transfer_to' => $type]);
         }
 
@@ -96,7 +97,7 @@ class AgreementController extends Controller
 
     /**
      * Displays a single Agreement model.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      * @throws ForbiddenHttpException
@@ -118,7 +119,7 @@ class AgreementController extends Controller
     /**
      * Finds the Agreement model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return Agreement the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -172,7 +173,7 @@ class AgreementController extends Controller
     /**
      * Updates an existing Agreement model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -202,6 +203,26 @@ class AgreementController extends Controller
         ]);
     }
 
+    public function actionMcom($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->status = 121;
+            if ($model->save()) {
+
+                $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
+
+                return $this->redirect(['index']);
+            }
+
+        }
+
+        return $this->renderAjax('_mcom', [
+            'model' => $model,
+        ]);
+    }
+
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
 
@@ -210,8 +231,8 @@ class AgreementController extends Controller
 
             $baseUploadPath = Yii::getAlias('@common/uploads');
             $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
-            $fileName = $model->id.'_'.$fileNamePrefix.'.'.$file->extension;
-            $filePath = $baseUploadPath.'/'.$model->id.'/'.$fileName;
+            $fileName = $model->id . '_' . $fileNamePrefix . '.' . $file->extension;
+            $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
 
             // Create directory if not exists
             if (!file_exists(dirname($filePath))) {
@@ -241,6 +262,7 @@ class AgreementController extends Controller
             51 => 3, // draft uploaded     from OLA to Applicant CC OSC
             72 => 7, // draft rejected     from OLA to OSC
             81 => 8, // final Draft uploaded from OLA to Applicant CC OSC
+            121 => 11, //MCOM Date Updated  from OLA to Applicant cc OSC
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);
@@ -319,7 +341,7 @@ class AgreementController extends Controller
     /**
      * Deletes an existing Agreement model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -349,7 +371,6 @@ class AgreementController extends Controller
     }
 
 
-
     public function actionDownloader($filePath)
     {
         Yii::$app->response->sendFile($filePath);
@@ -366,7 +387,7 @@ class AgreementController extends Controller
 
         $options = '<option value="">Select Organization</option>';
         foreach ($organizations as $organization) {
-            $options .= '<option value="'.$organization->col_organization.'">'.$organization->pi_kulliyyah.' - '.$organization->col_organization.'</option>';
+            $options .= '<option value="' . $organization->col_organization . '">' . $organization->pi_kulliyyah . ' - ' . $organization->col_organization . '</option>';
         }
 
         return ['html' => $options];
@@ -382,8 +403,8 @@ class AgreementController extends Controller
 
                 $baseUploadPath = Yii::getAlias('@common/uploads');
                 $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
-                $fileName = 'import_'.'.'.$file->extension;
-                $filePath = $baseUploadPath.'/'.$model->id.'/'.$fileName;
+                $fileName = 'import_' . '.' . $file->extension;
+                $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
 
                 // Create directory if not exists
                 if (!file_exists(dirname($filePath))) {
@@ -419,7 +440,7 @@ class AgreementController extends Controller
                     $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? $row['G'];
                     $pi_details = $this->applyExcelFormula($row['K']);
 
-                    $status = $row['L'] == "Active"? 100 : 102;
+                    $status = $row['L'] == "Active" ? 100 : 102;
 
                     $batchData[] = [
                         $row['B'],
@@ -437,17 +458,17 @@ class AgreementController extends Controller
             }
             // Perform batch insert
             Yii::$app->db->createCommand()->batchInsert('agreement', [
-                    'agreement_type',
-                    'col_organization',
-                    'country',
-                    'pi_kulliyyah',
-                    'sign_date',
-                    'end_date',
-                    'collaboration_area',
-                    'pi_details',
-                    'status',
-                    'transfer_to'
-                ], $batchData)->execute();
+                'agreement_type',
+                'col_organization',
+                'country',
+                'pi_kulliyyah',
+                'sign_date',
+                'end_date',
+                'collaboration_area',
+                'pi_details',
+                'status',
+                'transfer_to'
+            ], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
@@ -500,54 +521,54 @@ class AgreementController extends Controller
                         }
                     }
                     $credited_name_of_student = $this->applyExcelFormula($row['K']);
-                    $non_credited_name_of_student =$this->applyExcelFormula($row['R']);
+                    $non_credited_name_of_student = $this->applyExcelFormula($row['R']);
 
 
-                       $batchData[] = [
-                           $agreement_id,//ID
+                    $batchData[] = [
+                        $agreement_id,//ID
 
-                           $row['C'],  //Name
-                           $row['D'],  //Staff No
-                           $row['E'],  //KCDIOs
-                           $row['G'],  //Implementation Activities
+                        $row['C'],  //Name
+                        $row['D'],  //Staff No
+                        $row['E'],  //KCDIOs
+                        $row['G'],  //Implementation Activities
 
-                           $row['I'],  //Credited Type
-                           $row['J'],  //Credited Number of Students
-                           $credited_name_of_student,  //Credited Name of Students
-                           $row['L'],  //Credited Semester
-                           $row['M'],  //Credited Year
+                        $row['I'],  //Credited Type
+                        $row['J'],  //Credited Number of Students
+                        $credited_name_of_student,  //Credited Name of Students
+                        $row['L'],  //Credited Semester
+                        $row['M'],  //Credited Year
 
-                           $row["P"],  //Non-credited Type
-                           $row['Q'],  //Non-credited Number of Students
-                           $non_credited_name_of_student,  //Non-credited Name of Students
-                           $row['S'],  //Non-credited Name of Program
+                        $row["P"],  //Non-credited Type
+                        $row['Q'],  //Non-credited Number of Students
+                        $non_credited_name_of_student,  //Non-credited Name of Students
+                        $row['S'],  //Non-credited Name of Program
 
-                           $row['V'],  //Inbound Number of Staff Involved
-                           $row['W'],  //Inbound Name of Staff Involved
-                           $row['X'],  //Inbound Department Office
+                        $row['V'],  //Inbound Number of Staff Involved
+                        $row['W'],  //Inbound Name of Staff Involved
+                        $row['X'],  //Inbound Department Office
 
-                           $row['AA'],  //Outbound Number of Staff Involved
-                           $row['AB'], //Outbound Name of Staff Involved
+                        $row['AA'],  //Outbound Number of Staff Involved
+                        $row['AB'], //Outbound Name of Staff Involved
 
-                           $row['AE'], //SCWT Name of Program
-                           $row['AF'], //Date of the Program
-                           $row['AG'], //Venue of the Program
-                           $row['AH'], //Number of Participants
-                           $row['AI'], //Name of Participants
+                        $row['AE'], //SCWT Name of Program
+                        $row['AF'], //Date of the Program
+                        $row['AG'], //Venue of the Program
+                        $row['AH'], //Number of Participants
+                        $row['AI'], //Name of Participants
 
-                           $row['AL'], //Research Title
+                        $row['AL'], //Research Title
 
-                           $row['AO'], //Title of Publication
-                           $row['AP'], //Publisher
+                        $row['AO'], //Title of Publication
+                        $row['AP'], //Publisher
 
-                           $row['AS'], //Name of Consultancy
-                           $row['AT'], //Duration of Project
+                        $row['AS'], //Name of Consultancy
+                        $row['AT'], //Duration of Project
 
-                           $row['AW'], //Other Activity, Please Specify
-                           $row['AX'], //Other Activity, Date
+                        $row['AW'], //Other Activity, Please Specify
+                        $row['AX'], //Other Activity, Date
 
-                           $row['BA'], //No Activity, Justification
-                       ];
+                        $row['BA'], //No Activity, Justification
+                    ];
 
                 }
 
@@ -555,51 +576,51 @@ class AgreementController extends Controller
 
             // Perform batch insert
             Yii::$app->db->createCommand()->batchInsert('activities', [
-                'agreement_id'              ,//agreement_ID
+                'agreement_id',//agreement_ID
 
-                'name'                      ,//row c
-                'staff_number'              ,//row d
-                'kcdio'                     ,//row e
-                'activity_type'             ,//row g
+                'name',//row c
+                'staff_number',//row d
+                'kcdio',//row e
+                'activity_type',//row g
 
-                'type'                      ,//row i
-                'number_students'           ,//row j
-                'name_students'             ,//credited name of students
-                'semester'                  ,//row l
-                'year'                      ,//row m
+                'type',//row i
+                'number_students',//row j
+                'name_students',//credited name of students
+                'semester',//row l
+                'year',//row m
 
-                'non_type'                  ,//row p
-                'non_number_students'       ,//row q
-                'non_name_students'         ,//non credited name of student
-                'non_program_name'          ,//row s
+                'non_type',//row p
+                'non_number_students',//row q
+                'non_name_students',//non credited name of student
+                'non_program_name',//row s
 
-                'in_number_of_staff'        ,//row v
-                'in_staffs_name'            ,//row w
-                'in_department_office'      ,//row x
+                'in_number_of_staff',//row v
+                'in_staffs_name',//row w
+                'in_department_office',//row x
 
-                'out_number_of_staff'       ,//row aa
-                'out_staffs_name'           ,//row ab
+                'out_number_of_staff',//row aa
+                'out_staffs_name',//row ab
 
-                'scwt_name_of_program'      ,//row ae
-                'date_of_program'           ,//row af
-                'program_venue'             ,//row ag
-                'participants_number'       ,//row ah
+                'scwt_name_of_program',//row ae
+                'date_of_program',//row af
+                'program_venue',//row ag
+                'participants_number',//row ah
                 'name_participants_involved',//row ai
 
-                'research_title'            ,//row al
+                'research_title',//row al
 
-                'publication_title'         ,//row ao
-                'publisher'                 ,//row ap
+                'publication_title',//row ao
+                'publisher',//row ap
 
-                'consultancy_name'          ,//row as
-                'project_duration'          ,//row at
+                'consultancy_name',//row as
+                'project_duration',//row at
 
-                'other'                     ,//row aw
-                'date'                      ,//row ax
+                'other',//row aw
+                'date',//row ax
 
-                'justification'             ,//row ba
+                'justification',//row ba
 
-                ], $batchData)->execute();
+            ], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 

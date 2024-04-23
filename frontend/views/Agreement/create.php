@@ -11,6 +11,8 @@ use yii\helpers\Html;
 $this->title = 'Create';
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
 ?>
+
+<?php yii\widgets\Pjax::begin(['id' => 'log-in']) ?>
 <?php $form = ActiveForm::begin([
     'fieldConfig' => [
         'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],
@@ -89,13 +91,15 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <div class="modal-footer p-0">
     <?= Html::submitButton('Submit', ['class' => 'btn btn-success', 'name'=>'checked', 'value'=> 10]) ?>
-    <?php ActiveForm::end(); ?>
 </div>
+<?php ActiveForm::end(); ?>
+<?php yii\widgets\Pjax::end() ?>
 <script>
     let clicks = 0;
 
     function handleAdd() {
-        event.preventDefault(); // Prevent default form submission for now
+        event.preventDefault();
+
         if (clicks >= 2) {
             alert("You can only add 2 additional people in charge.");
             return;
@@ -104,43 +108,38 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
         const newRow = document.createElement('div');
         newRow.classList.add('row'); // Add the "row" class
 
+        let fieldsHtml;
         switch (clicks + 1) {
             case 1:
-                newRow.innerHTML = `
+                fieldsHtml = `
                 <div class="col-md">
-                    <?= $form->field($model, 'pi_name_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
-                    <?= $form->field($model, 'pi_kulliyyah_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_name_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Person in Charge Name (1)') ?>
+                    <?= $form->field($model, 'pi_kulliyyah_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Kulliyyah (1)') ?>
                 </div>
                 <div class="col-md">
-                    <?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
-                    <?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true]) ?>
+                    <?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true, 'type' => 'email'])->label('Email (1)') ?>
+                    <?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Phone Number (1)') ?>
                 </div>
             `;
                 break;
             case 2:
-                newRow.innerHTML = `
+                fieldsHtml = `
                 <div class="col-md">
-                    <?= $form->field($model, 'pi_name_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
-                    <?= $form->field($model, 'pi_kulliyyah_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
+                    <?= $form->field($model, 'pi_name_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Person in Charge Name (2)') ?>
+                    <?= $form->field($model, 'pi_kulliyyah_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Kulliyyah (2)') ?>
                 </div>
                 <div class="col-md">
-                    <?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])?>
-                    <?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true]) ?>
+                    <?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true, 'type' => 'email'])->label('Email (2)') ?>
+                    <?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'placeholder' => '', 'required' => true])->label('Phone Number (2)') ?>
                 </div>
             `;
                 break;
         }
 
+        newRow.innerHTML = fieldsHtml;
         $('#extra-pi-fields-container').append(newRow);
         clicks++;
     }
 
-    // Basic form validation check
-    $('#yourFormId').on('submit', function(event) {
-        if ($(this).find('input[required]').filter(function() { return this.value === '' }).length > 0) {
-            event.preventDefault();
-            alert('Please fill in all the required fields');
-        }
-    });
 </script>
 

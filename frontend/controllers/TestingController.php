@@ -1,17 +1,17 @@
 <?php
 
-namespace backend\controllers;
+namespace frontend\controllers;
 
-use common\models\Kcdio;
-use yii\data\ActiveDataProvider;
+use common\models\Testing;
+use common\models\TestingSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * KcdioController implements the CRUD actions for Kcdio model.
+ * TestingController implements the CRUD actions for Testing model.
  */
-class KcdioController extends Controller
+class TestingController extends Controller
 {
     /**
      * @inheritDoc
@@ -32,43 +32,46 @@ class KcdioController extends Controller
     }
 
     /**
-     * Lists all Kcdio models.
+     * Lists all Testing models.
      *
      * @return string
      */
     public function actionIndex()
     {
-        $dataProvider = new ActiveDataProvider([
-            'query' => Kcdio::find(),
-
-        'pagination' => [
-            'pageSize' => 50
-        ],
-        'sort' => [
-            'defaultOrder' => [
-                'kcdio' => SORT_ASC,
-            ]
-        ],
-
-        ]);
+        $searchModel = new TestingSearch();
+        $dataProvider = $searchModel->search($this->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
     }
 
     /**
-     * Creates a new Kcdio model.
+     * Displays a single Testing model.
+     * @param int $id ID
+     * @return string
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionView($id)
+    {
+        return $this->render('view', [
+            'model' => $this->findModel($id),
+        ]);
+    }
+
+    /**
+     * Creates a new Testing model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
-        $model = new Kcdio();
+        $model = new Testing();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+                return $this->redirect(['view', 'id' => $model->id]);
             }
         } else {
             $model->loadDefaultValues();
@@ -80,7 +83,7 @@ class KcdioController extends Controller
     }
 
     /**
-     * Updates an existing Kcdio model.
+     * Updates an existing Testing model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
      * @return string|\yii\web\Response
@@ -91,16 +94,16 @@ class KcdioController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['view', 'id' => $model->id]);
         }
 
-        return $this->renderAjax('update', [
+        return $this->render('update', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Deletes an existing Kcdio model.
+     * Deletes an existing Testing model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return \yii\web\Response
@@ -114,15 +117,15 @@ class KcdioController extends Controller
     }
 
     /**
-     * Finds the Kcdio model based on its primary key value.
+     * Finds the Testing model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param int $id ID
-     * @return Kcdio the loaded model
+     * @return Testing the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Kcdio::findOne(['id' => $id])) !== null) {
+        if (($model = Testing::findOne(['id' => $id])) !== null) {
             return $model;
         }
 

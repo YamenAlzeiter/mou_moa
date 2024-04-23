@@ -3,12 +3,13 @@
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
-/** @var common\models\Kcdio $model */
+/** @var common\models\Testing $model */
 
-$this->title = 'Update KCDIO: ' . $model->id;
+$this->title = 'Create Testing';
 
 ?>
-<div class="kcdio-update">
+<div class="testing-create">
+
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>

@@ -19,21 +19,30 @@ body{
     background: transparent;
     border: 0;
 }
+.btn-create{
+
+    height: 70px;
+    width:  70px;
+    border: 0;
+    background: teal;
+    color: white;
+}
+.btn-crete:hover{
+    background: #0a3622;
+}
 .table-striped > tbody > tr.need-action {
     --bs-table-striped-bg: #FEFDF2 !important;
     --bs-table-bg: #FEFDF2 !important;
     border-top: 1px black solid;
     border-bottom: 1px black solid
 }
-.btn-create{
-    height: 50px;
-    width: 50px;
-    border: 0;
-}
 .table-header-flex > thead > tr > th > a {
     display: flex;
     justify-content: space-between;
     align-items: center; /* Updated property */
+    text-decoration: none;
+}
+.table > tbody > tr > td > a{
     text-decoration: none;
 }
 .modal-inner-padding{
@@ -73,18 +82,23 @@ body{
 .mw-pill{
     min-width: 5.5rem;
 }
-.title_tool_tip{
-    margin-bottom: 0;
-    font-size: 16px;
-}
 
 .tooltip-inner > p{
     margin-bottom: 0;
 }
 
+.add-btn{
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+}
 main > .container, main > .container-fluid
 {
     padding: 75px 15px 20px;
+}
+
+.nav-link.active{
+    border-bottom: 2px solid black !important;
 }
 
 .footer {

@@ -10,9 +10,12 @@ use yii\widgets\ActiveForm;
 
 <div class="status-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'fieldConfig' => [
+            'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],
+        ],
+    ]); ?>
 
-    <?= $form->field($model, 'status')->textInput() ?>
 
     <?= $form->field($model, 'tag')->textInput(['maxlength' => true]) ?>
 

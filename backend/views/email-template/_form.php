@@ -2,6 +2,7 @@
 
 use coderius\pell\Pell;
 use Itstructure\CKEditor\CKEditor;
+use kartik\editors\Summernote;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -12,15 +13,19 @@ use yii\widgets\ActiveForm;
 
 <div class="email-template-form">
 
-    <?php $form = ActiveForm::begin(); ?>
+    <?php $form = ActiveForm::begin([
+        'fieldConfig' => [
+            'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],
+        ],
+    ]); ?>
 
     <?= $form->field($model, 'subject')->textInput(['maxlength' => true]) ?>
 
+    <?= $form->field($model, 'body')->widget(
+        CKEditor::className(),
+        ['preset' => 'basic',]
+    )->label(false)?>
 
-<?=      Pell::widget([
-    'model' => $model,
-    'attribute' => 'body',
-]);?>
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
     </div>

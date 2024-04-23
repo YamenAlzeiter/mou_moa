@@ -1,6 +1,8 @@
 <?php
 
+use common\helpers\builders;
 use common\models\Kcdio;
+use yii\bootstrap5\Modal;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -9,36 +11,47 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 
-$this->title = 'Kcdios';
-$this->params['breadcrumbs'][] = $this->title;
+$this->title = 'K/C/D/I/O';
+
 ?>
 <div class="kcdio-index">
 
-    <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Create Kcdio', ['create'], ['class' => 'btn btn-success']) ?>
-    </p>
+
 
     <?php Pjax::begin(); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
         'columns' => [
-            ['class' => 'yii\grid\SerialColumn'],
-
-            'id',
-            'kcdio',
+            [
+                    'attribute' => 'kcdio',
+                    'label' => 'KCDIO'
+            ],
             'tag',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, Kcdio $model, $key, $index, $column) {
-                    return Url::toRoute([$action, 'id' => $model->id]);
-                 }
+                'template' => '{update}',
+                'buttons' => [
+                    'update' => function ($url, $model, $key) {
+                        $build = new builders();
+
+                        return $build->buttonWithoutStatus($model, 'update', 'Update');
+
+                    },
+                ],
             ],
         ],
     ]); ?>
 
+
     <?php Pjax::end(); ?>
 
 </div>
+
+<?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i>', [
+    'value' => Url::to(['create']),
+    'class' => 'add-btn btn-create rounded-circle',
+    'id' => 'modalButton',
+    'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
+]); ?>

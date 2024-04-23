@@ -1,10 +1,7 @@
 <?php
 
 use common\helpers\builders;
-use common\models\EmailTemplate;
 use yii\bootstrap5\Modal;
-use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
@@ -23,21 +20,19 @@ $this->title = 'Email Templates';
         'dataProvider' => $dataProvider,
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
         'columns' => [
-            'id',
             'subject',
             [
                 'class' => ActionColumn::className(),
-                'template' => '{update}{view}{log}',
+                'template' => '{update}{view}',
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         $build = new builders();
-                        return $build->buttonWithoutStatus($model, 'view');
+                        return $build->buttonWithoutStatus($model, 'view',$model->subject);
                     },
-
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
 
-                        return $build->buttonWithoutStatus($model, 'update');
+                        return $build->buttonWithoutStatus($model, 'update', 'Update');
 
                     },
                 ],
@@ -48,18 +43,4 @@ $this->title = 'Email Templates';
     <?php Pjax::end(); ?>
 
 </div>
-<?php modal::begin([
-    'title' => '',
-    'id' => 'modal',
-    'size' => 'modal-xl',
-    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
-    'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
-    'centerVertical' => true,
-    'scrollable' => true,
-    'footer' =>  '&nbsp;',
-]);
 
-echo "<div id='modalContent'></div>";
-
-modal::end();
-?>

@@ -9,6 +9,7 @@ use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\search\AgreementSearch;
 use Yii;
+use yii\bootstrap5\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
@@ -233,6 +234,8 @@ class AgreementController extends Controller
         ]);
     }
 
+
+
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
         $file = UploadedFile::getInstance($model, $attribute);
@@ -310,17 +313,18 @@ class AgreementController extends Controller
 
         $osc =  Admin::findOne(['type' => $model->transfer_to]);
 
-        $body = $mail->body;
+        if ($osc!= null){
+            $body = $mail->body;
 
-        $mailer = Yii::$app->mailer->compose([
-            'html' => '@backend/views/email/emailTemplate.php'
-        ],[
-            'subject' => $mail->subject,
-            'recipientName' => $osc->username,
-            'body' => $body
-        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($osc->email)->setSubject($mail->subject);
+            $mailer = Yii::$app->mailer->compose([
+                'html' => '@backend/views/email/emailTemplate.php'
+            ],[
+                'subject' => $mail->subject,
+                'recipientName' => $osc->username,
+                'body' => $body
+            ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($osc->email)->setSubject($mail->subject);
+            $mailer->send();
+        }
 
-
-        $mailer->send();
     }
 }

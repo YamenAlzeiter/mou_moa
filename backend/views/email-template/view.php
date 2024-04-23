@@ -7,32 +7,12 @@ use yii\widgets\DetailView;
 /** @var common\models\EmailTemplate $model */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => 'Email Templates', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="email-template-view">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
-            'class' => 'btn btn-danger',
-            'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
-                'method' => 'post',
-            ],
-        ]) ?>
-    </p>
-
-    <?= DetailView::widget([
-        'model' => $model,
-        'attributes' => [
-            'id',
-            'subject',
-            'body:ntext',
-        ],
-    ]) ?>
-
+    <div class="p-4 border border-2 border-black rounded-2">
+        <h6 class="mb-0 text-black">
+            <span class="fs-2 d-block text-decoration-underline mb-2">Body</span>
+            <?= $model->body?></h6>
+    </div>
 </div>

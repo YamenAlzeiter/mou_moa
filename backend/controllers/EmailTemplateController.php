@@ -23,9 +23,6 @@ class EmailTemplateController extends Controller
             [
                 'verbs' => [
                     'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
                 ],
             ]
         );
@@ -40,16 +37,6 @@ class EmailTemplateController extends Controller
     {
         $dataProvider = new ActiveDataProvider([
             'query' => EmailTemplate::find(),
-            /*
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [
-                'defaultOrder' => [
-                    'id' => SORT_DESC,
-                ]
-            ],
-            */
         ]);
 
         return $this->render('index', [
@@ -83,7 +70,7 @@ class EmailTemplateController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         }
 
         return $this->renderAjax('update', [
@@ -91,19 +78,6 @@ class EmailTemplateController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing EmailTemplate model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
 
     /**
      * Finds the EmailTemplate model based on its primary key value.

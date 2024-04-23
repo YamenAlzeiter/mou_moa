@@ -23,10 +23,6 @@ use yii\widgets\Pjax;
         'dataProvider' => $dataProvider,
 //    'filterModel' => $searchModel,
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '], 'summary' => '',
-        'rowOptions' => function($model){
-            $build = new builders();
-            return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder']: [];
-        },
         'columns' => [
             'id',
             [
@@ -51,12 +47,9 @@ use yii\widgets\Pjax;
             ],
             [
                 'class' => ActionColumn::className(),
-                'template' => '{update}{view}{MCOMDate}{log}',
+                'template' => '{view}{log}',
                 'buttons' => [
-                    'MCOMDate' => function ($url, $model, $key) {
-                        $build = new builders();
-                        return $model->status == 21 ? $build->actionBuilder($model, 'mcom') : null;
-                    }, 'view' => function ($url, $model, $key) {
+                    'view' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->actionBuilder($model, 'view');
                     },
@@ -64,12 +57,7 @@ use yii\widgets\Pjax;
                         $build = new builders();
                         return $build->actionBuilder($model, 'log');
                     },
-                    'update' => function ($url, $model, $key) {
-                        $build = new builders();
 
-                            return $build->tableProbChanger($model->status, 'OLA') ? $build->actionBuilder($model, 'update'): null;
-
-                    },
                 ],
             ],
         ],
