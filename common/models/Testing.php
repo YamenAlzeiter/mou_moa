@@ -29,6 +29,7 @@ class Testing extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['first_name', 'last_name', 'email', 'email1'], 'required'],
             [['first_name', 'last_name', 'email', 'email1'], 'string', 'max' => 255],
         ];
     }

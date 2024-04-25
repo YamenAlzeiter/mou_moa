@@ -4,6 +4,7 @@ use common\helpers\builders;
 use yii\bootstrap5\Modal;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
+use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var common\models\search\AgreementSearch $searchModel */
@@ -25,8 +26,8 @@ echo "<div id='modalContent'></div>";
 
 modal::end();
 ?>
-
-<div class="mt-5">
+<?php Pjax::begin(); ?>
+<div class="my-3 p-3 border-2 rounded-3 bg-light-gray shadow">
     <?= $this->render('_search', ['model' => $searchModel]); ?>
 </div>
 
@@ -85,3 +86,4 @@ modal::end();
     ]); ?>
 
 </div>
+<?php Pjax::end(); ?>

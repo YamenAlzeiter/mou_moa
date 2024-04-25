@@ -52,6 +52,9 @@ class ReminderController extends Controller
                         $user->status = 110;
                         $user->save();
                     }
+                }if($currentDate > $user->end_date){
+                    $status = 112;
+                    $user->save();
                 }
             }
         }

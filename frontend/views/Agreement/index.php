@@ -21,11 +21,11 @@ $this->title = 'Agreements';
     'title' => '',
     'id' => 'modal',
     'size' => 'modal-xl',
-    'bodyOptions' => ['class' =>'modal-inner-padding-body mt-0'],
+    'bodyOptions' => ['class' => 'modal-inner-padding-body mt-0'],
     'headerOptions' => ['class' => 'modal-inner-padding justify-content-between'],
     'centerVertical' => true,
     'scrollable' => true,
-    'footer' =>  '&nbsp;',
+    'footer' => '&nbsp;',
 ]);
 
 echo "<div id='modalContent'></div>";
@@ -38,14 +38,17 @@ modal::end();
 
 <?php Pjax::begin(); ?>
 
-<div class="d-flex align-items-end justify-content-between">
-    <?= $this->render('_search', ['model' => $searchModel]); ?>
-    <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i> Add New Record', [
-        'value' => Url::to(['create']),
-        'class' => 'btn btn-lg btn-success shadow',
-        'id' => 'modalButton',
-        'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
-    ]); ?>
+<div class="my-3 p-3 rounded-3 bg-light-gray d-flex shadow justify-content-between">
+    <div class="align-items-end d-flex">
+        <?= $this->render('_search', ['model' => $searchModel]); ?>
+    </div>
+
+        <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i> Add New Record', [
+            'value' => Url::to(['create']),
+            'class' => 'btn btn-lg btn-success shadow',
+            'id' => 'modalButton',
+            'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
+        ]); ?>
 
 </div>
 
@@ -54,11 +57,11 @@ modal::end();
         'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
         'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '], 'summary' => '',
-        'rowOptions' => function($model){
+        'rowOptions' => function ($model) {
             $build = new builders();
             return $build->tableProbChanger($model->status, 'Applicant')
-                || $build->tableProbChanger($model->status, 'MCOM')
-                 ? ['class' => 'need-action fw-bold']: [];
+            || $build->tableProbChanger($model->status, 'ApplicantMCOM')
+                ? ['class' => 'need-action fw-bold'] : [];
         },
         'columns' => [
             'id',
@@ -89,7 +92,7 @@ modal::end();
                     }, 'MCOMDate' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->tableProbChanger($model->status, 'ApplicantMCOM') ? $build->actionBuilder($model, 'MCOM Date') : null;
-                    },'addActivity' => function ($url, $model, $key) {
+                    }, 'addActivity' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'Add Activity',) : null;
                     }, 'view' => function ($url, $model, $key) {

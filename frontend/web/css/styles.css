@@ -15847,9 +15847,10 @@ textarea.form-control-lg {
 }
 
 .btn-check:checked + .btn-bb, :not(.btn-check) + .btn-bb:active, .btn-bb:first-child:active, .btn-bb.active, .btn-bb.show {
-  color: var(--bs-btn-active-bg);
+  color: var(--bs-black);
   border: none;
-  border-bottom: 2px solid var(--bs-btn-active-bg);
+  background-color: var(--bs-gray-200);
 }
+
 
 /*# sourceMappingURL=styles.css.map */

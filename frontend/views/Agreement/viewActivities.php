@@ -15,7 +15,7 @@ YiiAsset::register($this);
 
 foreach ($model as $activity) {
 
-    $title = "<p>Created By: ".$activity->name."</p><p>Staff Number: ".$activity->name."</p>";
+    $title = "<p>Created By: " .$activity->name. " </p> <p> email: " . $activity->staff_number . "</p>";
     // Check an activity type and render content accordingly
     if ($activity->activity_type === 'Student Mobility for Credited') {
 

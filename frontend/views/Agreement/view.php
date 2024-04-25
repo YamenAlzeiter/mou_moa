@@ -30,34 +30,35 @@ echo "<div id='modalContent'></div>";
 modal::end();
 ?>
 
-<div class = "d-flex justify-content-between">
-    <div class = "d-flex gap-3">
-        <?= $build->pillBuilder($model->status, 'mb-3') ?>
-        <?php if (!Yii::$app->user->isGuest && $model->status == 21):?>
-            <p class="badge  fw-bolder mw-pill rounded-2 bg-dark-subtle text-light fs-5">MCOM: <span><?= Yii::$app->formatter->asDate($model->mcom_date, 'dd-MM-yyyy') ?>
+    <div class="d-flex justify-content-between">
+        <div class="d-flex gap-3">
+            <?= $build->pillBuilder($model->status, 'mb-3') ?>
+            <?php if (!Yii::$app->user->isGuest && $model->status == 21): ?>
+                <p class="badge  fw-bolder mw-pill rounded-2 bg-dark-subtle text-light fs-5">MCOM:
+                    <span><?= Yii::$app->formatter->asDate($model->mcom_date, 'dd-MM-yyyy') ?>
 </span></p>
-        <?php endif;?>
-        <span class = 'text-gray-dark fw-bolder fs-5'><?= $model->agreement_type ?></span>
+            <?php endif; ?>
+            <span class='text-gray-dark fw-bolder fs-5'><?= $model->agreement_type ?></span>
 
+        </div>
+        <?php $view->renderActionButton("Activities: $model->id", 'View Activities',
+            Url::to(['view-activities', 'id' => $model->id]), $haveActivity); ?>
     </div>
-    <?php $view->renderActionButton("Activities: $model->id", 'View Activities',
-                            Url::to(['view-activities', 'id' => $model->id]), $haveActivity); ?>
-</div>
 
-<!--section collaborator details-->
-<h4>Collaborator Details</h4>
+    <!--section collaborator details-->
+    <h4>Collaborator Details</h4>
 <?php if ($model->col_name == "" || $model->col_name == null): ?>
     <?= $view->renderer($model->col_details, 'Details') ?>
 <?php else : ?>
-    <div class = "row">
-        <div class = "col-6">
+    <div class="row">
+        <div class="col-6">
             <?= $view->renderer($model->col_name, 'Name') ?>
             <?= $view->renderer($model->col_phone_number, 'Phone Number') ?>
             <?= $view->renderer($model->col_collaborators_name, 'Collaborators Name') ?>
             <?= $view->renderer($model->col_address, 'Address') ?>
 
         </div>
-        <div class = "col-6">
+        <div class="col-6">
             <?= $view->renderer($model->col_organization, 'Organization') ?>
             <?= $view->renderer($model->col_email, 'Email Address', true) ?>
             <?= $view->renderer($model->col_wire_up, 'Wire Up') ?>
@@ -65,46 +66,72 @@ modal::end();
     </div>
 <?php endif; ?>
 
-<!--section person in charge details-->
-<h4>Person In Charge Details</h4>
+    <!--section person in charge details-->
+    <h4>Person In Charge Details</h4>
 <?php if ($model->pi_name == "" || $model->pi_name == null): ?>
     <?= $view->renderer($model->pi_details, 'Details') ?>
 <?php else : ?>
-    <div class = "row">
-        <div class = "col-md-6">
+    <div class="row">
+        <div class="col-md-6">
             <?= $view->renderer($model->pi_name, 'Name') ?>
             <?= $view->renderer($model->pi_kulliyyah, 'Kulliyyah') ?>
         </div>
-        <div class = "col-md-6">
+        <div class="col-md-6">
             <?= $view->renderer($model->pi_phone_number, 'Phone Number') ?>
             <?= $view->renderer($model->pi_email, 'Email Address', true) ?>
         </div>
     </div>
+    <?php if ($model->pi_name_extra != null): ?>
+        <h4>1. Person In Charge Details</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $view->renderer($model->pi_name_extra, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_extra, 'Kulliyyah') ?>
+            </div>
+            <div class="col-md-6">
+                <?= $view->renderer($model->pi_phone_number_extra, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_extra, 'Email Address', true) ?>
+            </div>
+        </div>
+    <?php endif; ?>
+    <?php if ($model->pi_name_extra2 != null): ?>
+        <h4>2. Person In Charge Details</h4>
+        <div class="row">
+            <div class="col-md-6">
+                <?= $view->renderer($model->pi_name_extra2, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_extra2, 'Kulliyyah') ?>
+            </div>
+            <div class="col-md-6">
+                <?= $view->renderer($model->pi_phone_number_extra2, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_extra2, 'Email Address', true) ?>
+            </div>
+        </div>
+    <?php endif; ?>
 <?php endif; ?>
 
-<!--section additional details-->
-<h4> Details</h4>
-<?= $view->renderer($model->grant_fund      , 'Fund') ?>
-<?= $view->renderer($model->member          , 'Number of Members') ?>
-<?= $view->renderer($model->proposal        , 'Proposal') ?>
-<?= $view->renderer($model->project_title   , 'Project Title') ?>
-<?= $view->renderer($model->ssm             , 'SSM') ?>
-<?= $view->renderer($model->company_profile , 'Company Profile') ?>
-<?= $view->renderer($model->mcom_date       , 'MCOM Date') ?>
-<?= $view->renderer($model->sign_date       , 'Sign Date') ?>
-<?= $view->renderer($model->end_date        , 'Expiry Date') ?>
+    <!--section additional details-->
+    <h4> Details</h4>
+<?= $view->renderer($model->grant_fund, 'Fund') ?>
+<?= $view->renderer($model->member, 'Number of Members') ?>
+<?= $view->renderer($model->proposal, 'Proposal') ?>
+<?= $view->renderer($model->project_title, 'Project Title') ?>
+<?= $view->renderer($model->ssm, 'SSM') ?>
+<?= $view->renderer($model->company_profile, 'Company Profile') ?>
+<?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
+<?= $view->renderer($model->sign_date, 'Sign Date') ?>
+<?= $view->renderer($model->end_date, 'Expiry Date') ?>
 
 
-<!--section files-->
-<h4>Files</h4>
-<div class = "d-flex gap-3">
-    <?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_final, 'Final Draft'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
-    <?php echo $build->downloadLinkBuilder($model->doc_executed, 'Executed Agreement'); ?>
-</div>
+    <!--section files-->
+    <h4>Files</h4>
+    <div class="d-flex gap-3">
+        <?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
+        <?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
+        <?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
+        <?php echo $build->downloadLinkBuilder($model->doc_final, 'Final Draft'); ?>
+        <?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
+        <?php echo $build->downloadLinkBuilder($model->doc_executed, 'Executed Agreement'); ?>
+    </div>
 
 <?php
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',

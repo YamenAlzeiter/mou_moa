@@ -9,7 +9,7 @@ use common\models\Agreement;
 /**
  * AgreementSearch represents the model behind the search form of `common\models\Agreement`.
  */
-class AgreementSearch extends Agreement
+class   AgreementSearch extends Agreement
 {
     public $full_info;
     public $applications;

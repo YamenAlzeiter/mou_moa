@@ -16,7 +16,7 @@ $this->title = 'Agreements';
 
 $type = Yii::$app->user->identity->type;
 
-
+Pjax::begin();
 if(!Yii::$app->user->isGuest){
     if($type == "IO" || $type == "RMC" || $type == "OIL"){
         echo $this->render('_oscIndex', [
@@ -37,4 +37,5 @@ if(!Yii::$app->user->isGuest){
         ]);
     }
 }
+Pjax::end();
 ?>

@@ -10,7 +10,9 @@ use common\models\Log;
 use common\models\search\AgreementSearch;
 use Yii;
 use yii\bootstrap5\ActiveForm;
+use yii\bootstrap5\Html;
 use yii\data\ActiveDataProvider;
+use yii\db\Expression;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
@@ -77,7 +79,8 @@ class AgreementController extends Controller
         ];
         if (Yii::$app->user->isGuest) {
             return $this->render('publicIndex', [
-                'searchModel' => $searchModel, 'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
             ]);
         } else {
             return $this->redirect('agreement/index');
@@ -95,6 +98,11 @@ class AgreementController extends Controller
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         $type = Yii::$app->user->identity->type;
+        $topStatuses = [2, 12, 33, 43, 81, 11];
+        $dataProvider->query->orderBy([
+            new Expression("CASE WHEN status IN (" . implode(',', $topStatuses) . ") THEN 0 ELSE 1 END"),
+            'updated_at' => SORT_DESC,
+        ]);
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
         $dataProvider->query->andWhere(
@@ -120,7 +128,7 @@ class AgreementController extends Controller
 
     /**
      * Displays a single Agreement model.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -128,12 +136,12 @@ class AgreementController extends Controller
     {
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
 
-            if (!Yii::$app->request->isAjax) {
-                return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-            }
-            return $this->renderAjax('view', [
-                'model' => $this->findModel($id), 'haveActivity' => $haveActivity
-            ]);
+        if (!Yii::$app->request->isAjax) {
+            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
+        }
+        return $this->renderAjax('view', [
+            'model' => $this->findModel($id), 'haveActivity' => $haveActivity
+        ]);
 
 
     }
@@ -141,7 +149,7 @@ class AgreementController extends Controller
     /**
      * Finds the Agreement model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return Agreement the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -156,7 +164,7 @@ class AgreementController extends Controller
 
     /**
      * Displays logs model.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return string
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -197,9 +205,9 @@ class AgreementController extends Controller
         $model = Activities::find()->where(['agreement_id' => $id])->all();
 
 
-            return $this->renderAjax('viewActivities', [
-                'model' => $model,
-            ]);
+        return $this->renderAjax('viewActivities', [
+            'model' => $model,
+        ]);
 
 
     }
@@ -213,20 +221,26 @@ class AgreementController extends Controller
     {
         $model = new Agreement();
         $model->scenario = 'uploadCreate';
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
 
-                $status = $this->request->post('checked');
-                $model->status = $status;
+        if ($this->request->isAjax && $model->load($this->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
 
-                if ($model->save(false)) {
+            $model->status = 10; //setting the initial status
+
+            $model->fileUpload = UploadedFile::getInstance($model, 'fileUpload');
+            if ($model->validate()) {
+                if ($model->save()) {
                     $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
                     $this->sendEmail($model, 5);
-                    return $this->redirect(['index']);
+                    return $this->asJson(['success' => true]);
                 }
+                $result = [];
             }
-        } else {
-            $model->loadDefaultValues();
+            foreach ($model->getErrors() as $attribute => $errors) {
+                $result[Html::getInputId($model, $attribute)] = $errors;
+            }
+
+            return $this->asJson(['validation' => $result]);
         }
 
         return $this->renderAjax('create', [
@@ -235,16 +249,15 @@ class AgreementController extends Controller
     }
 
 
-
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
-        $file = UploadedFile::getInstance($model, $attribute);
+        $file = $model->fileUpload;
         if ($file) {
 
             $baseUploadPath = Yii::getAlias('@common/uploads');
             $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
-            $fileName = $model->id.'_'.$fileNamePrefix.'.'.$file->extension;
-            $filePath = $baseUploadPath.'/'.$model->id.'/'.$fileName;
+            $fileName = $model->id . '_' . $fileNamePrefix . '.' . $file->extension;
+            $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
 
             // Create directory if not exists
             if (!file_exists(dirname($filePath))) {
@@ -258,10 +271,33 @@ class AgreementController extends Controller
         }
     }
 
+    private function sendEmail($model, $template)
+    {
+
+
+        $mail = EmailTemplate::findOne($template);
+
+        $osc = Admin::findOne(['type' => $model->transfer_to]);
+
+        if ($osc != null) {
+            $body = $mail->body;
+
+            $mailer = Yii::$app->mailer->compose([
+                'html' => '@backend/views/email/emailTemplate.php'
+            ], [
+                'subject' => $mail->subject,
+                'recipientName' => $osc->username,
+                'body' => $body
+            ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($osc->email)->setSubject($mail->subject);
+            $mailer->send();
+        }
+
+    }
+
     /**
      * Updates an existing Agreement model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -272,12 +308,12 @@ class AgreementController extends Controller
         if ($this->request->isPost && $model->load($this->request->post())) {
 
 
-            $model->status = $oldStatus != 110 ? $this->request->post('checked'): $model->status;
+            $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
 
             if ($model->save(false)) {
                 $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
                 $this->fileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'doc_executed');
-                if($model->status == 15) $this->sendEmail($model, 6);
+                if ($model->status == 15) $this->sendEmail($model, 6);
                 return $this->redirect(['index']);
             }
 
@@ -291,7 +327,7 @@ class AgreementController extends Controller
     /**
      * Deletes an existing Agreement model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param  int  $id  ID
+     * @param int $id ID
      * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
@@ -305,26 +341,5 @@ class AgreementController extends Controller
     public function actionDownloader($filePath)
     {
         Yii::$app->response->sendFile($filePath);
-    }
-    private function sendEmail($model, $template){
-
-
-        $mail = EmailTemplate::findOne($template);
-
-        $osc =  Admin::findOne(['type' => $model->transfer_to]);
-
-        if ($osc!= null){
-            $body = $mail->body;
-
-            $mailer = Yii::$app->mailer->compose([
-                'html' => '@backend/views/email/emailTemplate.php'
-            ],[
-                'subject' => $mail->subject,
-                'recipientName' => $osc->username,
-                'body' => $body
-            ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($osc->email)->setSubject($mail->subject);
-            $mailer->send();
-        }
-
     }
 }

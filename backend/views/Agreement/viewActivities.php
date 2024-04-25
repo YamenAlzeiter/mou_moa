@@ -201,10 +201,11 @@ foreach ($model as $activity) {
             ],'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     }
-
+    echo "<hr  class='mb-3 border-4 text-black'>";
 
 }
 ?>
+
 <?php
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
     ['depends' => [JqueryAsset::class]]);

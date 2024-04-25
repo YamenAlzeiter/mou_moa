@@ -57,7 +57,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'year')->textInput(['type' => 'date', 'placeholder' => ''])?>
         </div>
         <div class = "col-lg-4">
-
+Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus ad, commodi deserunt, dolores eaque eligendi eos et inventore magnam mollitia necessitatibus neque non obcaecati quae temporibus, unde voluptates voluptatibus voluptatum. Ab fuga impedit, labore magnam minima nihil officia provident reiciendis sit soluta! Ad fuga incidunt itaque labore molestias tempora veniam? A amet autem beatae, consequatur ex explicabo id laborum modi molestias nobis numquam, possimus, recusandae repellat sapiente sed temporibus unde ut vero. Fugiat nihil repudiandae vel! Amet corporis deserunt, esse expedita explicabo fugit, inventore ipsum itaque laborum, nihil non quas quasi recusandae sequi tenetur. At delectus fuga ipsa suscipit unde.
         </div>
     </div>
 

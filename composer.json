@@ -20,7 +20,8 @@
         "yiisoft/yii2-symfonymailer": "~2.0.3",
         "phpoffice/phpspreadsheet": "^2.0",
         "nesbot/carbon": "^2.72",
-        "itstructure/yii2-ckeditor": "~1.1.4"
+        "itstructure/yii2-ckeditor": "~1.1.4",
+        "dominus77/yii2-sweetalert2-widget": "2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

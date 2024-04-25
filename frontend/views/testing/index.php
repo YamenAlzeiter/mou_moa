@@ -16,6 +16,7 @@ use yii\widgets\Pjax;
 $this->title = 'Testings';
 
 ?>
+
 <div class="testing-index">
 
         <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i> Add New Record', [

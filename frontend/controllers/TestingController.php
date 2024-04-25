@@ -4,9 +4,12 @@ namespace frontend\controllers;
 
 use common\models\Testing;
 use common\models\TestingSearch;
+use dominus77\sweetalert2\Alert;
+use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * TestingController implements the CRUD actions for Testing model.
@@ -61,20 +64,38 @@ class TestingController extends Controller
     }
 
     /**
+     * Finds the Testing model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param int $id ID
+     * @return Testing the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Testing::findOne(['id' => $id])) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    /**
      * Creates a new Testing model.
      * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
+     * @return string|Response
      */
     public function actionCreate()
     {
         $model = new Testing();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isAjax && $model->load($this->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            if ($model->save()) {
+                return ['success' => true]; // Success response
+            } else {
+                return ['success' => false]; // Error response
             }
-        } else {
-            $model->loadDefaultValues();
         }
 
         return $this->renderAjax('create', [
@@ -82,11 +103,12 @@ class TestingController extends Controller
         ]);
     }
 
+
     /**
      * Updates an existing Testing model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param int $id ID
-     * @return string|\yii\web\Response
+     * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionUpdate($id)
@@ -106,7 +128,7 @@ class TestingController extends Controller
      * Deletes an existing Testing model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
-     * @return \yii\web\Response
+     * @return Response
      * @throws NotFoundHttpException if the model cannot be found
      */
     public function actionDelete($id)
@@ -114,21 +136,5 @@ class TestingController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Testing model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Testing the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Testing::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 }

@@ -40,6 +40,7 @@ class statusLable
             71 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
             10 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
             15 =>  ['badge' => 'bg-primary-subtle text-primary', 'dot' => 'text-bg-primary', 'from' => 'OSC'      , 'to' => 'Applicant'],
+            121 => ['badge' => 'bg-primary-subtle text-primary', 'dot' => 'text-bg-primary', 'from' => 'OLA'      , 'to' => 'Applicant'],
             2  =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
             12 =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
             32 =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],

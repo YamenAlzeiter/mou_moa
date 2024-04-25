@@ -437,7 +437,7 @@ class AgreementController extends Controller
             foreach ($sheetData as $row) {
 
                 if (!empty($row['A'])) {
-                    $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? $row['G'];
+                    $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? 'Error';
                     $pi_details = $this->applyExcelFormula($row['K']);
 
                     $status = $row['L'] == "Active" ? 100 : 102;
@@ -447,7 +447,7 @@ class AgreementController extends Controller
                         $row['C'],
                         $row['D'],
                         $kcdioName,
-                        $row['G'], //kulliyyah
+                        $row['G'],
                         $row['H'],
                         $row['I'],
                         $pi_details,
@@ -455,7 +455,9 @@ class AgreementController extends Controller
                         $to,
                     ];
                 }
+
             }
+
             // Perform batch insert
             Yii::$app->db->createCommand()->batchInsert('agreement', [
                 'agreement_type',
@@ -512,12 +514,22 @@ class AgreementController extends Controller
                     // Fetch all Agreements, likely needs optimization for efficiency
                     $agreements = Agreement::find()->all();
 
-                    $agreement_id = null;
+                    $similarities = []; // Map to store similarities
+
                     foreach ($agreements as $agreement) {
                         $similarity = similar_text($academy_name, $agreement->col_organization, $percent);
-                        if ($percent >= 100.0) {
-                            $agreement_id = $agreement->id;
-                            break; // Match found, stop the loop
+                        if ($percent >= 40.0) {
+                            $similarities[$agreement->id] = $percent; // Store similarity percentage
+                        }
+                    }
+
+                    // Find the agreement with the highest similarity percentage
+                    $maxSimilarity = 0;
+                    $agreement_id = null;
+                    foreach ($similarities as $agreementId => $similarityPercent) {
+                        if ($similarityPercent > $maxSimilarity) {
+                            $maxSimilarity = $similarityPercent;
+                            $agreement_id = $agreementId;
                         }
                     }
                     $credited_name_of_student = $this->applyExcelFormula($row['K']);
