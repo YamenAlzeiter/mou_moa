@@ -82,6 +82,8 @@ class m240315_030854_create_moua_table extends Migration
             'col_details' => $this->text(),
             'collaboration_area' => $this->text(),
 
+            //reminder
+            'isReminded' => $this->integer(1)->defaultValue(0),
         ]);
 
         //in case need foreign key

@@ -56,6 +56,7 @@ use yii\helpers\FileHelper;
  * @property string|null $doc_executed
  * @property string|null $reason
  * @property string|null $transfer_to
+ * @property integer|null $isReminded
  * @property Activities[] $activities
  * @property Log[] $logs
  */
@@ -100,7 +101,6 @@ class Agreement extends ActiveRecord
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member', 'needMe'], 'string', 'max' => 2],
-
         ];
     }
 
@@ -157,8 +157,8 @@ class Agreement extends ActiveRecord
             'agreement_type' => 'type',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
-            'country' => 'Country'
-
+            'country' => 'Country',
+            'isReminded' => 'Reminder Step',
         ];
     }
 

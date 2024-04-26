@@ -50,8 +50,10 @@ class statusLable
             81 =>  ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OLA'      , 'to' => 'Applicant'],
             91 =>  ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
             100 => ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
-            92 =>  ['badge' => 'bg-danger-subtle  text-success', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+            92 =>  ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
             102 => ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+
+            110 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
         ];
 
         $default = ['badge' => 'bg-danger-subtle text-danger', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];
