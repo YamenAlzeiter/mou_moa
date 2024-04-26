@@ -1,7 +1,6 @@
 <?php
 
 use common\models\McomDate;
-use Itstructure\CKEditor\CKEditor;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -22,12 +21,12 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
     <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where([
         '<', 'counter', 20
     ])->andWhere(['>', 'date', $currentDate])->all(), 'date', function ($model) {
-        return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (20 - $model->counter);
+        return 'Date: '.' '.$model->date.', available: '.' '.(20 - $model->counter);
     }), ['prompt' => 'Select a Date']) ?>
 
-<?php endif;?>
+<?php endif; ?>
 
-<div class="d-flex flex-row gap-2 mb-2 justify-content-end">
+<div class = "d-flex flex-row gap-2 mb-2 justify-content-end">
     <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
 </div>
 <?php ActiveForm::end(); ?>

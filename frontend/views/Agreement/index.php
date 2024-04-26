@@ -33,30 +33,33 @@ echo "<div id='modalContent'></div>";
 modal::end();
 ?>
 
-
-<!--    <h1>--><?php //= Html::encode($this->title) ?><!--</h1>-->
-
 <?php Pjax::begin(); ?>
 
-<div class="my-3 p-3 rounded-3 bg-light-gray d-flex shadow justify-content-between">
-    <div class="align-items-end d-flex">
-        <?= $this->render('_search', ['model' => $searchModel]); ?>
+<div class = "container-md my-3 p-3 rounded-3 bg-light shadow">
+    <div class = "row align-items-end">
+        <div class = "col-md-9 col-sm-12"> <?= $this->render('_search', ['model' => $searchModel]); ?>
+        </div>
+        <div
+            class = "col-md-3 col-sm-12 mt-3 mt-md-0"> <?= Html::button('<i class="ti ti-plus fs-7" ></i> Add New Record',
+                [
+                    'value' => Url::to(['create']),
+                    'class' => 'btn btn-lg btn-success w-100', // Adjust width as needed
+                    'id' => 'modalButton',
+                    'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');",
+                    'data-bs-toggle' => 'tooltip',
+                    'data-bs-placement' => 'top',
+                    'title' => 'Add New Record'
+                ]); ?>
+        </div>
     </div>
-
-        <?= Html::button('<i class="ti ti-plus fs-7" data-toggle="tooltip" title="view"></i> Add New Record', [
-            'value' => Url::to(['create']),
-            'class' => 'btn btn-lg btn-success shadow',
-            'id' => 'modalButton',
-            'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');"
-        ]); ?>
-
 </div>
 
-<div class="table-responsive">
+<div class = "table-responsive">
     <?= GridView::widget([
         'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
-        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '], 'summary' => '',
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '],
+        'summary' => '',
         'rowOptions' => function ($model) {
             $build = new builders();
             return $build->tableProbChanger($model->status, 'Applicant')
@@ -83,18 +86,22 @@ modal::end();
                     $statusHelper = new builders();
                     return $statusHelper->pillBuilder($model->status);
                 },
-            ], ['class' => ActionColumn::className(),
+            ], [
+                'class' => ActionColumn::className(),
                 'template' => '{view}{addActivity}{MCOMDate}{update}{log}',
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
-                        return $build->tableProbChanger($model->status, 'Applicant') ? $build->actionBuilder($model, 'update') : null;
+                        return $build->tableProbChanger($model->status, 'Applicant') ? $build->actionBuilder($model,
+                            'update') : null;
                     }, 'MCOMDate' => function ($url, $model, $key) {
                         $build = new builders();
-                        return $build->tableProbChanger($model->status, 'ApplicantMCOM') ? $build->actionBuilder($model, 'MCOM Date') : null;
+                        return $build->tableProbChanger($model->status, 'ApplicantMCOM') ? $build->actionBuilder($model,
+                            'MCOM Date') : null;
                     }, 'addActivity' => function ($url, $model, $key) {
                         $build = new builders();
-                        return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'Add Activity',) : null;
+                        return $build->tableProbChanger($model->status,
+                            'ApplicantActivity') ? $build->actionBuilder($model, 'Add Activity',) : null;
                     }, 'view' => function ($url, $model, $key) {
                         $build = new builders();
                         return $build->actionBuilder($model, 'view');

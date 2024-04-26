@@ -17,6 +17,7 @@ class AppAsset extends AssetBundle
         'css/styles.css',
     ];
     public $js = [
+        'js/sweet-alert.js',
     ];
     public $depends = [
         'yii\web\YiiAsset',

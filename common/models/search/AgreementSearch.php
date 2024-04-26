@@ -66,6 +66,7 @@ class   AgreementSearch extends Agreement
             'sign_date' => $this->sign_date,
             'end_date' => $this->end_date,
             'mcom_date' => $this->mcom_date,
+            'agreement_type' => $this->agreement_type
         ]);
 
 
@@ -97,7 +98,7 @@ class   AgreementSearch extends Agreement
             ->orFilterWhere(['ilike', 'doc_extra', $this->full_info])
             ->orFilterWhere(['ilike', 'reason', $this->full_info])
             ->orFilterWhere(['ilike', 'country', $this->full_info])
-            ->andFilterWhere(['ilike','agreement_type',$this->agreement_type]);
+            ->orFilterWhere(['ilike','agreement_type',$this->full_info]);
 
 
         if ($this->applications === 'new_applications') {
