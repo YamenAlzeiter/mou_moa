@@ -40,6 +40,9 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
+        <?= $form->field($model, 'endDate', ['options' => ['mb-0']])->dropDownList(['1 Year' => '1 Year', '6 Month' => '6 Month', '3 Month' => '3 Month', '2 Month' => '2 Month', '1 Month' => '1 Month'], ['class' => 'form-select', 'prompt' => 'Pick Type', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+        ])->label(false) ?>
         <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date', 'date'), ['prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',])->label(false) ?>
         <buttton class="btn btn-dark-light btn-sm"><i class="ti ti-search fs-7"></i></buttton>
     </div>

@@ -354,9 +354,7 @@ class AgreementController extends Controller
 
     public function actionLog($id)
     {
-        if (!Yii::$app->request->isAjax) {
-            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-        }
+
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
                 'pageSize' => 100,

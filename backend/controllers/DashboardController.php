@@ -3,8 +3,10 @@
 namespace backend\controllers;
 
 use common\models\Agreement;
+use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\search\AgreementSearch;
+use common\models\Status;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -57,9 +59,26 @@ class DashboardController extends Controller
 
         ]);
 
+        $statusDataProvider = new ActiveDataProvider([
+            'query' => Status::find(),
+            'pagination' => [
+                'pageSize' => 50
+            ],
+
+        ]);
+        $emailDataProvider = new ActiveDataProvider([
+            'query' => EmailTemplate::find(),
+            'pagination' => [
+                'pageSize' => 50
+            ],
+
+        ]);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+            'statusDataProvider' => $statusDataProvider,
+            'emailDataProvider' => $emailDataProvider,
         ]);
     }
 
@@ -76,6 +95,14 @@ class DashboardController extends Controller
         }
         return $this->renderAjax('view', [
             'model' => $this->findModel($id),
+        ]);
+    }
+
+    public function actionViewEmailTemplate($id)
+    {
+        $model = EmailTemplate::findOne($id);
+        return $this->renderAjax('viewEmailTemplate', [
+            'model' => $model,
         ]);
     }
     public function actionLog($id)
@@ -135,6 +162,30 @@ class DashboardController extends Controller
         }
 
         return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionStatusUpdate($id){
+        $model = Status::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('statusUpdate', [
+            'model' => $model,
+        ]);
+    }
+    public function actionUpdateEmailTemplate($id)
+    {
+        $model = EmailTemplate::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('updateEmailTemplate', [
             'model' => $model,
         ]);
     }

@@ -41,13 +41,18 @@ class builders
     {
         $icon = [
             'view'     => 'text-dark ti-eye              ',
+            'view-email-template'     => 'text-dark ti-eye              ',
             'delete'   => 'text-danger ti-trash             ',
             'update'   => 'text-primary ti-edit-circle         ',
+            'status-update'   => 'text-primary ti-edit-circle         ',
+            'update-email-template'     => 'text-primary ti-edit-circle           ',
             'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',
             'create'     => 'text-primary ti-eye              ',
         ];
+
+
         $header = $title == '' ? "<p class='title_tool_tip'>$type</p>" : "<p class='title_tool_tip'>$title</p>";
         return Html::button(
             '<i class="ti fs-7 ' . $icon[$type] . '" data-bs-toggle="tooltip" data-bs-placement="bottom" data-bs-html="true" title="' . $title . '"></i>',
@@ -72,6 +77,7 @@ class builders
             'view'     => 'text-dark ti-eye              ',
             'delete'   => 'text-danger ti-trash             ',
             'update'   => 'text-primary ti-edit-circle         ',
+
             'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',
@@ -91,7 +97,10 @@ class builders
             $url = 'update';
         } elseif ($type == 'Add Activity') {
             $url = 'add-activity';
-        }else $url = $type;
+        }elseif($type == 'statusUpdate') {
+            $url = 'update';
+        }else
+         $url = $type;
 
         $title = "<p class='title_tool_tip'>$type</p>";
         return Html::button(

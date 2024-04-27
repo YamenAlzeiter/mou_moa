@@ -11,8 +11,6 @@ use yii\grid\GridView;
 
 echo GridView::widget([
     'dataProvider' => $dataProvider,
-    //        'filterModel' => $searchModel,
-    //        'dataColumnClass' => 'common\helpers\customColumClass',
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '],
     'summary' => '',
     'rowOptions' => function ($model) {
