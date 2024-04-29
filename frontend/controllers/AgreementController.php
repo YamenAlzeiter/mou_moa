@@ -221,26 +221,20 @@ class AgreementController extends Controller
     {
         $model = new Agreement();
         $model->scenario = 'uploadCreate';
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post())) {
 
-        if ($this->request->isAjax && $model->load($this->request->post())) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+                $status = $this->request->post('checked');
+                $model->status = $status;
 
-            $model->status = 10; //setting the initial status
-
-            $model->fileUpload = UploadedFile::getInstance($model, 'fileUpload');
-            if ($model->validate()) {
-                if ($model->save()) {
+                if ($model->save(false)) {
                     $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
                     $this->sendEmail($model, 5);
-                    return $this->asJson(['success' => true]);
+                    return $this->redirect(['index']);
                 }
-                $result = [];
             }
-            foreach ($model->getErrors() as $attribute => $errors) {
-                $result[Html::getInputId($model, $attribute)] = $errors;
-            }
-
-            return $this->asJson(['validation' => $result]);
+        } else {
+            $model->loadDefaultValues();
         }
 
         return $this->renderAjax('create', [
@@ -273,15 +267,12 @@ class AgreementController extends Controller
 
     private function sendEmail($model, $template)
     {
-
-
         $mail = EmailTemplate::findOne($template);
 
         $osc = Admin::findOne(['type' => $model->transfer_to]);
 
         if ($osc != null) {
             $body = $mail->body;
-
             $mailer = Yii::$app->mailer->compose([
                 'html' => '@backend/views/email/emailTemplate.php'
             ], [
