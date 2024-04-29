@@ -137,8 +137,7 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
                 'maxlength' => true, 'placeholder' => ''
             ]) ?></div>
     </div>
-    <?= $form->field($model, 'executedAgreement',
-        ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?= $form->field($model, 'executedAgreement', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
 <?php elseif ($model->status == 110): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
