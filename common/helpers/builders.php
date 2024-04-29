@@ -45,6 +45,7 @@ class builders
             'delete'   => 'text-danger ti-trash             ',
             'update'   => 'text-primary ti-edit-circle         ',
             'status-update'   => 'text-primary ti-edit-circle         ',
+            'update-kcdio'   => 'text-primary ti-edit-circle         ',
             'update-email-template'     => 'text-primary ti-edit-circle           ',
             'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',

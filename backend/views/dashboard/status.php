@@ -28,7 +28,6 @@ use yii\widgets\Pjax;
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();
-
                         return $build->buttonWithoutStatus($model, 'status-update', 'Update');
 
                     },

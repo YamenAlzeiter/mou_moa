@@ -4,7 +4,9 @@ namespace backend\controllers;
 
 use common\models\Agreement;
 use common\models\EmailTemplate;
+use common\models\Kcdio;
 use common\models\Log;
+use common\models\Reminder;
 use common\models\search\AgreementSearch;
 use common\models\Status;
 use Yii;
@@ -51,12 +53,9 @@ class DashboardController extends Controller
 
         $dataProvider = new ActiveDataProvider([
             'query' => Agreement::find(),
-
             'pagination' => [
                 'pageSize' => 10
             ],
-
-
         ]);
 
         $statusDataProvider = new ActiveDataProvider([
@@ -74,11 +73,35 @@ class DashboardController extends Controller
 
         ]);
 
+        $reminderDataProvider = new ActiveDataProvider([
+            'query' => Reminder::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
+
+        $kcdioDataProvider = new ActiveDataProvider([
+            'query' => Kcdio::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
             'statusDataProvider' => $statusDataProvider,
             'emailDataProvider' => $emailDataProvider,
+            'reminderDataProvider' => $reminderDataProvider,
+            'kcdioDataProvider' => $kcdioDataProvider,
         ]);
     }
 
@@ -145,7 +168,38 @@ class DashboardController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionCreateReminder()
+    {
+        $model = new Reminder();
 
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->renderAjax('updateReminder', [
+            'model' => $model,
+        ]);
+    }
+    public function actionCreateKcdio()
+    {
+        $model = new Kcdio();
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->renderAjax('updateKcdio', [
+            'model' => $model,
+        ]);
+    }
     /**
      * Updates an existing Agreement model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -177,6 +231,17 @@ class DashboardController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionUpdateKcdio($id){
+        $model = Kcdio::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('updateKcdio', [
+            'model' => $model,
+        ]);
+    }
     public function actionUpdateEmailTemplate($id)
     {
         $model = EmailTemplate::findOne($id);
@@ -186,6 +251,19 @@ class DashboardController extends Controller
         }
 
         return $this->renderAjax('updateEmailTemplate', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionUpdateReminder($id)
+    {
+        $model = Reminder::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('updateReminder', [
             'model' => $model,
         ]);
     }
@@ -204,6 +282,13 @@ class DashboardController extends Controller
         return $this->redirect(['index']);
     }
 
+
+    public function actionDeleteReminder($id)
+    {
+        Reminder::findOne($id)->delete();
+
+        return $this->redirect(['index']);
+    }
     /**
      * Finds the Agreement model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
