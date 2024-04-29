@@ -38,7 +38,7 @@ echo GridView::widget([
         ],
         [
             'class' => ActionColumn::className(),
-            'template' => '{update}{addActivity}{view}{log}',
+            'template' => '{update}{addActivity}{view}{log}{updatePoc}',
             'buttons' => [
                 'view' => function ($url, $model, $key) {
                     $build = new builders();
@@ -52,6 +52,10 @@ echo GridView::widget([
                     $build = new builders();
                     return $build->tableProbChanger($model->status, 'OSC') ? $build->actionBuilder($model,
                         'update',) : null;
+                },
+                'updatePoc' => function ($url, $model, $key) {
+                    $build = new builders();
+                    return $build->actionBuilder($model, 'update-poc');
                 }
             ],
         ],

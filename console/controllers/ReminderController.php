@@ -30,13 +30,20 @@ class ReminderController extends Controller
             foreach ($reminders as $index => $reminder) {
                 $remindDate = $reminder->type === 'MONTH' ? $endDate->copy()->subMonths($reminder->reminder_before)->startOfDay() : $endDate->copy()->subDays($reminder->reminder_before)->startOfDay();
                 $currentDate = Carbon::now()->startOfDay();
-                var_dump($currentDate->eq($remindDate) && $user->isReminded == $index);
-                if ($currentDate->eq($remindDate) && $user->isReminded == $index && ($user->status == 91 || $user->status == 100)) {
+
+                if ($currentDate->eq($remindDate) && ($user->status == 91 || $user->status == 100)) {
                     // Send email reminder
                     $this->sendEmailReminder($user, $remindEmailTemplate);
                     $user->isReminded += 1;
                     $user->status = 110;
                     $user->save();
+                }elseif ($currentDate->greaterThan($remindDate) && ($user->status == 91 || $user->status == 110) && !($currentDate > $user->end_date)) {
+                    if( $user->isReminded == $index){
+                        $this->sendEmailReminder($user, $remindEmailTemplate);
+                        $user->isReminded += 1;
+                        $user->status = 110;
+                        $user->save();
+                    }
                 }
 
                 if ($currentDate > $user->end_date && ($user->status == 91 || $user->status == 110 || $user->status == 100)) {

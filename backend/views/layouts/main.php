@@ -49,6 +49,7 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Email Template', 'url' => ['/email-template'],    'active' => in_array(\Yii::$app->controller->id, ['email-template']),];
         $menuItems[] = ['label' => 'Status', 'url' => ['/status'],    'active' => in_array(\Yii::$app->controller->id, ['status']),];
         $menuItems[] = ['label' => 'KCDIO', 'url' => ['/kcdio'],    'active' => in_array(\Yii::$app->controller->id, ['kcdio']),];
+        $menuItems[] = ['label' => 'Administration Dashboard for OSIC', 'url' => ['/dashboard'],    'active' => in_array(\Yii::$app->controller->id, ['dashboard']),];
     }
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],

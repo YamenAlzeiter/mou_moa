@@ -11,11 +11,10 @@ use yii\widgets\Pjax;
 /** @var yii\web\View $this */
 /** @var yii\data\ActiveDataProvider $kcdioDataProvider */
 
-$this->title = 'K/C/D/I/O';
 
 ?>
     <div class="d-flex justify-content-between align-items-center">
-        <h1 class="mb-0"><i class = "ti ti-clock "></i> K/C/D/I/O</h1>
+        <h1 class="mb-0 fs-7 "><i class = "ti ti-clock "></i> K/C/D/I/O</h1>
         <?= Html::button('<i class="ti fs-7 ti-plus"></i>',
             [
                 'value' => Url::to(['create-kcdio']),

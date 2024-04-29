@@ -75,15 +75,15 @@ class builders
     public function actionBuilder($model, $type , $modal_id ="#modal")
     {
         $icon = [
-            'view'     => 'text-dark ti-eye              ',
-            'delete'   => 'text-danger ti-trash             ',
-            'update'   => 'text-primary ti-edit-circle         ',
-
-            'log'      => 'text-warning ti-file-description ',
-            'MCOM Date' => 'text-secondary ti-calendar-event',
-            'Add Activity' => 'text-indigo ti-radar-2',
-            'create'     => 'text-primary ti-eye              ',
-            'mcom'      => 'text-secondary ti-calendar-event ',
+            'view'           => 'text-dark ti-eye              ',
+            'delete'         => 'text-danger ti-trash             ',
+            'update'         => 'text-primary ti-edit-circle         ',
+            'update-poc'      => 'text-primary ti-edit-circle          ',
+            'log'            => 'text-warning ti-file-description ',
+            'MCOM Date'      => 'text-secondary ti-calendar-event',
+            'Add Activity'   => 'text-indigo ti-radar-2',
+            'create'         => 'text-primary ti-eye              ',
+            'mcom'           => 'text-secondary ti-calendar-event ',
         ];
         $title = [
             21 => 'Result of MCOM Meeting',

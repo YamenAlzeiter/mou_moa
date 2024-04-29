@@ -10,19 +10,16 @@ use common\models\Import;
 use common\models\Kcdio;
 use common\models\Log;
 use common\models\search\AgreementSearch;
-use common\models\User;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yii;
-use yii\bootstrap5\ActiveForm;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\filters\AccessControl;
-use yii\helpers\ArrayHelper;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
 use yii\web\Response;
 use yii\web\UploadedFile;
 
@@ -36,22 +33,7 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return [
-            'access' => [
-                'class' => AccessControl::class, 'rules' => [
-                    [
-                        'actions' => [
-                            'index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel',
-                            'import-excel-activity', 'view-activities', 'import', 'mcom'
-                        ], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],
-                    ],
-                ],
-            ], 'verbs' => [
-                'class' => VerbFilter::class, 'actions' => [
-                    'logout' => ['post'],
-                ],
-            ],
-        ];
+        return ['access' => ['class' => AccessControl::class, 'rules' => [['actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities', 'import', 'mcom', 'update-poc'], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],],],], 'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
     }
 
     /**
@@ -75,20 +57,12 @@ class AgreementController extends Controller
             $dataProvider->query->andWhere(['transfer_to' => $type]);
         }
 
-        $dataProvider->query->orderBy([
-            new Expression("CASE WHEN status IN (" . implode(',', $topStatuses) . ") THEN 0 ELSE 1 END"),
-            'updated_at' => SORT_DESC,
-        ]);
+        $dataProvider->query->orderBy([new Expression("CASE WHEN status IN (" . implode(',', $topStatuses) . ") THEN 0 ELSE 1 END"), 'updated_at' => SORT_DESC,]);
 
-        $dataProvider->pagination = [
-            'pageSize' => 11,
-        ];
+        $dataProvider->pagination = ['pageSize' => 11,];
 
         if (!Yii::$app->user->isGuest) {
-            return $this->render('index', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
+            return $this->render('index', ['searchModel' => $searchModel, 'dataProvider' => $dataProvider,]);
         } else {
             throw new ForbiddenHttpException("You need to login in order to have access to this page");
         }
@@ -104,12 +78,12 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
+    
+
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
         if (!Yii::$app->user->isGuest) {
 
-            return $this->renderAjax('view', [
-                'model' => $this->findModel($id), 'haveActivity' => $haveActivity
-            ]);
+            return $this->renderAjax('view', ['model' => $this->findModel($id), 'haveActivity' => $haveActivity]);
         } else {
             return throw new ForbiddenHttpException("You need to login in order to have access to this page");
         }
@@ -158,12 +132,12 @@ class AgreementController extends Controller
 
     public function actionViewActivities($id)
     {
+    
+
         $model = Activities::find()->where(['agreement_id' => $id])->all();
         if (!Yii::$app->user->isGuest) {
 
-            return $this->renderAjax('viewActivities', [
-                'model' => $model,
-            ]);
+            return $this->renderAjax('viewActivities', ['model' => $model,]);
         } else {
             return throw new ForbiddenHttpException("You need to login in order to have access to this page");
         }
@@ -179,9 +153,10 @@ class AgreementController extends Controller
      */
     public function actionUpdate($id)
     {
+
+
         $model = $this->findModel($id);
         $status = $model->status;
-
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
@@ -198,29 +173,7 @@ class AgreementController extends Controller
         }
 
 
-        return $this->renderAjax('update', [
-            'model' => $model,
-        ]);
-    }
-
-    public function actionMcom($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            $model->status = 121;
-            if ($model->save()) {
-
-                $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
-
-                return $this->redirect(['index']);
-            }
-
-        }
-
-        return $this->renderAjax('_mcom', [
-            'model' => $model,
-        ]);
+        return $this->renderAjax('update', ['model' => $model,]);
     }
 
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
@@ -248,8 +201,7 @@ class AgreementController extends Controller
 
     private function sendEmail($model, $needCC)
     {
-        $mailMap = [
-            //$model->status => emailTemplate->id//
+        $mailMap = [//$model->status => emailTemplate->id//
             1 => 5, // new application    from OSC to OLA
             2 => 4, // not complete       from OSC to Applicant
             12 => 4, // not complete       from OLA to OSC CC Applicant
@@ -300,18 +252,46 @@ class AgreementController extends Controller
         }
 
         // Compose and send the email
-        $mailer = Yii::$app->mailer->compose([
-            'html' => '@backend/views/email/emailTemplate.php'
-        ], [
-            'subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body
-        ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
-            ->setTo($model->status == 1 ? $ola->email : $model->pi_email)
-            ->setSubject($mail->subject);
+        $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->status == 1 ? $ola->email : $model->pi_email)->setSubject($mail->subject);
 
 
         $mailer->setCc($ccRecipients);
 
         $mailer->send();
+    }
+
+    public function actionUpdatePoc($id)
+    {
+    
+
+        $model = $this->findModel($id);
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            if ($model->save()) {
+                return $this->redirect(['index']);
+            }
+        }
+        return $this->renderAjax('_poc', ['model' => $model,]);
+    }
+
+    public function actionMcom($id)
+    {
+    
+
+        $model = $this->findModel($id);
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->status = 121;
+            if ($model->save()) {
+
+                $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
+
+                return $this->redirect(['index']);
+            }
+
+        }
+
+        return $this->renderAjax('_mcom', ['model' => $model,]);
     }
 
     /**
@@ -338,6 +318,7 @@ class AgreementController extends Controller
 //            'agreement' => $agreement,
 //        ]);
 //    }
+
     /**
      * Deletes an existing Agreement model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -354,18 +335,12 @@ class AgreementController extends Controller
 
     public function actionLog($id)
     {
+    
 
-        $logsDataProvider = new ActiveDataProvider([
-            'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
-                'pageSize' => 100,
-            ], 'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
-            ],
-        ]);
+        $logsDataProvider = new ActiveDataProvider(['query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => ['pageSize' => 100,], 'sort' => ['defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
+        ],]);
 
-        return $this->renderAjax('log', [
-            'logsDataProvider' => $logsDataProvider,
-        ]);
+        return $this->renderAjax('log', ['logsDataProvider' => $logsDataProvider,]);
     }
 
 
@@ -393,6 +368,7 @@ class AgreementController extends Controller
 
     public function actionImport()
     {
+
         $model = new Import();
 
         if ($this->request->isPost && $model->load($this->request->post())) {
@@ -413,8 +389,7 @@ class AgreementController extends Controller
 
             }
             if ($model->save()) {
-                $model->type == "Agreement" ? $this->importExcel($filePath,
-                    $model) : $this->importExcelActivity($filePath);
+                $model->type == "Agreement" ? $this->importExcel($filePath, $model) : $this->importExcelActivity($filePath);
                 return $this->redirect(['index']);
             }
 
@@ -440,35 +415,13 @@ class AgreementController extends Controller
 
                     $status = $row['L'] == "Active" ? 100 : 102;
 
-                    $batchData[] = [
-                        $row['B'],
-                        $row['C'],
-                        $row['D'],
-                        $kcdioName,
-                        $row['G'],
-                        $row['H'],
-                        $row['I'],
-                        $pi_details,
-                        $status,
-                        $to,
-                    ];
+                    $batchData[] = [$row['B'], $row['C'], $row['D'], $kcdioName, $row['G'], $row['H'], $row['I'], $pi_details, $status, $to,];
                 }
 
             }
 
             // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('agreement', [
-                'agreement_type',
-                'col_organization',
-                'country',
-                'pi_kulliyyah',
-                'sign_date',
-                'end_date',
-                'collaboration_area',
-                'pi_details',
-                'status',
-                'transfer_to'
-            ], $batchData)->execute();
+            Yii::$app->db->createCommand()->batchInsert('agreement', ['agreement_type', 'col_organization', 'country', 'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area', 'pi_details', 'status', 'transfer_to'], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
@@ -534,8 +487,7 @@ class AgreementController extends Controller
                     $non_credited_name_of_student = $this->applyExcelFormula($row['R']);
 
 
-                    $batchData[] = [
-                        $agreement_id,//ID
+                    $batchData[] = [$agreement_id,//ID
 
                         $row['C'],  //Name
                         $row['D'],  //Staff No
@@ -585,8 +537,7 @@ class AgreementController extends Controller
             }
 
             // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('activities', [
-                'agreement_id',//agreement_ID
+            Yii::$app->db->createCommand()->batchInsert('activities', ['agreement_id',//agreement_ID
 
                 'name',//row c
                 'staff_number',//row d
@@ -632,13 +583,12 @@ class AgreementController extends Controller
 
             ], $batchData)->execute();
 
-            Yii::$app->session->setFlash('success', 'Data imported successfully.');
+            Yii::$app->session->setFlash('success', 'Data Imported Successfully.');
 
             // You can redirect the user to another page or render a view here
             return $this->redirect(['index']); // Redirect to index or wherever you want
         } catch (Exception $e) {
-            var_dump($e);
-            die();
+            Yii::$app->session->setFlash('error', 'Unsuccessful Import.');
         }
     }
 

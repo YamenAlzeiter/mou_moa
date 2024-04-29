@@ -13,11 +13,12 @@ $this->title = 'Dashboard';
 ?>
 
 
+
 <div class = "row ">
-    <div class="col-12 col-lg-4 col-md-12">
+    <div class="col-12 col-lg-4 col-md-12 my-2">
     <div class = "card shadow border rounded-5">
             <div class = "card-body">
-                <h1><i class = "ti ti-status-change"></i> Status</h1>
+                <h1 class="fs-7"><i class = "ti ti-status-change"></i> Status</h1>
                 <hr class = "border  border-black">
                 <div class = "overflow-auto">
                     <?= $this->render('status', ['statusDataProvider' => $statusDataProvider]) ?>
@@ -25,10 +26,10 @@ $this->title = 'Dashboard';
             </div>
         </div>
     </div>
-    <div class="col-12 col-lg-5 col-md-12">
+    <div class="col-12 col-lg-4 col-md-12 my-2">
         <div class = "card bg-light-gray shadow border rounded-5">
             <div class = "card-body">
-                <h1><i class = "ti ti-mailbox"></i> Email Template</h1>
+                <h1 class="fs-7"><i class = "ti ti-mailbox"></i> Email Template</h1>
                 <hr class = "border  border-black">
                 <div class = "overflow-auto">
                     <?= $this->render('emailTemplate', ['emailDataProvider' => $emailDataProvider]) ?>
@@ -36,19 +37,16 @@ $this->title = 'Dashboard';
             </div>
         </div>
     </div>
-    <div class="col-12 col-lg-3 col-md-12">
+    <div class="col-12 col-lg-4 col-md-12 my-2">
         <div class = "card border border-2 border-dark rounded-5">
             <div class = "card-body ">
                 <?= $this->render('reminder', ['reminderDataProvider' => $reminderDataProvider]) ?>
             </div>
         </div>
     </div>
-</div>
-<div class = "row mt-2">
-    <div class="col-12 col-lg-6 col-md-12">
+    <div class="col-12 col-lg-6 col-md-12 my-2">
         <div class = "card shadow border rounded-5">
             <div class = "card-body">
-
                 <div class = "overflow-auto">
                     <?= $this->render('kcdio', ['kcdioDataProvider' => $kcdioDataProvider]) ?>
                 </div>
@@ -56,6 +54,7 @@ $this->title = 'Dashboard';
         </div>
     </div>
 </div>
+
 
 <?php
 Offcanvas::begin([

@@ -4,7 +4,7 @@ use yii\bootstrap5\Html;
 use yii\helpers\Url;
 ?>
 <div class="d-flex justify-content-between align-items-center">
-    <h1 class="mb-0"><i class = "ti ti-clock "></i> Reminders</h1>
+    <h1 class="mb-0 fs-7"><i class = "ti ti-clock "></i> Reminders</h1>
     <?= Html::button('<i class="ti fs-7 ti-plus"></i>',
         [
             'value' => Url::to(['create-reminder']),
