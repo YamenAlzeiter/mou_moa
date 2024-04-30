@@ -183,7 +183,7 @@ class AgreementController extends Controller
         ]);
     }
 
-    public function actionAddActivity($id = '')
+    public function actionAddActivity($id)
     {
         $agreement = $this->findModel($id);
         $model = new Activities();
@@ -196,7 +196,8 @@ class AgreementController extends Controller
         }
 
         return $this->renderAjax('addActivity', [
-            'model' => $model, 'agreement' => $agreement,
+            'model' => $model,
+            'agreement' => $agreement,
         ]);
     }
 

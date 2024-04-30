@@ -20,7 +20,7 @@ use yii\widgets\Pjax;
                 // Show the current page and total pages
                 'columns' => [
                     [
-                        'attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/M/y H:i'],
+                        'attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/m/y'],
                         'enableSorting' => false,
                     ], [
                         'label' => 'Current Status', 'format' => 'raw',       'value' => function ($model) {

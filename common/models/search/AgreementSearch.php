@@ -74,7 +74,36 @@ class   AgreementSearch extends Agreement
         $query->andFilterWhere(['id' => $this->id, 'sign_date' => $this->sign_date, 'end_date' => $this->end_date, 'mcom_date' => $this->mcom_date, 'agreement_type' => $this->agreement_type]);
 
 
-        $query->orFilterWhere(['ilike', 'col_organization', $this->full_info])->orFilterWhere(['ilike', 'col_name', $this->full_info])->orFilterWhere(['ilike', 'col_address', $this->full_info])->orFilterWhere(['ilike', 'col_contact_details', $this->full_info])->orFilterWhere(['ilike', 'col_collaborators_name', $this->full_info])->orFilterWhere(['ilike', 'col_wire_up', $this->full_info])->orFilterWhere(['ilike', 'col_phone_number', $this->full_info])->orFilterWhere(['ilike', 'col_email', $this->full_info])->orFilterWhere(['ilike', 'pi_name', $this->full_info])->orFilterWhere(['ilike', 'pi_kulliyyah', $this->full_info])->orFilterWhere(['ilike', 'pi_phone_number', $this->full_info])->orFilterWhere(['ilike', 'pi_email', $this->full_info])->orFilterWhere(['ilike', 'project_title', $this->full_info])->orFilterWhere(['ilike', 'grant_fund', $this->full_info])->orFilterWhere(['ilike', 'member', $this->full_info])->orFilterWhere(['ilike', 'proposal', $this->full_info])->orFilterWhere(['ilike', 'ssm', $this->full_info])->orFilterWhere(['ilike', 'company_profile', $this->full_info])->orFilterWhere(['ilike', 'meeting_link', $this->full_info])->orFilterWhere(['ilike', 'doc_applicant', $this->full_info])->orFilterWhere(['ilike', 'doc_draft', $this->full_info])->orFilterWhere(['ilike', 'doc_newer_draft', $this->full_info])->orFilterWhere(['ilike', 'doc_re_draft', $this->full_info])->orFilterWhere(['ilike', 'doc_final', $this->full_info])->orFilterWhere(['ilike', 'doc_extra', $this->full_info])->orFilterWhere(['ilike', 'reason', $this->full_info])->orFilterWhere(['ilike', 'country', $this->full_info])->orFilterWhere(['ilike', 'agreement_type', $this->full_info]);
+        $query->orFilterWhere(['ilike', 'col_organization', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_address', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_contact_details', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_collaborators_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_wire_up', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_phone_number', $this->full_info])
+            ->orFilterWhere(['ilike', 'col_email', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_kulliyyah', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_phone_number', $this->full_info])
+            ->orFilterWhere(['ilike', 'pi_email', $this->full_info])
+            ->orFilterWhere(['ilike', 'project_title', $this->full_info])
+            ->orFilterWhere(['ilike', 'grant_fund', $this->full_info])
+            ->orFilterWhere(['ilike', 'member', $this->full_info])
+            ->orFilterWhere(['ilike', 'proposal', $this->full_info])
+            ->orFilterWhere(['ilike', 'ssm', $this->full_info])
+            ->orFilterWhere(['ilike', 'company_profile', $this->full_info])
+            ->orFilterWhere(['ilike', 'meeting_link', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_applicant', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_newer_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_re_draft', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_final', $this->full_info])
+            ->orFilterWhere(['ilike', 'doc_extra', $this->full_info])
+            ->orFilterWhere(['ilike', 'reason', $this->full_info])
+            ->orFilterWhere(['ilike', 'country', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement_type', $this->full_info])
+            ->andFilterWhere(['ilike', 'transfer_to', $this->transfer_to]);
+
 
 
         if ($this->applications === 'new_applications') {

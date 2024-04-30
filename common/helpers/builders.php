@@ -10,11 +10,11 @@ class builders
 {
     public function tableProbChanger($status, $viewer){
         switch ($viewer){
-            case 'Applicant'         : return in_array($status, [2, 12, 33, 43, 81, 110]);
+            case 'Applicant'         : return in_array($status, [2, 12, 33, 34, 43, 47, 81, 110]);
             case 'ApplicantMCOM'     : return in_array($status, [11]);
             case 'ApplicantActivity' : return in_array($status, [100, 91]);
             case 'OSC'               : return in_array($status, [10, 51, 15, 72]);
-            case 'OLA'               : return in_array($status, [1, 21, 31, 41, 61, 121]);
+            case 'OLA'               : return in_array($status, [1, 21, 31, 41, 46, 61, 121]);
         }
     }
     public function pillBuilder($status, $options = "")
@@ -78,7 +78,7 @@ class builders
             'view'           => 'text-dark ti-eye              ',
             'delete'         => 'text-danger ti-trash             ',
             'update'         => 'text-primary ti-edit-circle         ',
-            'update-poc'      => 'text-primary ti-edit-circle          ',
+            'update-poc'      => 'text-primary ti-user-circle          ',
             'log'            => 'text-warning ti-file-description ',
             'MCOM Date'      => 'text-secondary ti-calendar-event',
             'Add Activity'   => 'text-indigo ti-radar-2',

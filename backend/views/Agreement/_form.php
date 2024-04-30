@@ -12,7 +12,9 @@ $approveMap = [10 => 1,  // init -> accept OSC
     1 => 11,  // OSC -> OLA approve OLA
     15 => 1,  // OSC -> OLA approve OLA
     21 => 31, // OLA -> / approve OLA
-    121 => 31, 31 => 41, // OLA -> / approve OLA
+    46 => 51,
+    121 => 31,
+    31 => 41, // OLA -> / approve OLA
     61 => 81,
 
 ];
@@ -20,22 +22,32 @@ $notCompleteMap = [10 => 2,  // OSC -> Applicant
     1 => 12,  // OLA -> Applicant
     15 => 2,  // OSC -> OLA approve OLA
     21 => 33, // OLA -> Applicant
-    121 => 33, 31 => 43, // OLA -> Applicant
+    121 => 33,
+    31 => 43, // OLA -> Applicant
+    46 => 47,
     61 => 72, // OLA -> OSC
 ];
 $rejectMap = [21 => 32, // OLA -> Applicant
     121 => 32, 31 => 42, // OLA -> Applicant
 ];
+$conditionalMap = [21 => 34];
 
-if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $model->status != 81) {
+if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $model->status != 81 || $model->status != 46) {
+
     $tag = ($model->status == 21 || $model->status == 31) ? 'KIV' : 'Not Complete';
-    $options = [$approveMap[$model->status] => 'Recommended', $notCompleteMap[$model->status] => $tag,];
+
+    $options = [$approveMap[$model->status] => 'Approve', $notCompleteMap[$model->status] => $tag,];
+
     if ($model->status == 21 || $model->status == 31 || $model->status == 121) {
-        $options += [$rejectMap[$model->status] => ' Not Recommended'];
+        if($model->status == 21){
+            $options += [$conditionalMap[$model->status] => 'Conditional Recommend'];
+        }
+        $options += [$rejectMap[$model->status] => ' Reject'];
 
     }
 }
 $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
+$model->reason = null;
 ?>
 
 <div class="agreement-form">
@@ -65,7 +77,10 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
         <?php endif; ?>
         <div class="not-complete mb-4 d-none">
 
-            <?= $form->field($model, 'reason')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
+            <?= $form->field($model, 'reason')->widget(CKEditor::className(), [
+                'preset' => 'basic',
+            ]) ?>
+
         </div>
     <?php endif; ?>
 
@@ -77,13 +92,13 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
 
 
     <script>
-        $("#is2, #is12, #is42, #is43, #is51").on("change", function () {
+        $("#is2, #is12, #is42, #is43, #is51, #is31, #is32, #is33, #is41, #is47").on("change", function () {
 
             if (this.checked) {
                 $(".not-complete").removeClass('d-none');
             }
         });
-        $("#is1, #is11, #is31, #is41").on("change", function () {
+        $("#is1, #is11").on("change", function () {
 
             if (this.checked) {
                 $(".not-complete").addClass('d-none');

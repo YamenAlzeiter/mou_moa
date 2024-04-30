@@ -55,7 +55,7 @@ echo GridView::widget([
                 },
                 'updatePoc' => function ($url, $model, $key) {
                     $build = new builders();
-                    return $build->actionBuilder($model, 'update-poc');
+                    return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'update-poc') : null;
                 }
             ],
         ],

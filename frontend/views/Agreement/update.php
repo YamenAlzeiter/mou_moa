@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -16,11 +17,16 @@ $status = [
     12 => 15,
     11 => 21,
     33 => 15,
+    34 => 46,
+    47 => 46,
     43 => 15,
     81 => 91,
 ];
 
-$currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
+
+$currentDate = Carbon::now();
+$nextTwoMonth = $currentDate->copy()->addMonths(2);
+
 
 
 ?>
@@ -31,7 +37,7 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
 ]); ?>
 
 
-<?php if ($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43): ?>
+<?php if ($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 34 || $model->status == 47): ?>
     <div class="row">
         <div class="col-md-4">
             <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
@@ -118,11 +124,22 @@ $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
 
 <?php elseif ($model->status == 11): ?>
 
-    <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where([
-        '<', 'counter', 20
-    ])->andWhere(['>', 'date', $currentDate])->all(), 'date', function ($model) {
-        return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (20 - $model->counter);
-    }), ['prompt' => 'Select a Date']) ?>
+    <?= $form->field($model, 'mcom_date')->dropDownList(
+        ArrayHelper::map(
+            McomDate::find()
+                ->where(['<', 'counter', 10])
+                ->andWhere(['>', 'date', $currentDate->toDateString()])
+                ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
+                ->limit(3) // Limit the number of results to three
+                ->all(),
+            'date',
+            function ($model) {
+                return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
+            }
+        ),
+        ['prompt' => 'Select a Date']
+    ) ?>
+
 
 <?php elseif ($model->status == 81): ?>
     <div class="row">

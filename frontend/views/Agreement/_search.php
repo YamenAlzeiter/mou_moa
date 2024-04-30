@@ -52,6 +52,10 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
+        <?= $form->field($model, 'transfer_to', ['options' => ['mb-0']])->dropDownList(['IO' => 'IO', 'OIL' => 'OIL', 'RMC' => 'RMC'], ['class' => 'form-select', 'prompt' => 'Pick ', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+        ])->label(false) ?>
+
         <?php if(!Yii::$app->user->isGuest) :?>
         <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date',
             'date'), [

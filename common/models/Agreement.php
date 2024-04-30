@@ -84,9 +84,9 @@ class Agreement extends ActiveRecord
     public function rules()
     {
         return [
-            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf' ],
+            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf', 'maxSize' => 1024 * 1024 * 10],
 
-                [[ 'col_organization','fileUpload',
+            [[ 'col_organization','fileUpload',
                 'col_name', 'col_address', 'col_collaborators_name',
                 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'project_title',
                 'proposal', 'col_phone_number', 'col_email','pi_phone_number',
@@ -94,13 +94,16 @@ class Agreement extends ActiveRecord
                 'agreement_type', 'country'],
                 'required', 'on' => 'uploadCreate'],
 
-            [['pi_email', 'col_email', 'pi_email_extra', 'pi_email_extra2'], 'email'], [['project_title', 'proposal', 'reason'], 'string'],
+            [['pi_email', 'col_email', 'pi_email_extra', 'pi_email_extra2'], 'email'],
+            [['project_title', 'proposal', 'reason'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at'], 'safe'],
-            [['status'], 'default', 'value' => null], [['status'], 'integer'],
+            [['status'], 'default', 'value' => null],
+            [['status'], 'integer'],
             [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'doc_executed', 'transfer_to', 'agreement_type', 'country', 'pi_name_extra'        , 'pi_kulliyyah_extra'   ,  'pi_phone_number_extra', 'pi_email_extra', 'pi_name_extra2', 'pi_kulliyyah_extra2', 'pi_phone_number_extra2', 'pi_email_extra2'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member', 'needMe'], 'string', 'max' => 2],
+            [['reason'], 'default', 'value' => null],
         ];
     }
 

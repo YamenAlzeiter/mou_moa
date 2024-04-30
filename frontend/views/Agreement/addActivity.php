@@ -28,7 +28,11 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 ?>
 
 <?php $form = ActiveForm::begin([
-    'fieldConfig' => ['enableClientValidation' => false, 'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],], 'id' =>'add_activity']); ?>
+    'fieldConfig' =>
+        ['enableClientValidation' => false,
+            'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>",
+            'labelOptions' => ['class' => ''],],
+            'id' =>'add_activity']); ?>
 
 <div class="header-section">
     <?= $form->field($model, 'name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
@@ -232,17 +236,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 <?php ActiveForm::end(); ?>
 
 
-
-
-<?php
-// ... (your existing modal code)
-?>
-
-
 <script>
-
-
-
     $(document).ready(function() {
         const sectionMap = { // Use const for constant data
             'Student Mobility for Credited': '1',
@@ -281,24 +275,5 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         });
     });
 
-
-
-
 </script>
 
-
-<script>
-    function loadOrganizations(kcdioValue) {
-
-        var userType = '<?= Yii::$app->user->identity->type ?>'; // Get user type
-        $.ajax({
-            url: '/agreement/get-organization',
-            type: 'POST',
-            data: { kcdio: kcdioValue, userType: userType },
-            success: function(response) {
-                var options = response.html;
-                $('#activities-mou_moa').html(options);
-            }
-        });
-    }
-</script>
