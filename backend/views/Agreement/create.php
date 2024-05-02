@@ -1,216 +1,139 @@
 <?php
 
-use common\models\Kcdio;
+use common\models\AgreementType;
+use common\models\Poc;
+use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\bootstrap5\ActiveForm;
-use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
-/** @var common\models\Activities $model */
-/** @var yii\widgets\ActiveForm $form */
-$type = Yii::$app->user->identity->type;
-$activityOptions = [
-    'Student Mobility for Credited',
-    'Student Mobility Non-Credited',
-    'Staff Mobility (Inbound)',
-    'Staff Mobility (Outbound)',
-    'Seminar/Conference/Workshop/Training',
-    'Research',
-    'Publication',
-    'Consultancy',
-    'Any other of Cooperation, Please specify',
-    'No Activity, Please specify',
-];
-$activityOptionsMap = array_combine($activityOptions, $activityOptions);
-$templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{input}{error}';
+/** @var common\models\Agreement $model */
+
+$this->title = 'Create';
+$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
 ?>
 
-
-
 <?php $form = ActiveForm::begin([
-    'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],]]); ?>
-<section id = "section-1" class = "form-section d-none">
-    <h2 class="my-4">Student Mobility for Credited</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-2"><?= $form->field($model, 'type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?></div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class="col-lg-4">
-            <?= $form->field($model, 'name_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-    </div>
-    <div class = "row">
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
-        </div>
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'number_students')->textInput(['type' => 'date', 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-4">
+    'id' => 'create-form',
+    'fieldConfig' => [
+        'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>",
+        'labelOptions' => ['class' => ''],
+    ],
+]); ?>
 
-        </div>
-    </div>
+<div class="row">
+    <div class="col-md-4">
+        <?= $form->field($model, 'agreement_type')->dropDownList(
+          ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'),
+            [
+                'prompt' => 'Select Type',
+                'options' => [
+                    'MOU (Academic)' => ['selected' => true]
+                ]
+            ]
+        ) ?>
 
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-2']) ?>
     </div>
-</section>
+    <div class="col-md-8">
+        <?= $form->field($model, 'col_organization')->textInput([
+            'maxlength' => true,
+            'placeholder' => '',
+            'value' => 'Kansai University' // Set your default value here
+        ]) ?>
 
-<section id = "section-2" class = "form-section d-none">
-    <h2 class="my-4">Student Mobility for Non-Credited</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-2"><?= $form->field($model, 'type', ['template' => $templateRadio,   'labelOptions' => ['class' => 'form-label']])->radioList(['Inbound' => 'Inbound', 'Outbound' => 'Outbound'])?></div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'number_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class="col-lg-4">
-            <?= $form->field($model, 'name_students')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
     </div>
-    <div class = "row">
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'semester')->dropDownList(['semester 1' => 'semester 1', 'semester 2' => 'semester 2', 'semester 3' => 'semester 3',], ['prompt' => 'Select Semester']) ?>
-        </div>
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'number_students')->textInput(['type' => 'date', 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'program_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-    </div>
+</div>
 
 
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-2']) ?>
+<div class="row">
+    <div class="col-md">
+        <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Dr. Prof. Keiko IKEDA' ]) ?>
+        <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value'=> '81663681174 
+']) ?>
     </div>
-</section>
+    <div class="col-md">
+        <?= $form->field($model, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Center for International Education, Division of International Affairs']) ?>
+        <?= $form->field($model, 'col_email')->textInput([
+            'type' => 'email', // Correct syntax for setting the input type
+            'maxlength' => true,
+            'placeholder' => 'mi-room@ml.kandai.jp',
+            'value' => 'mi-room@ml.kandai.jp' // Set your default email value here
+        ]) ?>
 
-<section id = "section-3" class = "form-section d-none">
-    <h2 class="my-4">Staff Mobility (Inbound)</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-3']) ?>
-    </div>
-</section>
+</div>
+<?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6, 'value' => 'names......']) ?>
 
-<section id = "section-4" class = "form-section d-none">
-    <h2 class="my-4">Staff Mobility (Outbound)</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'number_of_staff')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-    </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-4']) ?>
-    </div>
-</section>
 
-<section id = "section-5" class = "form-section d-none">
-    <h2 class="my-4">Seminar/Conference/Workshop/Training</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'scwt_name_of_program')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'date_of_program')->textInput(['type' => 'date', 'placeholder' => ''])?>
-        </div>
+<div class="row">
+    <div class="col-md-8">
+        <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'wire up .....']) ?>
     </div>
-    <div class = "row align-items-center">
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'program_venue')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'participants_number')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-4">
-            <?= $form->field($model, 'name_participants_involved')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
+    <div class="col-md-4">
+        <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Japan']) ?>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-5']) ?>
-    </div>
-</section>
+</div>
+<h4>Person In Charge Details</h4>
 
-<section id = "section-6" class = "form-section d-none">
-    <h2 class="my-4">Seminar/Conference/Workshop/Training</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'research_title')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
+<div class="row">
+    <div class="col-md poc">
+        <?= $form->field($model,'pi_name')
+            ->dropDownList(ArrayHelper::map(Poc::find()->all(),'id', 'name'),
+                [
+                        'prompt' => 'Select POC',
+                    'onchange'=>'
+                    $.get( "'.Yii::$app->urlManager->createUrl('agreement/get-poc-info?id=').'"+$(this).val(), function( data ) {
+                    $( "select#piKulliyyah" ).html( data );
+                    })'
+                ]
+            )?>
 
-        </div>
+        <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false) ?>
+        <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false) ?>
+        <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '0193079894']) ?>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-6']) ?>
-    </div>
-</section>
+</div>
 
-<section id = "section-7" class = "form-section d-none">
-    <h2 class="my-4">Publication</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'publication_title')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'publisher')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
+<div id="extra-pi-fields-container"></div>
+<button class="btn btn-lg btn-dark text-capitalize mb-3" onclick="handleAdd()" data-clicks="0">Add person in charge
+</button>
+<?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
+<div class="row">
+    <div class="col-md">
+        <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '1000']) ?>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-7']) ?>
-    </div>
-</section>
 
-<section id = "section-8" class = "form-section d-none">
-    <h2 class="my-4">Consultancy</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'consultancy_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'project_duration')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
+    <div class="col-md">
+        <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '10']) ?>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-8']) ?>
-    </div>
-</section>
+    <div class="col-md">
+        <?= $form->field($model, 'transfer_to')->dropDownList(
+            ['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'],
+            [
+                'prompt' => 'select OSC',
+                'options' => [
+                    'IO' => ['selected' => true] // Set 'IO' as default
+                ]
+            ]
+        ) ?>
 
-<section id = "section-9" class = "form-section d-none">
-    <h2 class="my-4">Any other of Collaboration</h2>
-    <div class = "row align-items-center">
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'other')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
-        <div class = "col-lg-6">
-            <?= $form->field($model, 'date')->textInput(['maxlength' => true, 'placeholder' => ''])?>
-        </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-9']) ?>
-    </div>
-</section>
+</div>
 
-<section id = "section-10" class = "form-section d-none">
-    <h2 class="my-4">No Activity</h2>
 
-    <?= $form->field($model, 'justification')->textarea(['maxlength' => true, 'placeholder' => ''])?>
+<?php //= $form->field($model, 'sign_date')->textInput() ?>
+<!---->
+<?php //= $form->field($model, 'end_date')->textInput() ?>
 
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-10']) ?>
-    </div>
-</section>
+
+
+<?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'value' => 'proposal.....................']) ?>
+
+
+
+<?= $form->field($model, 'fileUpload', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+
+<div class="modal-footer p-0">
+    <?= Html::submitButton('Submit', ['class' => 'btn btn-success', 'name' => 'checked', 'value' => 91]) ?>
+</div>
 <?php ActiveForm::end(); ?>
-

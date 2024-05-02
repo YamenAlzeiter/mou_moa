@@ -24,6 +24,8 @@ class m240320_055809_create_log_table extends Migration
 
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'updated_at' => $this->timestamp()->defaultValue(null),
+
+            'created_by' => $this->integer(),
         ]);
         $this->addForeignKey(
             'fk-log',

@@ -32,7 +32,7 @@ $rejectMap = [21 => 32, // OLA -> Applicant
 ];
 $conditionalMap = [21 => 34];
 
-if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $model->status != 81 || $model->status != 46) {
+if ($model->status != 41 && $model->status != 51 && $model->status != 72 && $model->status != 81 && $model->status != 46  && $model->status != 51)  {
 
     $tag = ($model->status == 21 || $model->status == 31) ? 'KIV' : 'Not Complete';
 

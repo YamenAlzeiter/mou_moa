@@ -128,6 +128,20 @@ class builders
         return $attribute !== null ? $link : null;
 
     }
+    function createButton($url, $iconClass, $title, $modalTitle) {
+        return Html::button(
+            "<i class=\"ti fs-5 $iconClass\" data-bs-toggle=\"tooltip\" data-bs-placement=\"bottom\" data-bs-html=\"true\" title=\"$title\"></i> $title",
+            [
+                'value' => Url::to($url),
+                'class' => 'btn btn-lg btn-success w-100',
+                'id' => 'modelButton',
+                'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value'), function() {
+                                            // Set the modal title
+                                            $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$modalTitle</h1>'); 
+                                        });"
+            ]
+        );
+    }
 
 
 }

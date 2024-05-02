@@ -81,7 +81,6 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <div class="row">
     <div class="col-md poc">
-        <?= $form->field($model, 'needMe')->hiddenInput(['value' => '1'])->label(false) ?>
         <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false) ?>
         <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false) ?>
         <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false) ?>

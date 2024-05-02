@@ -227,7 +227,7 @@ class AgreementController extends Controller
 
                 $status = $this->request->post('checked');
                 $model->status = $status;
-
+                $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
                 if ($model->save(false)) {
                     $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
                     $this->sendEmail($model, 5);
@@ -303,6 +303,7 @@ class AgreementController extends Controller
             $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
             $this->fileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'doc_executed');
             $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
+            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 if ($model->status == 15) $this->sendEmail($model, 6);

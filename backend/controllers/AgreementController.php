@@ -9,6 +9,7 @@ use common\models\EmailTemplate;
 use common\models\Import;
 use common\models\Kcdio;
 use common\models\Log;
+use common\models\Poc;
 use common\models\search\AgreementSearch;
 use Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -33,7 +34,20 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return ['access' => ['class' => AccessControl::class, 'rules' => [['actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities', 'import', 'mcom', 'update-poc'], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],],],], 'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
+        return ['access' =>
+            ['class' => AccessControl::class,
+                'rules' => [
+                    ['actions' => ['index', 'update', 'view', 'downloader',
+                                    'log', 'get-organization', 'import-excel',
+                                    'import-excel-activity', 'view-activities',
+                                    'import', 'mcom', 'update-poc', 'create-poc',
+                                    'create', 'get-poc-info'
+                    ], 'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
+                        ],
+                    ],
+                ],
+            'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
     }
 
     /**
@@ -78,7 +92,7 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
-    
+
 
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
         if (!Yii::$app->user->isGuest) {
@@ -113,26 +127,60 @@ class AgreementController extends Controller
      */
 
 
-//    public function actionCreate()
-//    {
-//        $model = new Agreement();
-//
-//        if ($this->request->isPost) {
-//            if ($model->load($this->request->post()) && $model->save()) {
-//                return $this->redirect(['view', 'id' => $model->id]);
-//            }
-//        } else {
-//            $model->loadDefaultValues();
-//        }
-//
-//        return $this->render('create', [
-//            'model' => $model,
-//        ]);
-//    }
+    public function actionCreate()
+    {
+       if(Yii::$app->user->identity->type == 'OLA'){
+           $model = new Agreement();
+           $model->scenario = 'uploadCreate';
+           if ($this->request->isPost) {
+               if ($model->load($this->request->post())) {
+
+                   $status = $this->request->post('checked');
+                   $model->status = $status;
+                   $model->temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
+                   if ($model->save(false)) {
+                       $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
+
+                       return $this->redirect(['index']);
+                   }
+               }
+           } else {
+               $model->loadDefaultValues();
+           }
+
+           return $this->renderAjax('create', [
+               'model' => $model,
+           ]);
+       }else throw new forbiddenHttpException("You are not authorized to be in this page");
+    }
+
+
+    public function actionCreatePoc()
+    {
+        $type = Yii::$app->user->identity->type;
+
+        if($type == "IO" || $type == 'OIL' || $type == 'RMC'){
+            $model = new Poc();
+
+            if ($this->request->isPost) {
+                if ($model->load($this->request->post()) && $model->save()) {
+                    return $this->redirect(['index']);
+                }
+            } else {
+                $model->loadDefaultValues();
+            }
+
+            return $this->renderAjax('createPoc', [
+                'model' => $model,
+            ]);
+        }else throw new ForbiddenHttpException("you can't access this page");
+
+    }
+
 
     public function actionViewActivities($id)
     {
-    
+
 
         $model = Activities::find()->where(['agreement_id' => $id])->all();
         if (!Yii::$app->user->isGuest) {
@@ -162,6 +210,7 @@ class AgreementController extends Controller
             $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
             $this->fileHandler($model, 'oscDraft', 'draftOSC', 'doc_newer_draft');
             $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
+            $model->temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 if ($model->status == 1 || $model->status == 2 || $model->status == 12 || $model->status == 11 || $model->status == 32 || $model->status == 33 || $model->status == 42 || $model->status == 43 || $model->status == 51 || $model->status == 41 || $model->status == 72 || $model->status == 81) {
@@ -262,7 +311,7 @@ class AgreementController extends Controller
 
     public function actionUpdatePoc($id)
     {
-    
+
 
         $model = $this->findModel($id);
 
@@ -276,12 +325,11 @@ class AgreementController extends Controller
 
     public function actionMcom($id)
     {
-    
-
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $model->status = 121;
+            $temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
@@ -335,7 +383,7 @@ class AgreementController extends Controller
 
     public function actionLog($id)
     {
-    
+
 
         $logsDataProvider = new ActiveDataProvider(['query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => ['pageSize' => 100,], 'sort' => ['defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
         ],]);
@@ -349,21 +397,11 @@ class AgreementController extends Controller
         Yii::$app->response->sendFile($filePath);
     }
 
-    public function actionGetOrganization()
+    public function actionGetPocInfo($id)
     {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        $kcdio = Yii::$app->request->post('kcdio');
-        $userType = Yii::$app->request->post('userType');
-
-        $organizations = Agreement::find()->where(['transfer_to' => $userType, 'pi_kulliyyah' => $kcdio])->all();
-
-        $options = '<option value="">Select Organization</option>';
-        foreach ($organizations as $organization) {
-            $options .= '<option value="' . $organization->col_organization . '">' . $organization->pi_kulliyyah . ' - ' . $organization->col_organization . '</option>';
-        }
-
-        return ['html' => $options];
+        $kulliyyah = Poc::findOne($id);
+        var_dump($kulliyyah);
+        die();
     }
 
     public function actionImport()
@@ -401,6 +439,7 @@ class AgreementController extends Controller
     public function importExcel($filePath, $model)
     {
         $to = $model->import_from;
+        $temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
@@ -415,13 +454,13 @@ class AgreementController extends Controller
 
                     $status = $row['L'] == "Active" ? 100 : 102;
 
-                    $batchData[] = [$row['B'], $row['C'], $row['D'], $kcdioName, $row['G'], $row['H'], $row['I'], $pi_details, $status, $to,];
+                    $batchData[] = [$row['B'], $row['C'], $row['D'], $kcdioName, $row['G'], $row['H'], $row['I'], $pi_details, $status, $to, $temp];
                 }
 
             }
 
             // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('agreement', ['agreement_type', 'col_organization', 'country', 'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area', 'pi_details', 'status', 'transfer_to'], $batchData)->execute();
+            Yii::$app->db->createCommand()->batchInsert('agreement', ['agreement_type', 'col_organization', 'country', 'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area', 'pi_details', 'status', 'transfer_to', 'temp'], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 

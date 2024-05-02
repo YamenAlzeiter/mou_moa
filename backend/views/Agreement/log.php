@@ -29,6 +29,11 @@ use yii\widgets\Pjax;
                     }, 'contentOptions' => ['class' => 'col-1 text-start'],
                 ],
                 [
+                    'attribute' => 'created_by',
+                    'label' => 'By',
+                    'format' => 'raw',
+                ],
+                [
                     'attribute' => 'From', 'value' => function ($model) {
                     $statusHelper = new statusLable();
                     return $statusHelper->getStatusFrom($model->new_status);
@@ -38,7 +43,8 @@ use yii\widgets\Pjax;
                         $statusHelper = new statusLable();
                         return $statusHelper->getStatusTo($model->new_status);
                     },
-                ], [
+                ],
+                [
                     'attribute' => 'message',
                     'format' => 'raw',
                     'enableSorting' => false,

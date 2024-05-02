@@ -84,6 +84,11 @@ class m240315_030854_create_moua_table extends Migration
 
             //reminder
             'isReminded' => $this->integer(1)->defaultValue(0),
+
+            //temp
+
+            'temp' => $this->text(),
+            'last_reminder' => $this->date(),
         ]);
 
         //in case need foreign key
