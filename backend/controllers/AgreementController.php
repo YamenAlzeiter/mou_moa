@@ -34,20 +34,7 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return ['access' =>
-            ['class' => AccessControl::class,
-                'rules' => [
-                    ['actions' => ['index', 'update', 'view', 'downloader',
-                                    'log', 'get-organization', 'import-excel',
-                                    'import-excel-activity', 'view-activities',
-                                    'import', 'mcom', 'update-poc', 'create-poc',
-                                    'create', 'get-poc-info'
-                    ], 'allow' => !Yii::$app->user->isGuest,
-                        'roles' => ['@'],
-                        ],
-                    ],
-                ],
-            'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
+        return ['access' => ['class' => AccessControl::class, 'rules' => [['actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities', 'import', 'mcom', 'update-poc', 'create-poc', 'create', 'get-poc-info', 'get-kcdio-poc'], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],],],], 'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
     }
 
     /**
@@ -129,37 +116,57 @@ class AgreementController extends Controller
 
     public function actionCreate()
     {
-       if(Yii::$app->user->identity->type == 'OLA'){
-           $model = new Agreement();
-           $model->scenario = 'uploadCreate';
-           if ($this->request->isPost) {
-               if ($model->load($this->request->post())) {
+        if (Yii::$app->user->identity->type == 'OLA') {
+            $model = new Agreement();
+            $model->scenario = 'uploadCreate';
+            if ($this->request->isPost) {
+                if ($model->load($this->request->post())) {
 
-                   $status = $this->request->post('checked');
-                   $model->status = $status;
-                   $model->temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
-                   if ($model->save(false)) {
-                       $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
+                    $status = $this->request->post('checked');
+                    $model->status = $status;
+                    $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+                    if ($model->save(false)) {
+                        $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
 
-                       return $this->redirect(['index']);
-                   }
-               }
-           } else {
-               $model->loadDefaultValues();
-           }
+                        return $this->redirect(['index']);
+                    }
+                }
+            } else {
+                $model->loadDefaultValues();
+            }
 
-           return $this->renderAjax('create', [
-               'model' => $model,
-           ]);
-       }else throw new forbiddenHttpException("You are not authorized to be in this page");
+            return $this->renderAjax('create', ['model' => $model,]);
+        } else throw new forbiddenHttpException("You are not authorized to be in this page");
     }
 
+    function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
+    {
+
+        $file = UploadedFile::getInstance($model, $attribute);
+        if ($file) {
+
+            $baseUploadPath = Yii::getAlias('@common/uploads');
+            $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
+            $fileName = $model->id . '_' . $fileNamePrefix . '.' . $file->extension;
+            $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
+
+            // Create directory if not exists
+            if (!file_exists(dirname($filePath))) {
+                mkdir(dirname($filePath), 0777, true);
+            }
+
+            $file->saveAs($filePath);
+            $model->$attribute = $fileName;
+            $model->$docAttribute = $filePath;
+            $model->save(false);
+        }
+    }
 
     public function actionCreatePoc()
     {
         $type = Yii::$app->user->identity->type;
 
-        if($type == "IO" || $type == 'OIL' || $type == 'RMC'){
+        if ($type == "IO" || $type == 'OIL' || $type == 'RMC') {
             $model = new Poc();
 
             if ($this->request->isPost) {
@@ -170,13 +177,10 @@ class AgreementController extends Controller
                 $model->loadDefaultValues();
             }
 
-            return $this->renderAjax('createPoc', [
-                'model' => $model,
-            ]);
-        }else throw new ForbiddenHttpException("you can't access this page");
+            return $this->renderAjax('createPoc', ['model' => $model,]);
+        } else throw new ForbiddenHttpException("you can't access this page");
 
     }
-
 
     public function actionViewActivities($id)
     {
@@ -210,7 +214,7 @@ class AgreementController extends Controller
             $this->fileHandler($model, 'olaDraft', 'draft', 'doc_draft');
             $this->fileHandler($model, 'oscDraft', 'draftOSC', 'doc_newer_draft');
             $this->fileHandler($model, 'finalDraft', 'FinalDraft', 'doc_final');
-            $model->temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 if ($model->status == 1 || $model->status == 2 || $model->status == 12 || $model->status == 11 || $model->status == 32 || $model->status == 33 || $model->status == 42 || $model->status == 43 || $model->status == 51 || $model->status == 41 || $model->status == 72 || $model->status == 81) {
@@ -223,29 +227,6 @@ class AgreementController extends Controller
 
 
         return $this->renderAjax('update', ['model' => $model,]);
-    }
-
-    function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
-    {
-
-        $file = UploadedFile::getInstance($model, $attribute);
-        if ($file) {
-
-            $baseUploadPath = Yii::getAlias('@common/uploads');
-            $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
-            $fileName = $model->id . '_' . $fileNamePrefix . '.' . $file->extension;
-            $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
-
-            // Create directory if not exists
-            if (!file_exists(dirname($filePath))) {
-                mkdir(dirname($filePath), 0777, true);
-            }
-
-            $file->saveAs($filePath);
-            $model->$attribute = $fileName;
-            $model->$docAttribute = $filePath;
-            $model->save(false);
-        }
     }
 
     private function sendEmail($model, $needCC)
@@ -329,7 +310,7 @@ class AgreementController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $model->status = 121;
-            $temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
+            $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
@@ -397,12 +378,35 @@ class AgreementController extends Controller
         Yii::$app->response->sendFile($filePath);
     }
 
+    public function actionGetKcdioPoc($id)
+    {
+        $poc = Poc::find()->where(['kcdio' => $id])->all();
+
+
+        if ($poc) {
+            $options = "<option>Select POC</option>";
+            foreach ($poc as $apoc) {
+                $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
+            }
+        } else $options = "<option>Person In charge Not found</option>";
+
+        echo $options;
+    }
+
     public function actionGetPocInfo($id)
     {
-        $kulliyyah = Poc::findOne($id);
-        var_dump($kulliyyah);
-        die();
+        $poc = Poc::findOne($id);
+
+        if ($poc) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['name' => $poc->name, 'kulliyyah' => $poc->kcdio, // Adjust this according to your attribute name
+                'email' => $poc->email, 'phone_number' => $poc->phone_number,];
+        } else {
+            // Handle the case where no POC is found with the given ID
+            return ['error' => 'POC not found'];
+        }
     }
+
 
     public function actionImport()
     {
@@ -439,7 +443,7 @@ class AgreementController extends Controller
     public function importExcel($filePath, $model)
     {
         $to = $model->import_from;
-        $temp = "(" .Yii::$app->user->identity->type.") " ."(" . Yii::$app->user->identity->staff_ID .") ".Yii::$app->user->identity->username;
+        $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);

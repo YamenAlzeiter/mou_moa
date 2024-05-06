@@ -72,6 +72,11 @@ class Agreement extends ActiveRecord
     public $finalDraft;
     public $executedAgreement;
     public $needMe;
+
+    public $temp_attribute;
+    public $temp_attribute_poc;
+    public $temp_attribute_extra;
+    public $temp_attribute_poc_extra;
     /**
      * {@inheritdoc}
      */
@@ -164,6 +169,8 @@ class Agreement extends ActiveRecord
             'updated_at' => 'Updated At',
             'country' => 'Country',
             'isReminded' => 'Reminder Step',
+            'temp_attribute_poc' => 'KCDIO',
+            'temp_attribute' => 'person in charge name'
         ];
     }
 

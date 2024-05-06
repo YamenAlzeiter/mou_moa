@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use common\models\Kcdio;
 use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -82,26 +83,70 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
     </div>
     <?php if ($model->pi_name_extra): ?>
         <div class="row">
-            <div class="col-md">
-                <?= $form->field($model, 'pi_name_extra')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-                <?= $form->field($model, 'pi_kulliyyah_extra')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <div class="col-12 col-md-6">
+                <?= $form->field($model, 'temp_attribute_poc')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
+                    function (data){
+                    $("select#agreement-temp_attribute").html(data);
+                    $("select#agreement-temp_attribute").trigger("change");
+                })']) ?>
             </div>
-            <div class="col-md">
-                <?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-                <?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <div class="col-12 col-md-6">
+                <?= $form->field($model, 'temp_attribute')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
+        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
+            .done(function(data) {
+                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val(data.name);
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val(data.kulliyyah);
+                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val(data.email);
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val(data.phone_number);
+            })
+            .fail(function() {
+                // If the request fails, clear all the fields
+                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val("");
+            });
+    ']) ?>
             </div>
+
+            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
+            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
+            <?= $form->field($model, 'pi_kulliyyah_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+            <?= $form->field($model, 'pi_name_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
         </div>
     <?php endif; ?>
     <?php if ($model->pi_name_extra2): ?>
         <div class="row">
-            <div class="col-md">
-                <?= $form->field($model, 'pi_name_extra2')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-                <?= $form->field($model, 'pi_kulliyyah_extra2')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <div class="col-12 col-md-6">
+                <?= $form->field($model, 'temp_attribute_poc_extra')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
+                    function (data){
+                    $("select#agreement-temp_attribute_extra").html(data);
+                    $("select#agreement-temp_attribute_extra").trigger("change");
+                })']) ?>
             </div>
-            <div class="col-md">
-                <?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-                <?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <div class="col-12 col-md-6">
+                <?= $form->field($model, 'temp_attribute_extra')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
+        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
+            .done(function(data) {
+                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val(data.name);
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val(data.kulliyyah);
+                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val(data.email);
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val(data.phone_number);
+            })
+            .fail(function() {
+                // If the request fails, clear all the fields
+                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val("");
+            });
+    ']) ?>
             </div>
+
+            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
+            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
+            <?= $form->field($model, 'pi_kulliyyah_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+            <?= $form->field($model, 'pi_name_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
         </div>
     <?php endif; ?>
     <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>

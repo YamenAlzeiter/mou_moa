@@ -7,6 +7,7 @@ use common\models\admin;
 use common\models\Agreement;
 use common\models\EmailTemplate;
 use common\models\Log;
+use common\models\Poc;
 use common\models\search\AgreementSearch;
 use Yii;
 use yii\bootstrap5\ActiveForm;
@@ -37,7 +38,7 @@ class AgreementController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'create', 'downloader', 'log', 'add-activity'
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -242,7 +243,34 @@ class AgreementController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionGetKcdioPoc($id)
+    {
+        $poc = Poc::find()->where(['kcdio' => $id])->all();
 
+
+        if ($poc) {
+            $options = "<option>Select POC</option>";
+            foreach ($poc as $apoc) {
+                $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
+            }
+        } else $options = "<option>Person In charge Not found</option>";
+
+        echo $options;
+    }
+
+    public function actionGetPocInfo($id)
+    {
+        $poc = Poc::findOne($id);
+
+        if ($poc) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return ['name' => $poc->name, 'kulliyyah' => $poc->kcdio, // Adjust this according to your attribute name
+                'email' => $poc->email, 'phone_number' => $poc->phone_number,];
+        } else {
+            // Handle the case where no POC is found with the given ID
+            return ['error' => 'POC not found'];
+        }
+    }
 
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {

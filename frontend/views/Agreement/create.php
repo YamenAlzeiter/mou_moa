@@ -12,37 +12,15 @@ $this->title = 'Create';
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
 ?>
 
-<?php $form = ActiveForm::begin([
-    'id' => 'create-form',
-    'fieldConfig' => [
-        'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>",
-        'labelOptions' => ['class' => ''],
-    ],
-]); ?>
+<?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 <div class="row">
     <div class="col-md-4">
-        <?= $form->field($model, 'agreement_type')->dropDownList(
-            [
-                'MOU (Academic)' => 'MOU (Academic)',
-                'MOU (Non-Academic)' => 'MOU (Non-Academic)',
-                'MOA (Academic)' => 'MOA (Academic)',
-                'MOA (Non-Academic)' => 'MOA (Non-Academic)'
-            ],
-            [
-                'prompt' => 'Select Type',
-                'options' => [
-                    'MOU (Academic)' => ['selected' => true]
-                ]
-            ]
-        ) ?>
+        <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type', 'options' => ['MOU (Academic)' => ['selected' => true]]]) ?>
 
     </div>
     <div class="col-md-8">
-        <?= $form->field($model, 'col_organization')->textInput([
-            'maxlength' => true,
-            'placeholder' => '',
-            'value' => 'Kansai University' // Set your default value here
+        <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
         ]) ?>
 
     </div>
@@ -51,17 +29,14 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <div class="row">
     <div class="col-md">
-        <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Dr. Prof. Keiko IKEDA' ]) ?>
-        <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value'=> '81663681174 
+        <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Dr. Prof. Keiko IKEDA']) ?>
+        <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '81663681174 
 ']) ?>
     </div>
     <div class="col-md">
         <?= $form->field($model, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Center for International Education, Division of International Affairs']) ?>
-        <?= $form->field($model, 'col_email')->textInput([
-            'type' => 'email', // Correct syntax for setting the input type
-            'maxlength' => true,
-            'placeholder' => 'mi-room@ml.kandai.jp',
-            'value' => 'mi-room@ml.kandai.jp' // Set your default email value here
+        <?= $form->field($model, 'col_email')->textInput(['type' => 'email', // Correct syntax for setting the input type
+            'maxlength' => true, 'placeholder' => 'mi-room@ml.kandai.jp', 'value' => 'mi-room@ml.kandai.jp' // Set your default email value here
         ]) ?>
 
     </div>
@@ -101,15 +76,8 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
         <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '10']) ?>
     </div>
     <div class="col-md">
-        <?= $form->field($model, 'transfer_to')->dropDownList(
-            ['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'],
-            [
-                'prompt' => 'select OSC',
-                'options' => [
-                    'IO' => ['selected' => true] // Set 'IO' as default
-                ]
-            ]
-        ) ?>
+        <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select OSC', 'options' => ['IO' => ['selected' => true] // Set 'IO' as default
+            ]]) ?>
 
     </div>
 </div>
@@ -131,3 +99,101 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
     <?= Html::submitButton('Submit', ['class' => 'btn btn-success', 'name' => 'checked', 'value' => 10]) ?>
 </div>
 <?php ActiveForm::end(); ?>
+
+
+<script>
+    let clicks = 0;
+
+    function handleAdd() {
+        event.preventDefault();
+
+        if (clicks >= 2) {
+            Swal.fire({
+                title: "Oops...!",
+                text: "You Can't Add More than 2 Person in Charge.",
+                icon: "error",
+            });
+            return;
+        }
+
+        const newRow = document.createElement('div');
+        newRow.classList.add('row'); // Add the "row" class
+
+        let fieldsHtml;
+        switch (clicks + 1) {
+            case 1:
+                fieldsHtml = `
+                <div class="col-12 col-md-6">
+        <?= $form->field($model, 'temp_attribute_poc')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
+                    function (data){
+                    $("select#agreement-temp_attribute").html(data);
+                    $("select#agreement-temp_attribute").trigger("change");
+                })']) ?>
+    </div>
+    <div class="col-12 col-md-6">
+        <?= $form->field($model, 'temp_attribute')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
+        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
+            .done(function(data) {
+                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val(data.name);
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val(data.kulliyyah);
+                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val(data.email);
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val(data.phone_number);
+            })
+            .fail(function() {
+                // If the request fails, clear all the fields
+                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val("");
+            });
+    ']) ?>
+    </div>
+
+    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
+    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
+    <?= $form->field($model, 'pi_kulliyyah_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+    <?= $form->field($model, 'pi_name_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+            `;
+                break;
+            case 2:
+                fieldsHtml = `
+                <div class="col-12 col-md-6">
+        <?= $form->field($model, 'temp_attribute_poc_extra')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
+                    function (data){
+                    $("select#agreement-temp_attribute_extra").html(data);
+                    $("select#agreement-temp_attribute_extra").trigger("change");
+                })']) ?>
+    </div>
+    <div class="col-12 col-md-6">
+        <?= $form->field($model, 'temp_attribute_extra')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
+        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
+            .done(function(data) {
+                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val(data.name);
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val(data.kulliyyah);
+                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val(data.email);
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val(data.phone_number);
+            })
+            .fail(function() {
+                // If the request fails, clear all the fields
+                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val("");
+                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val("");
+            });
+    ']) ?>
+    </div>
+
+    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
+    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
+    <?= $form->field($model, 'pi_kulliyyah_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+    <?= $form->field($model, 'pi_name_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+            `;
+                break;
+        }
+
+        newRow.innerHTML = fieldsHtml;
+        $('#extra-pi-fields-container').append(newRow);
+        clicks++;
+    }
+
+</script>

@@ -13,6 +13,7 @@ use Yii;
  * @property string $email
  * @property string $address
  * @property int $staff_id
+ * @property string $kcdio
  */
 class Poc extends \yii\db\ActiveRecord
 {
@@ -30,8 +31,8 @@ class Poc extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'phone_number', 'email', 'address','staff_id'], 'required'],
-            [['name', 'phone_number', 'email', 'address'], 'string', 'max' => 255],
+            [['name', 'phone_number', 'email', 'address', 'kcdio'], 'required'],
+            [['name', 'phone_number', 'email', 'address', 'kcdio'], 'string', 'max' => 255],
             [['staff_id'], 'integer'],
             ['email', 'email'],
         ];
@@ -48,6 +49,7 @@ class Poc extends \yii\db\ActiveRecord
             'phone_number' => 'Phone Number',
             'email' => 'Email',
             'address' => 'Address',
+            'kcdio' => 'K/C/D/I/O'
         ];
     }
 }

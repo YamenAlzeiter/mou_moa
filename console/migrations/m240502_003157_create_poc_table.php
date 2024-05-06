@@ -19,6 +19,7 @@ class m240502_003157_create_poc_table extends Migration
             'phone_number' => $this->string()->notNull(),
             'email' => $this->string()->notNull(),
             'address' => $this->string()->notNull(),
+            'kcdio' => $this->string()->notNull(),
         ]);
     }
 
