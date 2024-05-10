@@ -13,82 +13,67 @@ class m240315_030854_create_moua_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%agreement}}', [
-            'id' => $this->primaryKey(),
+                'id' => $this->primaryKey(),
+                //status
+                'status' => $this->integer(),
+                //Collaborator Details
+                'col_organization' => $this->string(522),
+                'col_name' => $this->string(522),
+                'col_address' => $this->string(522),
+                'col_contact_details' => $this->string(522),
+                'col_collaborators_name' => $this->string(522),
+                'col_wire_up' => $this->string(522),
+                'col_phone_number' => $this->string(512),
+                'col_email' => $this->string(512),
+                'country' => $this->string(522),
+                //primary person in charge
+                'pi_name' => $this->string(522),
+                'pi_kulliyyah' => $this->string(522),
+                'pi_phone_number' => $this->string(512),
+                'pi_email' => $this->string(512),
+                //secondary person in charge
+                'pi_name_x' => $this->string(522),
+                'pi_kulliyyah_x' => $this->string(522),
+                'pi_phone_number_x' => $this->string(512),
+                'pi_email_x' => $this->string(512),
+                //3rd person in charge
+                'pi_name_xx' => $this->string(522),
+                'pi_kulliyyah_xx' => $this->string(522),
+                'pi_phone_number_xx' => $this->string(512),
+                'pi_email_xx' => $this->string(512),
+                //research/ project
+                'project_title' => $this->text(),
+                'grant_fund' => $this->string(),
+                'sign_date' => $this->date(),
+                'end_date'  => $this->date(),
+                'member' => $this->string(2),
+                'progress' => $this ->text(),
+                //extra
+                'ssm' => $this->string(522),
+                'company_profile' => $this->string(),
+                'mcom_date' => $this->date(),
+                'meeting_link' => $this->string(),
+                'agreement_type' => $this->string(),
+                'transfer_to' => $this->string(),
+                'proposal' => $this->string(),
+                //docs
+                'applicant_doc' =>$this->text(),
+                'dp_doc' =>$this->text(),
+                //messages
+                'reason' => $this->text(),
+                //time
+                'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+                'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+                //details
+                'pi_details' => $this->text(),
+                'col_details' => $this->text(),
+                'collaboration_area' => $this->text(),
+                //reminder
+                'isReminded' => $this->integer(1)->defaultValue(0),//this for application
+                'last_reminder' => $this->date(),//this for activities
+                //temp
+                'temp' => $this->text(),
 
-            //Collaborator Details
-            'col_organization' => $this->string(522),
-            'col_name' => $this->string(522),
-            'col_address' => $this->string(522),
-            'col_contact_details' => $this->string(522),
-            'col_collaborators_name' => $this->string(522),
-            'col_wire_up' => $this->string(522),
-            'col_phone_number' => $this->string(512),
-            'col_email' => $this->string(512),
-            'country' => $this->string(522),
-            //Pi Details
-            'pi_name' => $this->string(522),
-            'pi_kulliyyah' => $this->string(522),
-            'pi_phone_number' => $this->string(512),
-            'pi_email' => $this->string(512),
-
-            'pi_name_extra' => $this->string(522),
-            'pi_kulliyyah_extra' => $this->string(522),
-            'pi_phone_number_extra' => $this->string(512),
-            'pi_email_extra' => $this->string(512),
-
-            'pi_name_extra2' => $this->string(522),
-            'pi_kulliyyah_extra2' => $this->string(522),
-            'pi_phone_number_extra2' => $this->string(512),
-            'pi_email_extra2' => $this->string(512),
-
-            //research/ project
-            'project_title' => $this->text(),
-            'grant_fund' => $this->string(),
-            'sign_date' => $this->date(),
-            'end_date'  => $this->date(),
-            'member' => $this->string(2),
-            'progress' => $this ->text(),
-
-            //status
-            'status' => $this->integer(),
-
-            //extra
-            'ssm' => $this->string(522),
-            'company_profile' => $this->string(),
-            'mcom_date' => $this->date(),
-            'meeting_link' => $this->string(),
-            'agreement_type' => $this->string(),
-            'transfer_to' => $this->string(),
-            'proposal' => $this->string(),
-            //docs
-            'doc_applicant' => $this->string(522),
-
-            'doc_draft' => $this->string(522),
-            'doc_newer_draft' => $this->string(522),
-            'doc_re_draft' => $this->string(522),
-            'doc_final' => $this->string(522),
-            'doc_executed' => $this->string(522),
-            //in case extra one needed
-            'doc_extra' => $this->string(522),
-            //messages
-            'reason' => $this->text(),
-
-            //time
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-
-            //details
-            'pi_details' => $this->text(),
-            'col_details' => $this->text(),
-            'collaboration_area' => $this->text(),
-
-            //reminder
-            'isReminded' => $this->integer(1)->defaultValue(0),
-
-            //temp
-
-            'temp' => $this->text(),
-            'last_reminder' => $this->date(),
         ]);
 
         //in case need foreign key
@@ -123,28 +108,28 @@ class m240315_030854_create_moua_table extends Migration
             EXECUTE FUNCTION before_insert_agreement();
         ");
 
-        $this->execute("
-            CREATE OR REPLACE FUNCTION clear_draft_fields() 
-            RETURNS TRIGGER AS $$
-            BEGIN
-                IF NEW.status = 81 THEN
-                    NEW.doc_applicant := '';
-                    NEW.doc_draft := '';
-                    NEW.doc_newer_draft := '';
-                END IF;
-                RETURN NEW;
-            END;
-            $$ LANGUAGE plpgsql;
-        ");
+//        $this->execute("
+//            CREATE OR REPLACE FUNCTION clear_draft_fields()
+//            RETURNS TRIGGER AS $$
+//            BEGIN
+//                IF NEW.status = 81 THEN
+//                    NEW.doc_applicant := '';
+//                    NEW.doc_draft := '';
+//                    NEW.doc_newer_draft := '';
+//                END IF;
+//                RETURN NEW;
+//            END;
+//            $$ LANGUAGE plpgsql;
+//        ");
 
         // Create the trigger
-        $this->execute("
-            CREATE TRIGGER clear_files_on_status_81
-            BEFORE UPDATE ON agreement
-            FOR EACH ROW 
-            WHEN (NEW.status = 81 AND OLD.status <> 81) -- Trigger only on change TO 81
-            EXECUTE FUNCTION clear_draft_fields();
-        ");
+//        $this->execute("
+//            CREATE TRIGGER clear_files_on_status_81
+//            BEFORE UPDATE ON agreement
+//            FOR EACH ROW
+//            WHEN (NEW.status = 81 AND OLD.status <> 81) -- Trigger only on change TO 81
+//            EXECUTE FUNCTION clear_draft_fields();
+//        ");
         $this->execute("
          CREATE OR REPLACE FUNCTION create_status_log()
 RETURNS trigger AS $$ 

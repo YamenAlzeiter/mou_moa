@@ -60,6 +60,7 @@ class ReminderController extends Controller
     private function sendEmailReminder($user, $emailTemplate)
     {
         if ($user->pi_email != null) {
+            echo $user->pi_email . "\n";
             $body = str_replace('{recipientName}', $user->pi_name, $emailTemplate->body);
             Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $emailTemplate->subject, 'body' => $body])->setFrom(["noreply@example.com" => "My Application"])->setTo($user->pi_email)->setSubject($emailTemplate->subject)->send();
         }

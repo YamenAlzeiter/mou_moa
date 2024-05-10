@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use common\models\Kcdio;
 use common\models\McomDate;
+use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -21,14 +22,18 @@ $status = [
     34 => 46,
     47 => 46,
     43 => 15,
+    51 => 61,
+    72 => 61,
     81 => 91,
 ];
 
+$additionalPoc = new \common\helpers\pocFieldMaker();
 
 $currentDate = Carbon::now();
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
 
-
+$model->poc_kcdio_getter_x = $model->pi_kulliyyah_x;
+$model->poc_kcdio_getter_xx = $model->pi_kulliyyah_xx;
 
 ?>
 <?php $form = ActiveForm::begin([
@@ -38,7 +43,7 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
 ]); ?>
 
 
-<?php if ($model->status == 2 || $model->status == 12 || $model->status == 33 || $model->status == 43 || $model->status == 34 || $model->status == 47): ?>
+<?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
     <div class="row">
         <div class="col-md-4">
             <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
@@ -48,7 +53,6 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
-
 
     <div class="row">
         <div class="col-md">
@@ -60,9 +64,8 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             <?= $form->field($model, 'col_email')->textInput(['type => email', 'maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
+
     <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6]) ?>
-
-
     <div class="row">
         <div class="col-md-8">
             <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
@@ -71,8 +74,8 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
-    <h4>Person In Charge Details</h4>
 
+    <h4>Person In Charge Details</h4>
     <div class="row">
         <div class="col-md">
             <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false) ?>
@@ -81,74 +84,17 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
-    <?php if ($model->pi_name_extra): ?>
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <?= $form->field($model, 'temp_attribute_poc')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
-                    function (data){
-                    $("select#agreement-temp_attribute").html(data);
-                    $("select#agreement-temp_attribute").trigger("change");
-                })']) ?>
-            </div>
-            <div class="col-12 col-md-6">
-                <?= $form->field($model, 'temp_attribute')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
-        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
-            .done(function(data) {
-                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val(data.name);
-                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val(data.kulliyyah);
-                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val(data.email);
-                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val(data.phone_number);
-            })
-            .fail(function() {
-                // If the request fails, clear all the fields
-                $("#' . Html::getInputId($model, 'pi_name_extra') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_email_extra') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_phone_number_extra') . '").val("");
-            });
-    ']) ?>
-            </div>
 
-            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
-            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
-            <?= $form->field($model, 'pi_kulliyyah_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-            <?= $form->field($model, 'pi_name_extra', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-        </div>
-    <?php endif; ?>
-    <?php if ($model->pi_name_extra2): ?>
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <?= $form->field($model, 'temp_attribute_poc_extra')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
-                    function (data){
-                    $("select#agreement-temp_attribute_extra").html(data);
-                    $("select#agreement-temp_attribute_extra").trigger("change");
-                })']) ?>
-            </div>
-            <div class="col-12 col-md-6">
-                <?= $form->field($model, 'temp_attribute_extra')->dropDownList([], ['prompt' => 'Select POC', 'onchange' => '
-        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
-            .done(function(data) {
-                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val(data.name);
-                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val(data.kulliyyah);
-                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val(data.email);
-                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val(data.phone_number);
-            })
-            .fail(function() {
-                // If the request fails, clear all the fields
-                $("#' . Html::getInputId($model, 'pi_name_extra2') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_kulliyyah_extra2') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_email_extra2') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_phone_number_extra2') . '").val("");
-            });
-    ']) ?>
-            </div>
+    <?php
+    if ($model->pi_name_x) {
+        $additionalPoc->renderExtraFields($form, $model, '_x');
 
-            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
-            <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number_extra2')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
-            <?= $form->field($model, 'pi_kulliyyah_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-            <?= $form->field($model, 'pi_name_extra2', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-        </div>
-    <?php endif; ?>
+    }
+
+    if ($model->pi_name_xx) {
+        $additionalPoc->renderExtraFields($form, $model, '_xx');
+    }
+    ?>
     <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
     <div class="row">
         <div class="col-md">
@@ -165,7 +111,7 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
 
     <?= $form->field($model, 'proposal')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'fileUpload', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
 
 <?php elseif ($model->status == 11): ?>
 
@@ -185,8 +131,13 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
         ['prompt' => 'Select a Date']
     ) ?>
 
-
-<?php elseif ($model->status == 81): ?>
+<?php
+elseif (in_array($model->status, [51, 72])): ?>
+    <?= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
+    <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?php echo $model->status?>
+<?php
+elseif ($model->status == 81): ?>
     <div class="row">
         <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
         <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
@@ -200,7 +151,8 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             ]) ?></div>
     </div>
     <?= $form->field($model, 'executedAgreement', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-<?php elseif ($model->status == 110): ?>
+<?php
+elseif ($model->status == 110): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
         <?= $form->field($model, 'status')->radioList(['91' => 'Yes', '92' => 'No'], [
@@ -214,7 +166,8 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
             <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
         </div>
     </div>
-<?php endif; ?>
+<?php
+endif; ?>
 
 <?php if ($model->status == 110): ?>
     <div class="modal-footer p-0">
@@ -224,6 +177,7 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
     </div>
 <?php else: ?>
     <div class="modal-footer p-0">
+        <?php echo  $status[$model->status]?>
         <?= Html::submitButton('Submit',
             ['class' => 'btn btn-success', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
         <?php ActiveForm::end(); ?>

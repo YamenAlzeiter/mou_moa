@@ -53,12 +53,12 @@ modal::end();
         </div>
     </div>
 </div>
-
+<div class="container-md my-3 p-4 rounded-3 bg-white shadow">
 <div class = "table-responsive">
     <?= GridView::widget([
         'dataProvider' => $dataProvider, //        'filterModel' => $searchModel,
 //        'dataColumnClass' => 'common\helpers\customColumClass',
-        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap '],
+        'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap rounded-3 overflow-hidden'],
         'summary' => '',
         'rowOptions' => function ($model) {
             $build = new builders();
@@ -117,6 +117,7 @@ modal::end();
             'activePageCssClass' => ['class' => 'link-white active'],// additional pager options if needed
         ], 'layout' => "{items}\n{pager}",
     ]); ?>
+</div>
 </div>
 
 <?php Pjax::end(); ?>

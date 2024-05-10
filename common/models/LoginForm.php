@@ -45,7 +45,7 @@ class LoginForm extends Model
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user || !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Incorrect staff_id or password.');
+                $this->addError($attribute, 'Incorrect staff id or password.');
             }
         }
     }
@@ -71,8 +71,11 @@ class LoginForm extends Model
      */
     protected function getUser()
     {
-        if ($this->_user === null) {
-            $this->_user = User::findByUsername($this->staff_id);
+        $staff = Poc::find()->where(['staff_id' => $this->staff_id])->one();
+        if($staff){
+            if ($this->_user === null) {
+                $this->_user = User::findByUsername($this->staff_id);
+            }
         }
 
         return $this->_user;

@@ -8,7 +8,7 @@ use yii\grid\GridView;
 /** @var yii\web\View $this */
 /** @var common\models\search\AgreementSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
-
+echo '<div class="container-md my-3 p-4 rounded-3 bg-white shadow">';
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '],
@@ -68,7 +68,9 @@ echo GridView::widget([
 
         // additional pager options if needed
     ], 'layout' => "{items}\n{pager}",
-]); ?>
+]);
+echo '</div>'
+?>
 
 
 

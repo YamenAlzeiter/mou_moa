@@ -1,14 +1,14 @@
 <?php
 
 use common\models\AgreementType;
-use common\models\Kcdio;
-use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
+
+$additionalPoc = new \common\helpers\pocFieldMaker();
 
 $this->title = 'Create';
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
@@ -57,38 +57,8 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 <h4>Person In Charge Details</h4>
 
 <div class="row">
-
-    <div class="col-12 col-md-6">
-        <?= $form->field($model, 'temp_attribute_poc')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, 
-                    function (data){
-                    $("select#agreement-temp_attribute").html(data);
-                    $("select#agreement-temp_attribute").trigger("change");
-                })']) ?>
-    </div>
-    <div class="col-12 col-md-6">
-        <?= $form->field($model, 'temp_attribute')->dropDownList([],['prompt' => 'Select POC', 'onchange' => '
-        $.get("' . Yii::$app->urlManager->createUrl('agreement/get-poc-info') . '", { id: $(this).val() })
-            .done(function(data) {
-                $("#' . Html::getInputId($model, 'pi_name') . '").val(data.name);
-                $("#' . Html::getInputId($model, 'pi_kulliyyah') . '").val(data.kulliyyah);
-                $("#' . Html::getInputId($model, 'pi_email') . '").val(data.email);
-                $("#' . Html::getInputId($model, 'pi_phone_number') . '").val(data.phone_number);
-            })
-            .fail(function() {
-                // If the request fails, clear all the fields
-                $("#' . Html::getInputId($model, 'pi_name') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_kulliyyah') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_email') . '").val("");
-                $("#' . Html::getInputId($model, 'pi_phone_number') . '").val("");
-            });
-    ']) ?>
-    </div>
-
-    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_email')->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
-    <div class="col-12 col-md-6"><?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
-    <?= $form->field($model, 'pi_kulliyyah', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-    <?= $form->field($model, 'pi_name', ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0'],])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-
+    <!--person in charge Builder-->
+<?php $additionalPoc->renderExtraFields($form, $model, '');?>
 </div>
 
 <div id="extra-pi-fields-container"></div>
@@ -119,11 +89,51 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'value' => 'proposal.....................']) ?>
 
+<div class="row">
+    <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
+    <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+</div>
 
 
-<?= $form->field($model, 'fileUpload', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+<?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
 
 <div class="modal-footer p-0">
     <?= Html::submitButton('Submit', ['class' => 'btn btn-success', 'name' => 'checked', 'value' => 91]) ?>
 </div>
 <?php ActiveForm::end(); ?>
+
+
+<script>
+    let clicks = 0;
+
+    function handleAdd() {
+        event.preventDefault();
+
+        if (clicks >= 2) {
+            Swal.fire({
+                title: "Oops...!",
+                text: "You Can't Add More than 2 Person in Charge.",
+                icon: "error",
+            });
+            return;
+        }
+
+        const newRow = document.createElement('div');
+        newRow.classList.add('row');
+
+        let fieldsHtml;
+        switch (clicks + 1) {
+            case 1:
+                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_x');?>`;
+                break;
+            case 2:
+                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_xx');?>`;
+                break;
+        }
+
+        newRow.innerHTML = fieldsHtml;
+        $('#extra-pi-fields-container').append(newRow);
+        clicks++;
+    }
+
+</script>

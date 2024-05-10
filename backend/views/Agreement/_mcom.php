@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -9,20 +10,34 @@ use yii\helpers\Html;
 /** @var common\models\Agreement $model */
 /** @var yii\bootstrap5\ActiveForm $form */
 
-$currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
+$currentDate = Carbon::now();
+$nextTwoMonth = $currentDate->copy()->addMonths(2);
 ?>
 
 <?php $form = ActiveForm::begin([
-    'id' => 'actiontaken', 'validateOnBlur' => false, 'validateOnChange' => false,
+    'id' => 'actiontaken',
+    'validateOnBlur' => false,
+    'validateOnChange' => false,
     'options' => ['enctype' => 'multipart/form-data'],
 ]); ?>
+
 <?php if ($model->status == 21): ?>
 
-    <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where([
-        '<', 'counter', 20
-    ])->andWhere(['>', 'date', $currentDate])->all(), 'date', function ($model) {
-        return 'Date: '.' '.$model->date.', available: '.' '.(20 - $model->counter);
-    }), ['prompt' => 'Select a Date']) ?>
+    <?= $form->field($model, 'mcom_date')->dropDownList(
+        ArrayHelper::map(
+            McomDate::find()
+                ->where(['<', 'counter', 10])
+                ->andWhere(['>', 'date', $currentDate->toDateString()])
+                ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
+                ->limit(3) // Limit the number of results to three
+                ->all(),
+            'date',
+            function ($model) {
+                return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
+            }
+        ),
+        ['prompt' => 'Select a Date']
+    ) ?>
 
 <?php endif; ?>
 

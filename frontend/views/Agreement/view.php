@@ -2,7 +2,10 @@
 
 use common\helpers\builders;
 use common\helpers\viewRenderer;
+use yii\bootstrap5\Html;
 use yii\bootstrap5\Modal;
+use yii\data\ArrayDataProvider;
+use yii\grid\GridView;
 use yii\helpers\Url;
 use yii\web\JqueryAsset;
 use yii\web\YiiAsset;
@@ -81,29 +84,29 @@ modal::end();
             <?= $view->renderer($model->pi_email, 'Email Address', true) ?>
         </div>
     </div>
-    <?php if ($model->pi_name_extra != null): ?>
+    <?php if ($model->pi_name_x != null): ?>
         <h4>1. Person In Charge Details</h4>
         <div class="row">
             <div class="col-md-6">
-                <?= $view->renderer($model->pi_name_extra, 'Name') ?>
-                <?= $view->renderer($model->pi_kulliyyah_extra, 'Kulliyyah') ?>
+                <?= $view->renderer($model->pi_name_x, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_x, 'Kulliyyah') ?>
             </div>
             <div class="col-md-6">
-                <?= $view->renderer($model->pi_phone_number_extra, 'Phone Number') ?>
-                <?= $view->renderer($model->pi_email_extra, 'Email Address', true) ?>
+                <?= $view->renderer($model->pi_phone_number_x, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_x, 'Email Address', true) ?>
             </div>
         </div>
     <?php endif; ?>
-    <?php if ($model->pi_name_extra2 != null): ?>
+    <?php if ($model->pi_name_xx != null): ?>
         <h4>2. Person In Charge Details</h4>
         <div class="row">
             <div class="col-md-6">
-                <?= $view->renderer($model->pi_name_extra2, 'Name') ?>
-                <?= $view->renderer($model->pi_kulliyyah_extra2, 'Kulliyyah') ?>
+                <?= $view->renderer($model->pi_name_xx, 'Name') ?>
+                <?= $view->renderer($model->pi_kulliyyah_xx, 'Kulliyyah') ?>
             </div>
             <div class="col-md-6">
-                <?= $view->renderer($model->pi_phone_number_extra2, 'Phone Number') ?>
-                <?= $view->renderer($model->pi_email_extra2, 'Email Address', true) ?>
+                <?= $view->renderer($model->pi_phone_number_xx, 'Phone Number') ?>
+                <?= $view->renderer($model->pi_email_xx, 'Email Address', true) ?>
             </div>
         </div>
     <?php endif; ?>
@@ -124,14 +127,90 @@ modal::end();
 
     <!--section files-->
     <h4>Files</h4>
-    <div class="d-flex gap-3">
-        <?php echo $build->downloadLinkBuilder($model->doc_applicant, 'Init Document'); ?>
-        <?php echo $build->downloadLinkBuilder($model->doc_draft, 'first Draft'); ?>
-        <?php echo $build->downloadLinkBuilder($model->doc_newer_draft, 'Newer Draft'); ?>
-        <?php echo $build->downloadLinkBuilder($model->doc_final, 'Final Draft'); ?>
-        <?php echo $build->downloadLinkBuilder($model->doc_extra, 'Extra Document'); ?>
-        <?php echo $build->downloadLinkBuilder($model->doc_executed, 'Executed Agreement'); ?>
+    <div class="row">
+        <div class="col-md-6">
+            <?php
+            $folder = $model->applicant_doc;
+            $files = [];
+            if (is_dir($folder)) {
+                $files = array_diff(scandir($folder), ['.', '..']);
+            }
+
+            if (!empty($files)) {
+                echo GridView::widget([
+                    'dataProvider' => new ArrayDataProvider([
+                        'allModels' => array_values($files),
+                        'pagination' => false, // Disable pagination
+                    ]),
+                    'summary' => false,
+                    'columns' => [
+                        [
+                            'attribute' => 'file',
+                            'label' => 'File Name',
+                            'value' => function ($file) use ($model) {
+                                $build = new builders();
+                                return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                            },
+                            'format' => 'raw',
+                        ],
+                        [
+                            'class' => 'yii\grid\ActionColumn',
+                            'template' => '{delete}',
+                            'buttons' => [
+                                'delete' => function ($url, $fileModel, $key) use ($model) {
+                                    return Html::a(
+                                        '<span class="ti ti-trash fs-7 text-danger"></span>',
+                                        ['delete-file', 'id' => $model->id, 'filename' => $fileModel],
+                                        [
+                                            'class' => 'btn-action',
+                                            'id' => 'modelButton',
+                                            'data-confirm' => 'Are you sure you want to delete this file?',
+                                            'data-method' => 'post',
+                                        ]
+                                    );
+                                },
+                            ],
+                        ],
+                    ],
+                ]);
+            } else {
+                echo 'No files found.';
+            }
+            ?>
+        </div>
+        <div class="col-md-6">
+            <?php
+            $folder = $model->dp_doc;
+            $files = [];
+            if (is_dir($folder)) {
+                $files = array_diff(scandir($folder), ['.', '..']);
+            }
+
+            if (!empty($files)) {
+                echo GridView::widget([
+                    'dataProvider' => new ArrayDataProvider([
+                        'allModels' => array_values($files),
+                        'pagination' => false, // Disable pagination
+                    ]),
+                    'summary' => false,
+                    'columns' => [
+                        [
+                            'attribute' => 'file',
+                            'label' => 'File Name',
+                            'value' => function ($file) use ($model) {
+                                $build = new builders();
+                                return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                            },
+                            'format' => 'raw',
+                        ],
+                    ],
+                ]);
+            }
+            ?>
+        </div>
     </div>
+
+
 
 <?php
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',

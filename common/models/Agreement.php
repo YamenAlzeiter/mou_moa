@@ -27,14 +27,17 @@ use yii\helpers\FileHelper;
  * @property string|null $pi_phone_number
  * @property string|null $country
  * @property string|null $pi_email
- * @property string|null $pi_name_extra
- * @property string|null $pi_kulliyyah_extra
- * @property string|null $pi_phone_number_extra
- * @property string|null $pi_email_extra
- * @property string|null $pi_name_extra2
- * @property string|null $pi_kulliyyah_extra2
- * @property string|null $pi_phone_number_extra2
- * @property string|null $pi_email_extra2
+ *
+ * @property string|null $pi_name_x
+ * @property string|null $pi_kulliyyah_x
+ * @property string|null $pi_phone_number_x
+ * @property string|null $pi_email_x
+ *
+ * @property string|null $pi_name_xx
+ * @property string|null $pi_kulliyyah_xx
+ * @property string|null $pi_phone_number_xx
+ * @property string|null $pi_email_xx
+ *
  * @property string|null $project_title
  * @property string|null $grant_fund
  * @property string|null $sign_date
@@ -48,13 +51,10 @@ use yii\helpers\FileHelper;
  * @property string|null $mcom_date
  * @property string|null $meeting_link
  * @property string|null $agreement_type
- * @property string|null $doc_applicant
- * @property string|null $doc_draft
- * @property string|null $doc_newer_draft
- * @property string|null $doc_re_draft
- * @property string|null $doc_final
- * @property string|null $doc_extra
- * @property string|null $doc_executed
+ *
+ * @property string|null $dp_doc
+ * @property string|null $applicant_doc
+
  * @property string|null $reason
  * @property string|null $transfer_to
  * @property string|null $temp
@@ -64,19 +64,16 @@ use yii\helpers\FileHelper;
  */
 class Agreement extends ActiveRecord
 {
-    public $submitter;
 
-    public $fileUpload;
-    public $olaDraft;
-    public $oscDraft;
-    public $finalDraft;
-    public $executedAgreement;
-    public $needMe;
+    public $files_applicant;
+    public $files_dp;
+    public $poc_kcdio_getter;
+    public $poc_kcdio_getter_x;
+    public $poc_kcdio_getter_xx;
+    public $poc_name_getter;
+    public $poc_name_getter_x;
+    public $poc_name_getter_xx;
 
-    public $temp_attribute;
-    public $temp_attribute_poc;
-    public $temp_attribute_extra;
-    public $temp_attribute_poc_extra;
     /**
      * {@inheritdoc}
      */
@@ -91,7 +88,8 @@ class Agreement extends ActiveRecord
     public function rules()
     {
         return [
-            [['fileUpload', 'olaDraft', 'oscDraft', 'finalDraft', 'executedAgreement'], 'file', 'extensions' => 'docx, pdf', 'maxSize' => 1024 * 1024 * 10],
+            [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
+            [['files_dp'], 'file', 'extensions' => 'docx, pdf', 'maxSize' => 1024 * 1024 * 10],
 
             [[ 'col_organization','fileUpload',
                 'col_name', 'col_address', 'col_collaborators_name',
@@ -101,12 +99,16 @@ class Agreement extends ActiveRecord
                 'agreement_type', 'country'],
                 'required', 'on' => 'uploadCreate'],
 
-            [['pi_email', 'col_email', 'pi_email_extra', 'pi_email_extra2'], 'email'],
+            [['pi_email', 'col_email', 'pi_email_x', 'pi_email_xx'], 'email'],
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
             [['status'], 'default', 'value' => null],
             [['status'], 'integer'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'ssm', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'doc_executed', 'transfer_to', 'agreement_type', 'country', 'pi_name_extra'        , 'pi_kulliyyah_extra'   ,  'pi_phone_number_extra', 'pi_email_extra', 'pi_name_extra2', 'pi_kulliyyah_extra2', 'pi_phone_number_extra2', 'pi_email_extra2'], 'string', 'max' => 522],
+            [['col_organization', 'col_name', 'col_address', 'col_contact_details',
+                'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah',
+                'ssm','dp_doc','applicant_doc', 'transfer_to', 'agreement_type', 'country',
+                'pi_name_x', 'pi_kulliyyah_x',  'pi_phone_number_x', 'pi_email_x',
+                'pi_name_xx', 'pi_kulliyyah_xx', 'pi_phone_number_xx', 'pi_email_xx'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
@@ -134,15 +136,15 @@ class Agreement extends ActiveRecord
             'pi_phone_number' => 'Phone Number',
             'pi_email' => 'Email',
 
-            'pi_name_extra' => 'Name',
-            'pi_kulliyyah_extra' => 'Champion',
-            'pi_phone_number_extra' => 'Phone Number',
-            'pi_email_extra' => 'Email',
+            'pi_name_x' => 'Name',
+            'pi_kulliyyah_x' => 'Champion',
+            'pi_phone_number_x' => 'Phone Number',
+            'pi_email_x' => 'Email',
 
-            'pi_name_extra2' => 'Name',
-            'pi_kulliyyah_extra2' => 'Champion',
-            'pi_phone_number_extra2' => 'Phone Number',
-            'pi_email_extra2' => 'Email',
+            'pi_name_xx' => 'Name',
+            'pi_kulliyyah_xx' => 'Champion',
+            'pi_phone_number_xx' => 'Phone Number',
+            'pi_email_xx' => 'Email',
 
             'project_title' => 'Project Title',
             'grant_fund' => 'Grant Fund',
@@ -155,13 +157,10 @@ class Agreement extends ActiveRecord
             'company_profile' => 'Company Profile',
             'mcom_date' => 'MCOM Date',
             'meeting_link' => 'Meeting Link',
-            'doc_applicant' => 'Document Applicant',
-            'doc_draft' => 'Document Draft',
-            'doc_newer_draft' => 'Document Newer Draft',
-            'doc_re_draft' => 'Document Re-Draft',
-            'doc_final' => 'Document Final',
-            'doc_extra' => 'Document Extra',
-            'doc_executed' => 'Document Executed',
+
+            'dp_doc' => 'by department',
+            'applicant_doc' => 'by applicant',
+
             'reason' => 'Reason',
             'transfer_to' => 'OSC',
             'agreement_type' => 'type',
@@ -171,6 +170,7 @@ class Agreement extends ActiveRecord
             'isReminded' => 'Reminder Step',
             'temp_attribute_poc' => 'KCDIO',
             'temp_attribute' => 'person in charge name'
+
         ];
     }
 
@@ -206,8 +206,8 @@ class Agreement extends ActiveRecord
     {
         parent::afterSave($insert, $changedAttributes);
 
-        //delete draft files when status become 81 AKA ACTV
-        if($this->status == 81) $this->deleteDrafts();
+        //delete draft files when status become 91 AKA ACTV
+//        if($this->status == 91) $this->deleteDrafts();
         if($this->status == 21) $this->increaseMCOMDate();
     }
 
@@ -216,21 +216,21 @@ class Agreement extends ActiveRecord
         $mcom->counter++;
         $mcom->save();
     }
-    protected function deleteDrafts()
-    {
-        $fileLocations = [
-            $this->doc_applicant,
-            $this->doc_draft,
-            $this->doc_newer_draft
-        ];
-
-        foreach ($fileLocations as $filePath) {
-            if (is_file($filePath)) {  // Use is_file() to check existence
-                FileHelper::unlink($filePath);
-                Yii::info("File deleted: $filePath", __METHOD__);
-            } else {
-                Yii::warning("File not found: $filePath", __METHOD__);
-            }
-        }
-    }
+//    protected function deleteDrafts()
+//    {
+//        $fileLocations = [
+//            $this->doc_applicant,
+//            $this->doc_draft,
+//            $this->doc_newer_draft
+//        ];
+//
+//        foreach ($fileLocations as $filePath) {
+//            if (is_file($filePath)) {  // Use is_file() to check existence
+//                FileHelper::unlink($filePath);
+//                Yii::info("File deleted: $filePath", __METHOD__);
+//            } else {
+//                Yii::warning("File not found: $filePath", __METHOD__);
+//            }
+//        }
+//    }
 }

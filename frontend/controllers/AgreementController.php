@@ -2,6 +2,7 @@
 
 namespace frontend\controllers;
 
+use Carbon\Carbon;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
@@ -27,6 +28,7 @@ use yii\web\UploadedFile;
  */
 class AgreementController extends Controller
 {
+
     /**
      * @inheritDoc
      */
@@ -38,7 +40,7 @@ class AgreementController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc'
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -74,7 +76,8 @@ class AgreementController extends Controller
 
         $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
 
-        $dataProvider->query->andWhere(['status' => 100])->orWhere(['status' => 91]);
+        $dataProvider->query->andWhere(['status' => 100])
+                            ->orWhere(['status' => 91]);
         $dataProvider->pagination = [
             'pageSize' => 11,
         ];
@@ -99,7 +102,7 @@ class AgreementController extends Controller
         $dataProvider = $searchModel->search($this->request->queryParams);
 
         $type = Yii::$app->user->identity->type;
-        $topStatuses = [2, 12, 33, 43, 81, 11];
+        $topStatuses = [2, 12, 33, 43, 51, 72, 81, 11];
         $dataProvider->query->orderBy([
             new Expression("CASE WHEN status IN (" . implode(',', $topStatuses) . ") THEN 0 ELSE 1 END"),
             'updated_at' => SORT_DESC,
@@ -109,8 +112,8 @@ class AgreementController extends Controller
         $dataProvider->query->andWhere(
             ['or',
                 ['pi_kulliyyah' => $type],
-                ['pi_kulliyyah_extra' => $type],
-                ['pi_kulliyyah_extra2' => $type]
+                ['pi_kulliyyah_x' => $type],
+                ['pi_kulliyyah_xx' => $type]
             ]
         );
 
@@ -204,15 +207,16 @@ class AgreementController extends Controller
 
     public function actionViewActivities($id)
     {
-        $model = Activities::find()->where(['agreement_id' => $id])->all();
-
+        $model = Activities::find()
+            ->where(['agreement_id' => $id])
+            ->orderBy(['id' => SORT_DESC])
+            ->all();
 
         return $this->renderAjax('viewActivities', [
             'model' => $model,
         ]);
-
-
     }
+
 
     /**
      * Creates a new Agreement model.
@@ -230,7 +234,7 @@ class AgreementController extends Controller
                 $model->status = $status;
                 $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
                 if ($model->save(false)) {
-                    $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
+                    $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
                     $this->sendEmail($model, 5);
                     return $this->redirect(['index']);
                 }
@@ -264,13 +268,18 @@ class AgreementController extends Controller
 
         if ($poc) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['name' => $poc->name, 'kulliyyah' => $poc->kcdio, // Adjust this according to your attribute name
-                'email' => $poc->email, 'phone_number' => $poc->phone_number,];
+            return [
+                'name' => $poc->name,
+                'kulliyyah' => $poc->kcdio,
+                'email' => $poc->email,
+                'phone_number' => $poc->phone_number,
+            ];
         } else {
             // Handle the case where no POC is found with the given ID
             return ['error' => 'POC not found'];
         }
     }
+
 
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
@@ -280,7 +289,7 @@ class AgreementController extends Controller
             $baseUploadPath = Yii::getAlias('@common/uploads');
             $inputName = preg_replace('/[^a-zA-Z0-9]+/', '_', $file->name);
             $fileName = $model->id . '_' . $fileNamePrefix . '.' . $file->extension;
-            $filePath = $baseUploadPath . '/' . $model->id . '/' . $fileName;
+            $filePath = $baseUploadPath . '/' . $model->id . '/applicant/' . $fileName;
 
             // Create directory if not exists
             if (!file_exists(dirname($filePath))) {
@@ -293,6 +302,43 @@ class AgreementController extends Controller
             $model->save(false);
         }
     }
+
+    function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
+    {
+        $files = UploadedFile::getInstances($model, $attribute);
+        if ($files) {
+            $baseUploadPath = Yii::getAlias('@common/uploads');
+            $path = $baseUploadPath. '/' . $model->id . '/applicant/';
+
+            foreach ($files as $file) {
+                $fileName = $file->baseName . '.'. $file->extension;
+
+                $filePath = $path . $fileName;
+                if (!file_exists(dirname($filePath))) {
+                    mkdir(dirname($filePath), 0777, true);
+                }
+                $file->saveAs($filePath);
+                $model->$attribute = $fileName;
+            }
+
+            $model->$docAttribute = $path;
+            $model->save(false);
+        }
+    }
+    public function actionDeleteFile($id, $filename)
+    {
+        $model = Agreement::findOne($id);
+        $filePath = $model->applicant_doc . $filename;
+
+        if (file_exists($filePath) && unlink($filePath)) {
+            Yii::$app->session->setFlash('success', 'File deleted successfully.');
+        } else {
+            Yii::$app->session->setFlash('error', 'Failed to delete file.');
+        }
+
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
 
     private function sendEmail($model, $template)
     {
@@ -327,10 +373,12 @@ class AgreementController extends Controller
         $oldStatus = $model->status;
         if ($this->request->isPost && $model->load($this->request->post())) {
 
-
             $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
-            $this->fileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'doc_executed');
-            $this->fileHandler($model, 'fileUpload', 'document', 'doc_applicant');
+
+            $model->status == 91? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
+
+            $this->multiFileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'applicant_doc');
+            $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
             $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
             if ($model->save()) {
 

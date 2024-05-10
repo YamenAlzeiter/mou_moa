@@ -29,7 +29,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 
 <?php $form = ActiveForm::begin([
     'fieldConfig' =>
-        ['enableClientValidation' => false,
+        [
             'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>",
             'labelOptions' => ['class' => ''],],
             'id' =>'add_activity']); ?>
@@ -70,10 +70,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 
         </div>
     </div>
-
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-1']) ?>
-    </div>
 </section>
 
 <section id = "section-2" class = "form-section d-none">
@@ -101,11 +97,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'non_program_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
-
-
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-2']) ?>
-    </div>
 </section>
 
 <section id = "section-3" class = "form-section d-none">
@@ -118,9 +109,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'in_staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-3']) ?>
-    </div>
 </section>
 
 <section id = "section-4" class = "form-section d-none">
@@ -132,9 +120,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         <div class = "col-lg-6">
             <?= $form->field($model, 'out_staffs_name')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
-    </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-4']) ?>
     </div>
 </section>
 
@@ -159,9 +144,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'name_participants_involved')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-5']) ?>
-    </div>
 </section>
 
 <section id = "section-6" class = "form-section d-none">
@@ -173,9 +155,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         <div class = "col-lg-6">
 
         </div>
-    </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-6']) ?>
     </div>
 </section>
 
@@ -189,9 +168,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'publisher')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-7']) ?>
-    </div>
 </section>
 
 <section id = "section-8" class = "form-section d-none">
@@ -203,9 +179,6 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         <div class = "col-lg-6">
             <?= $form->field($model, 'project_duration')->textInput(['maxlength' => true, 'placeholder' => ''])?>
         </div>
-    </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-8']) ?>
     </div>
 </section>
 
@@ -219,20 +192,16 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             <?= $form->field($model, 'date')->textInput(['type' => 'date', 'placeholder' => ''])?>
         </div>
     </div>
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-9']) ?>
-    </div>
 </section>
 
 <section id = "section-10" class = "form-section d-none">
     <h2 class="my-4">No Activity</h2>
 
     <?= $form->field($model, 'justification')->textarea(['maxlength' => true, 'placeholder' => ''])?>
-
-    <div class="mb-4 text-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark', 'name' => 'submit', 'value' => 'section-10']) ?>
-    </div>
 </section>
+<div class="mb-4 text-end">
+    <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark']) ?>
+</div>
 <?php ActiveForm::end(); ?>
 
 
