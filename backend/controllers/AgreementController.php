@@ -3,9 +3,11 @@
 namespace backend\controllers;
 
 use Carbon\Carbon;
+use common\helpers\Model;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
+use common\models\AgreementPoc;
 use common\models\EmailTemplate;
 use common\models\Import;
 use common\models\Kcdio;
@@ -53,7 +55,7 @@ class AgreementController extends Controller
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
         // Define the statuses to be always on top
-        $type != "OLA" ? $topStatuses = [10, 15] : $topStatuses = [1, 21, 31, 41, 61];
+        $type != "OLA" ? $topStatuses = [10, 15, 81] : $topStatuses = [1, 21, 31, 41, 61];
 
         if ($type != 'OLA' && $type != 'admin') {
             $dataProvider->query->andWhere(['transfer_to' => $type]);
@@ -80,12 +82,14 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
-
-
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
+        $modelsPoc = AgreementPoc::find()->where(['agreement_id' => $id])->all();
         if (!Yii::$app->user->isGuest) {
 
-            return $this->renderAjax('view', ['model' => $this->findModel($id), 'haveActivity' => $haveActivity]);
+            return $this->renderAjax('view', [
+                'model' => $this->findModel($id),
+                'haveActivity' => $haveActivity,
+                'modelsPoc' => $modelsPoc,]);
         } else {
             return throw new ForbiddenHttpException("You need to login in order to have access to this page");
         }
@@ -119,24 +123,56 @@ class AgreementController extends Controller
     {
         if (Yii::$app->user->identity->type == 'OLA') {
             $model = new Agreement();
-            $model->scenario = 'uploadCreate';
+            $modelsPoc = [new AgreementPoc()];
+            $model->scenario = 'createSpecial';
             if ($this->request->isPost) {
-                if ($model->load($this->request->post())) {
+                $model->load($this->request->post());
+                $modelsPoc = [];
+
+                $pocData = Yii::$app->request->post('AgreementPoc', []);
+                foreach ($pocData as $index => $data) {
+                    $modelPoc = new AgreementPoc();
+                    $modelPoc->load($data, '');
+                    $modelsPoc[] = $modelPoc;
+
+                }
+
                     $status = $this->request->post('checked');
                     $model->status = $status;
                     $model->status == 91 ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
                     $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
-                    if ($model->save(false)) {
-                        $this->multiFileHandler($model, 'files_applicant', 'draft', 'dp_doc');
 
-                        return $this->redirect(['index']);
+                $valid = Model::validateMultiple($modelsPoc);
+
+                if ($valid) {
+                    $transaction = \Yii::$app->db->beginTransaction();
+                    try {
+                        if ($model->save(false)) {
+                            foreach ($modelsPoc as $modelPoc) {
+                                $modelPoc->agreement_id = $model->id;
+                                if (!($modelPoc->save(false))) {
+                                    $transaction->rollBack();
+                                    break;
+                                }
+                            }
+                            $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
+
+                            $transaction->commit();
+                            return $this->redirect(['index']);
+                        }
+                    } catch (Exception $e) {
+                        $transaction->rollBack();
                     }
                 }
+
             } else {
                 $model->loadDefaultValues();
             }
 
-            return $this->renderAjax('create', ['model' => $model,]);
+            return $this->renderAjax('create', [
+                'model' => $model,
+                'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
+            ]);
         } else throw new forbiddenHttpException("You are not authorized to be in this page");
     }
     function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
@@ -211,7 +247,7 @@ class AgreementController extends Controller
             $this->multiFileHandler($model, 'files_applicant', 'draft', 'dp_doc');
             $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
             if ($model->save()) {
-                if (in_array($model->status, [2, 11, 12, 32, 33, 41, 42, 43, 51, 72, 81])) {
+                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81])) {
                     $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
                 }
                 return $this->redirect(['index']);
@@ -226,19 +262,21 @@ class AgreementController extends Controller
     private function sendEmail($model, $needCC)
     {
         $mailMap = [//$model->status => emailTemplate->id//
-            1 => 5, // new application    from OSC to OLA
-            2 => 4, // not complete       from OSC to Applicant
-            12 => 4, // not complete       from OLA to OSC CC Applicant
-            11 => 2, // Pick date          from OLA
-            32 => 1, // MCOM Reject        from OLA to Applicant CC OSC
-            33 => 4, // MCOM not Complete  from OLA to Applicant CC OSC
-            41 => 9, // Approved UMC       from OLA to Applicant CC OSC
-            42 => 1, // UMC Reject         from OLA to Applicant CC OSC
-            43 => 4, // UMC not Complete   from OLA to Applicant CC OSC
-            51 => 3, // draft uploaded     from OLA to Applicant CC OSC
-            72 => 7, // draft rejected     from OLA to OSC
-            81 => 8, // final Draft uploaded from OLA to Applicant CC OSC
-            121 => 11, //MCOM Date Updated  from OLA to Applicant cc OSC
+            1 => 5,     // new application    from OSC to OLA
+            2 => 4,     // not complete       from OSC to Applicant
+            12 => 4,    // not complete       from OLA to OSC CC Applicant
+            11 => 2,    // Pick date          from OLA
+            31 => 2,    // MCOM Recommended   from OLA to Applicant CC OSC
+            32 => 1,    // MCOM Reject        from OLA to Applicant CC OSC
+            33 => 4,    // MCOM not Complete  from OLA to Applicant CC OSC
+            34 => 2,    // MCOM Special       from OLA to Applicant CC OSC
+            41 => 9,    // Approved UMC       from OLA to Applicant CC OSC
+            42 => 1,    // UMC Reject         from OLA to Applicant CC OSC
+            43 => 4,    // UMC not Complete   from OLA to Applicant CC OSC
+            51 => 3,    // draft uploaded     from OLA to Applicant CC OSC
+            72 => 7,    // draft rejected     from OLA to OSC
+            81 => 8,    // final Draft uploaded from OLA to Applicant CC OSC
+            121 => 11,  // MCOM Date Updated  from OLA to Applicant cc OSC
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);
@@ -276,7 +314,7 @@ class AgreementController extends Controller
         }
 
         // Compose and send the email
-        $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->status == 1 ? $ola->email : $model->pi_email)->setSubject($mail->subject);
+        $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->pi_email)->setSubject($mail->subject);
 
 
         $mailer->setCc($ccRecipients);
@@ -286,17 +324,35 @@ class AgreementController extends Controller
 
     public function actionUpdatePoc($id)
     {
-
-
         $model = $this->findModel($id);
+        $modelsPoc = AgreementPoc::find()
+            ->where(['agreement_id' => $id])
+            ->orderBy(['id' => SORT_ASC])
+            ->all();
 
-        if ($this->request->isPost && $model->load($this->request->post())) {
-            if ($model->save()) {
-                return $this->redirect(['index']);
+        if ($this->request->isPost) {
+            $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
+            $modelsPoc = [];
+
+            foreach ($modelsPocData as $data) {
+                $poc =  isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
+                $poc->load($data, '');
+                $modelsPoc[] = $poc;
             }
+                foreach ($modelsPoc as $modelPoc) {
+
+                    $modelPoc->save(false);
+                }
+                return $this->redirect(['index']);
+
         }
-        return $this->renderAjax('_poc', ['model' => $model,]);
+
+        return $this->renderAjax('_poc', [
+            'model' => $model,
+            'modelsPoc' => $modelsPoc,
+        ]);
     }
+
 
     public function actionMcom($id)
     {
@@ -376,27 +432,36 @@ class AgreementController extends Controller
     {
         $poc = Poc::find()->where(['kcdio' => $id])->all();
 
-
         if ($poc) {
-            $options = "<option>Select POC</option>";
+            $options = "<option value=''>Select POC</option>";
             foreach ($poc as $apoc) {
                 $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
             }
-        } else $options = "<option>Person In charge Not found</option>";
+        } else {
+            $options = "<option value=''>Person In charge Not found</option>";
+        }
 
         echo $options;
     }
 
     public function actionGetPocInfo($id)
     {
+
+
+        if(is_numeric($id))
         $poc = Poc::findOne($id);
+        else
+            $poc = Poc::find()->where(['name' => $id])->one();
 
         if ($poc) {
             Yii::$app->response->format = Response::FORMAT_JSON;
-            return ['name' => $poc->name, 'kulliyyah' => $poc->kcdio,
-                'email' => $poc->email, 'phone_number' => $poc->phone_number,];
+            return [
+                'name' => $poc->name,
+                'address' => $poc->address,
+                'email' => $poc->email,
+                'phone_number' => $poc->phone_number,
+            ];
         } else {
-            // Handle the case where no POC is found with the given ID
             return ['error' => 'POC not found'];
         }
     }

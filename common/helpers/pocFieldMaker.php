@@ -46,7 +46,9 @@ class pocFieldMaker
             <div class="col-12 col-md-6"><?= $form->field($model, "pi_email$attributePrefix")->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?></div>
             <div class="col-12 col-md-6"><?= $form->field($model, "pi_phone_number$attributePrefix")->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?></div>
             <?= $form->field($model, "pi_kulliyyah$attributePrefix", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
-            <?= $form->field($model, "pi_name$attributePrefix", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['maxlength' => true, 'class' => ''])->label(false) ?>
+            <?= $form->field($model, "pi_name$attributePrefix", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])
+                ->hiddenInput(['maxlength' => true, 'class' => ''])
+                ->label(false) ?>
         </div>
         <?php
     }

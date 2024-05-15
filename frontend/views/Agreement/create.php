@@ -1,21 +1,24 @@
 <?php
 
-use common\models\Kcdio;
+use common\helpers\agreementPocMaker;
+use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
+/* @var $modelsPoc common\models\AgreementPoc[] */
 
 $this->title = 'Create';
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 
-$additionalPoc = new \common\helpers\pocFieldMaker();
+// get the default user for person in charge
+$defaultPoc = Poc::findOne(['staff_id' => Yii::$app->user->identity->staff_id]);
+$additionalPoc = new agreementPocMaker()
 ?>
 
-<?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
+<?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 <div class="row">
     <div class="col-md-4">
@@ -55,20 +58,19 @@ $additionalPoc = new \common\helpers\pocFieldMaker();
         <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Japan']) ?>
     </div>
 </div>
-<h4>Person In Charge Details</h4>
 
-<div class="row">
-    <div class="col-md poc">
-        <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false) ?>
-        <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false) ?>
-        <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false) ?>
-        <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '0193079894']) ?>
-    </div>
+<h4>Person In Charge Details</h4>
+<div id="poc-container">
+    <?php foreach ($modelsPoc as $index => $modelPoc):
+        $additionalPoc->renderInitPocFields($form, $modelPoc, $index, $defaultPoc);
+    endforeach; ?>
 </div>
 
-<div id="extra-pi-fields-container"></div>
-<button class="btn btn-lg btn-dark text-capitalize mb-3" onclick="handleAdd()" data-clicks="0">Add person in charge
-</button>
+<div class="row mb-3">
+    <div class="col"><?= Html::button('Add another POC', ['class' => 'btn btn-outline-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?></div>
+</div>
+
+
 <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
 <div class="row">
     <div class="col-md">
@@ -80,16 +82,10 @@ $additionalPoc = new \common\helpers\pocFieldMaker();
     </div>
     <div class="col-md">
         <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select OSC', 'options' => ['IO' => ['selected' => true] // Set 'IO' as default
-            ]]) ?>
+        ]]) ?>
 
     </div>
 </div>
-
-
-<?php //= $form->field($model, 'sign_date')->textInput() ?>
-<!---->
-<?php //= $form->field($model, 'end_date')->textInput() ?>
-
 
 
 <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'value' => 'proposal.....................']) ?>
@@ -103,38 +99,29 @@ $additionalPoc = new \common\helpers\pocFieldMaker();
 </div>
 <?php ActiveForm::end(); ?>
 
-
 <script>
-    let clicks = 0;
+    $(document).ready(function () {
+        var pocIndex = $('#poc-container .poc-row').length;
+        $("#agreement-poc_name_getter-0").trigger("change");
 
-    function handleAdd() {
-        event.preventDefault();
+        $('#add-poc-button').on('click', function () {
 
-        if (clicks >= 2) {
-            Swal.fire({
-                title: "Oops...!",
-                text: "You Can't Add More than 2 Person in Charge.",
-                icon: "error",
-            });
-            return;
-        }
+            if (pocIndex < 5) {
+                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, $modelPoc);?>`;
+                newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
+                newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
+                newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
+                $('#poc-container').append(newRow);
+                pocIndex++;
 
-        const newRow = document.createElement('div');
-        newRow.classList.add('row'); // Add the "row" class
+            } else {
+                Swal.fire({
+                    title: "Oops...!",
+                    text: "You Can't Add More than 5 Person in Charge.",
+                    icon: "error",
+                });
 
-        let fieldsHtml;
-        switch (clicks + 1) {
-            case 1:
-                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_x');?>`;
-                break;
-            case 2:
-                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_xx');?>`;
-                break;
-        }
-
-        newRow.innerHTML = fieldsHtml;
-        $('#extra-pi-fields-container').append(newRow);
-        clicks++;
-    }
-
+            }
+        });
+    });
 </script>

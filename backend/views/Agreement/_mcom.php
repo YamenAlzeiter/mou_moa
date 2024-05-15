@@ -11,6 +11,7 @@ use yii\helpers\Html;
 /** @var yii\bootstrap5\ActiveForm $form */
 
 $currentDate = Carbon::now();
+$nextTwoWeeks = $currentDate->copy()->addWeeks(2);
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
 ?>
 
@@ -27,7 +28,7 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
         ArrayHelper::map(
             McomDate::find()
                 ->where(['<', 'counter', 10])
-                ->andWhere(['>', 'date', $currentDate->toDateString()])
+                ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
                 ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
                 ->limit(3) // Limit the number of results to three
                 ->all(),

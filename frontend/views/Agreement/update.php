@@ -12,35 +12,32 @@ use yii\helpers\Html;
 /** @var common\models\Agreement $model */
 
 $this->title = 'Update Agreement: ' . $model->id;
-$templateFileInput = '<div class="col align-items-center"><div class="col-md-2 col-form-label">{label}</div><div class="col-md">{input}</div>{error}</div>';
+$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
+                        <div class="col-md-md">{input}{error}</div></div>';
 
 $status = [
-    2 => 15,
+    2  => 15,
     12 => 15,
     11 => 21,
-    33 => 15,
-    34 => 46,
+    33 => 21,
+    34 => 31,
     47 => 46,
-    43 => 15,
+    43 => 21,
     51 => 61,
     72 => 61,
-    81 => 91,
 ];
 
 $additionalPoc = new \common\helpers\pocFieldMaker();
 
 $currentDate = Carbon::now();
+$nextTwoWeeks = $currentDate->copy()->addWeeks(2);
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
 
 $model->poc_kcdio_getter_x = $model->pi_kulliyyah_x;
 $model->poc_kcdio_getter_xx = $model->pi_kulliyyah_xx;
-
+$model->mcom_date = '';
 ?>
-<?php $form = ActiveForm::begin([
-    'fieldConfig' => [
-        'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],
-    ],
-]); ?>
+<?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 
 <?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
@@ -113,13 +110,15 @@ $model->poc_kcdio_getter_xx = $model->pi_kulliyyah_xx;
 
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
 
-<?php elseif ($model->status == 11): ?>
+<?php endif;?>
+<?php
+if (in_array($model->status, [11, 33, 43])): ?>
 
     <?= $form->field($model, 'mcom_date')->dropDownList(
         ArrayHelper::map(
             McomDate::find()
                 ->where(['<', 'counter', 10])
-                ->andWhere(['>', 'date', $currentDate->toDateString()])
+                ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
                 ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
                 ->limit(3) // Limit the number of results to three
                 ->all(),
@@ -128,29 +127,16 @@ $model->poc_kcdio_getter_xx = $model->pi_kulliyyah_xx;
                 return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
             }
         ),
-        ['prompt' => 'Select a Date']
+        ['prompt' => 'Select a Date', 'required' => true] // Adding 'required' => true here
     ) ?>
+
 
 <?php
 elseif (in_array($model->status, [51, 72])): ?>
     <?= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
     <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
     <?php echo $model->status?>
-<?php
-elseif ($model->status == 81): ?>
-    <div class="row">
-        <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
-        <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
-    </div>
-    <div class="row">
-        <div class="col-md"><?= $form->field($model, 'ssm')->textInput([
-                'maxlength' => true, 'placeholder' => ''
-            ]) ?></div>
-        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput([
-                'maxlength' => true, 'placeholder' => ''
-            ]) ?></div>
-    </div>
-    <?= $form->field($model, 'executedAgreement', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+
 <?php
 elseif ($model->status == 110): ?>
     <h4>Do You want to Extend the Agreement?</h4>

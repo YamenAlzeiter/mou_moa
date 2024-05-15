@@ -91,13 +91,21 @@ class Agreement extends ActiveRecord
             [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
             [['files_dp'], 'file', 'extensions' => 'docx, pdf', 'maxSize' => 1024 * 1024 * 10],
 
-            [[ 'col_organization','fileUpload',
+            [[ 'col_organization',
+                'col_name', 'col_address', 'col_collaborators_name',
+                'col_wire_up','project_title',
+                'proposal', 'col_phone_number', 'col_email','pi_phone_number',
+                'pi_email',  'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'files_applicant'],
+                'required', 'on' => 'uploadCreate'],
+
+            [[ 'col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
                 'col_wire_up', 'pi_name', 'pi_kulliyyah', 'project_title',
                 'proposal', 'col_phone_number', 'col_email','pi_phone_number',
                 'pi_email',  'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country'],
-                'required', 'on' => 'uploadCreate'],
+                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date', 'files_applicant'],
+                'required', 'on' => 'createSpecial'],
 
             [['pi_email', 'col_email', 'pi_email_x', 'pi_email_xx'], 'email'],
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
@@ -182,6 +190,10 @@ class Agreement extends ActiveRecord
     public function getActivities()
     {
         return $this->hasMany(Activities::class, ['agreement_id' => 'id']);
+    }
+    public function getAgreementPoc()
+    {
+        return $this->hasMany(AgreementPoc::class, ['agreement_id' => 'id']);
     }
 
     /**

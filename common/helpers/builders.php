@@ -10,11 +10,11 @@ class builders
 {
     public function tableProbChanger($status, $viewer){
         switch ($viewer){
-            case 'Applicant'         : return in_array($status, [2, 12, 33, 34, 43, 47, 51, 72, 81, 110]);
+            case 'Applicant'         : return in_array($status, [2, 12, 33, 34, 43, 47, 51, 72, 110]);
             case 'ApplicantMCOM'     : return in_array($status, [11]);
             case 'ApplicantActivity' : return in_array($status, [100, 91]);
-            case 'OSC'               : return in_array($status, [10, 15]);
-            case 'OLA'               : return in_array($status, [1, 21, 31, 41, 46, 61, 121]);
+            case 'OSC'               : return in_array($status, [10, 15, 81]);
+            case 'OLA'               : return in_array($status, [1, 21, 31, 41, 46, 61, 121, 86]);
         }
     }
     public function pillBuilder($status, $options = "")
@@ -62,12 +62,9 @@ class builders
                 'class' => 'btn-action',
                 'id' => 'modelButton',
                 'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value'), function() {
-    // Append the HTML snippet to the modal content
-    $('#modalContent').append('');
-    
-    // Set the modal title
-    $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$title</h1>');
-});"
+                            $('#modalContent').append('');
+                            $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$title</h1>');
+                        });"
             ]
         );
     }
@@ -111,10 +108,7 @@ class builders
                 'class' => 'btn-action',
                 'id' => 'modelButton',
                 'onclick' => "$('$modal_id').modal('show').find('#modalContent').load($(this).attr('value'), function() {
-            // Append the HTML snippet to the modal content
             $('#modalContent').append('');
-            
-            // Set the modal title
             $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$label</h1>');
         });"
             ]
@@ -136,7 +130,6 @@ class builders
                 'class' => 'btn btn-lg btn-success w-100',
                 'id' => 'modelButton',
                 'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value'), function() {
-                                            // Set the modal title
                                             $('#modal').find('.modal-title').html('<h1 class=\"mb-0\">$modalTitle</h1>'); 
                                         });"
             ]

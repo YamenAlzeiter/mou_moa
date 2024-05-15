@@ -18,17 +18,6 @@ AppAsset::register($this);
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
-
-    <!-- FAVICONS ICON -->
-    <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
-    <!-- Style css -->
-<!--    <link href="https://style.iium.edu.my/css/style.css" rel="stylesheet">-->
-    <link href="https://style.iium.edu.my/css/iium.css" rel="stylesheet">
-    <!-- FONTS -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Icons" rel="stylesheet">
-    <!-- BOOTSTRAP SELECT -->
-    <link href="https://style.iium.edu.my/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
-
     <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -130,10 +119,7 @@ modal::end();
         $('.alert').fadeOut('slow');
     }, 2500);
 </script>
-<!--<script src="https://style.iium.edu.my/vendor/global/global.min.js"></script>-->
-<script src="https://style.iium.edu.my/js/custom.js"></script>
-<script src="https://style.iium.edu.my/js/deznav-init.js"></script>
-<!--<script src="https://style.iium.edu.my/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>-->
+
 </body>
 </html>
 <?php $this->endPage();

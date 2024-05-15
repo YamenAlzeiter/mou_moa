@@ -1,6 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use common\models\AgreementType;
+use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -10,8 +12,13 @@ use yii\helpers\Html;
 
 $additionalPoc = new \common\helpers\pocFieldMaker();
 
+$currentDate = Carbon::now();
+$nextTwoWeeks = $currentDate->copy()->addWeeks(2);
+$nextTwoMonth = $currentDate->copy()->addMonths(2);
+
 $this->title = 'Create';
-$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div><div class="col-md-md">{input}</div>{error}</div>';
+$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
+                        <div class="col-md-md">{input}{error}</div></div>';
 ?>
 
 <?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
@@ -88,6 +95,22 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 
 <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'value' => 'proposal.....................']) ?>
+
+<?= $form->field($model, 'mcom_date')->dropDownList(
+    ArrayHelper::map(
+        McomDate::find()
+            ->where(['<', 'counter', 10])
+            ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
+            ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
+            ->limit(3) // Limit the number of results to three
+            ->all(),
+        'date',
+        function ($model) {
+            return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
+        }
+    ),
+    ['prompt' => 'Select a Date']
+) ?>
 
 <div class="row">
     <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>

@@ -6,11 +6,15 @@ use Carbon\Carbon;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
+use common\models\AgreementPoc;
 use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
+use Exception;
 use Yii;
+//use yii\base\Model;
+use common\helpers\Model;
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
 use yii\data\ActiveDataProvider;
@@ -109,13 +113,8 @@ class AgreementController extends Controller
         ]);
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
-        $dataProvider->query->andWhere(
-            ['or',
-                ['pi_kulliyyah' => $type],
-                ['pi_kulliyyah_x' => $type],
-                ['pi_kulliyyah_xx' => $type]
-            ]
-        );
+        $dataProvider->query->joinWith(['agreementPoc']);
+        $dataProvider->query->andWhere(['agreement_poc.pi_kcdio' => $type]);
 
         $dataProvider->pagination = [
             'pageSize' => 11,
@@ -139,12 +138,14 @@ class AgreementController extends Controller
     public function actionView($id)
     {
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
-
+        $modelsPoc = AgreementPoc::find()->where(['agreement_id' => $id])->all();
         if (!Yii::$app->request->isAjax) {
             return throw new ForbiddenHttpException('You are not authorized  to access this page!');
         }
         return $this->renderAjax('view', [
-            'model' => $this->findModel($id), 'haveActivity' => $haveActivity
+            'model' => $this->findModel($id),
+            'modelsPoc' => $modelsPoc,
+            'haveActivity' => $haveActivity
         ]);
 
 
@@ -226,17 +227,47 @@ class AgreementController extends Controller
     public function actionCreate()
     {
         $model = new Agreement();
+        $modelsPoc = [new AgreementPoc()];
         $model->scenario = 'uploadCreate';
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post())) {
 
-                $status = $this->request->post('checked');
-                $model->status = $status;
-                $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
-                if ($model->save(false)) {
-                    $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
-                    $this->sendEmail($model, 5);
-                    return $this->redirect(['index']);
+        if ($this->request->isPost) {
+            $model->load($this->request->post());
+            $modelsPoc = [];
+
+            $pocData = Yii::$app->request->post('AgreementPoc', []);
+            foreach ($pocData as $index => $data) {
+                $modelPoc = new AgreementPoc();
+                $modelPoc->load($data, '');
+                $modelsPoc[] = $modelPoc;
+
+            }
+
+
+            $status = $this->request->post('checked');
+            $model->status = $status;
+            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
+
+
+            $valid = Model::validateMultiple($modelsPoc);
+
+            if ($valid) {
+                $transaction = \Yii::$app->db->beginTransaction();
+                try {
+                    if ($model->save(false)) {
+                        foreach ($modelsPoc as $modelPoc) {
+                            $modelPoc->agreement_id = $model->id;
+                            if (!($modelPoc->save(false))) {
+                                $transaction->rollBack();
+                                break;
+                            }
+                        }
+                        $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
+                        $this->sendEmail($model, 5);
+                        $transaction->commit();
+                        return $this->redirect(['index']);
+                    }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
                 }
             }
         } else {
@@ -245,6 +276,7 @@ class AgreementController extends Controller
 
         return $this->renderAjax('create', [
             'model' => $model,
+            'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
         ]);
     }
     public function actionGetKcdioPoc($id)
@@ -270,7 +302,7 @@ class AgreementController extends Controller
             Yii::$app->response->format = Response::FORMAT_JSON;
             return [
                 'name' => $poc->name,
-                'kulliyyah' => $poc->kcdio,
+                'address' => $poc->address,
                 'email' => $poc->email,
                 'phone_number' => $poc->phone_number,
             ];

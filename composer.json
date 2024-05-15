@@ -22,7 +22,8 @@
         "nesbot/carbon": "^2.72",
         "itstructure/yii2-ckeditor": "~1.1.4",
         "dominus77/yii2-sweetalert2-widget": "2.0",
-        "yiisoft/yii2-queue": "^2.3"
+        "yiisoft/yii2-queue": "^2.3",
+        "wbraganca/yii2-dynamicform": "*"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

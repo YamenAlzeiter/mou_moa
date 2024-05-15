@@ -12,6 +12,7 @@ use yii\web\YiiAsset;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
+/** @var common\models\AgreementPoc $modelsPoc */
 /** @var common\models\Activities $haveActivity */
 
 $this->title = $model->id;
@@ -69,47 +70,20 @@ modal::end();
 <?php endif; ?>
 
     <!--section person in charge details-->
-    <h4>Person In Charge Details</h4>
-<?php if ($model->pi_name == "" || $model->pi_name == null): ?>
-    <?= $view->renderer($model->pi_details, 'Details') ?>
-<?php else : ?>
-    <div class = "row">
-        <div class = "col-md-6">
-            <?= $view->renderer($model->pi_name, 'Name') ?>
-            <?= $view->renderer($model->pi_kulliyyah, 'Kulliyyah') ?>
+<?php foreach ($modelsPoc as $index => $modelPoc): ?>
+    <h4><?= $index + 1?>. Person In Charge Details</h4>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $view->renderer($modelPoc->pi_name, 'Name') ?>
+            <?= $view->renderer($modelPoc->pi_kcdio, 'Kulliyyah') ?>
+            <?= $view->renderer($modelPoc->pi_address, 'Address') ?>
         </div>
-        <div class = "col-md-6">
-            <?= $view->renderer($model->pi_phone_number, 'Phone Number') ?>
-            <?= $view->renderer($model->pi_email, 'Email Address', true) ?>
+        <div class="col-md-6">
+            <?= $view->renderer($modelPoc->pi_phone, 'Phone Number') ?>
+            <?= $view->renderer($modelPoc->pi_email, 'Email Address', true) ?>
         </div>
     </div>
-<?php if($model->pi_name_x != null):?>
-        <h4>1. Person In Charge Details</h4>
-        <div class = "row">
-            <div class = "col-md-6">
-                <?= $view->renderer($model->pi_name_x, 'Name') ?>
-                <?= $view->renderer($model->pi_kulliyyah_x, 'Kulliyyah') ?>
-            </div>
-            <div class = "col-md-6">
-                <?= $view->renderer($model->pi_phone_number_x, 'Phone Number') ?>
-                <?= $view->renderer($model->pi_email_x, 'Email Address', true) ?>
-            </div>
-        </div>
-    <?php endif;?>
-    <?php if($model->pi_name_xx != null):?>
-        <h4>2. Person In Charge Details</h4>
-        <div class = "row">
-            <div class = "col-md-6">
-                <?= $view->renderer($model->pi_name_xx, 'Name') ?>
-                <?= $view->renderer($model->pi_kulliyyah_xx, 'Kulliyyah') ?>
-            </div>
-            <div class = "col-md-6">
-                <?= $view->renderer($model->pi_phone_number_xx, 'Phone Number') ?>
-                <?= $view->renderer($model->pi_email_xx, 'Email Address', true) ?>
-            </div>
-        </div>
-    <?php endif;?>
-<?php endif; ?>
+<?php endforeach; ?>
 
     <!--section additional details-->
     <h4> Details</h4>

@@ -7,7 +7,8 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
 /** @var yii\bootstrap5\ActiveForm $form */
-$templateFileInput = '<div class="col align-items-center"><div class="col-md-2 col-form-label">{label}</div><div class="col-md">{input}</div>{error}</div>';
+$templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
+                        <div class="col-md-md">{input}{error}</div></div>';
 $approveMap = [
          10 => 1,  // init -> accept OSC
          1  => 11,  // OSC -> OLA approve OLA
@@ -21,7 +22,8 @@ $approveMap = [
 
          41 => 51,
          51 => 61,
-         72 => 61
+         72 => 61,
+         81 => 91,
 
 ];
 $notCompleteMap = [
@@ -33,6 +35,7 @@ $notCompleteMap = [
          61 => 72, // OLA -> OSC
 
          46 => 47,
+         86 => 87,
         121 => 33,
 ];
 $rejectMap = [
@@ -47,11 +50,11 @@ $conditionalMap = [
 
 $form = ActiveForm::begin(['id' => 'actiontaken', 'validateOnBlur' => false, 'validateOnChange' => false, 'options' => ['enctype' => 'multipart/form-data'],]);
 
-if (!in_array($model->status, [41, 51, 72, 81])) {
+if (!in_array($model->status, [51, 72, 81, 41])) {
 
     $tag = (in_array($model->status, [21, 31])) ? 'KIV' : 'Not Complete';
 
-    $options = [$approveMap[$model->status] => 'Approve', $notCompleteMap[$model->status] => $tag,];
+    $options = [$approveMap[$model->status] => 'Recommended', $notCompleteMap[$model->status] => $tag,];
 
     if (in_array($model->status, [21, 31, 121])) {
         if ($model->status == 21)
@@ -79,7 +82,7 @@ $model->reason = null; // init reason to null for ckeditor value
 
 <div class="agreement-form">
 
-    <?php if (in_array($model->status, [41, 72])): ?>
+    <?php if (in_array($model->status, [72, 41])): ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => $approveMap[$model->status]])->label(false) ?>
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
         <?php echo $model->status?>
@@ -90,11 +93,22 @@ $model->reason = null; // init reason to null for ckeditor value
             <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
         </div>
     <?php endif;?>
+    <?php if (in_array($model->status, [81])): ?>
+        <div class="row">
+            <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+        </div>
+        <div class="row">
+            <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        </div>
+        <?= $form->field($model, 'status')->hiddenInput(['value' =>$approveMap[$model->status]])->label(false)?>
+
+        <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
+    <?php endif; ?>
 
         <div class="not-complete mb-4 d-none">
-            <?= $form->field($model, 'reason')->widget(CKEditor::className(), [
-                'preset' => 'basic',])
-            ?>
+            <?= $form->field($model, 'reason')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
         </div>
 
 
@@ -107,13 +121,13 @@ $model->reason = null; // init reason to null for ckeditor value
 
 
     <script>
-        $("#is2, #is12, #is42, #is43, #is31, #is32, #is34, #is33, #is41, #is47, #is72").on("change", function () {
+        $("#is2, #is12, #is42, #is43, #is31, #is32, #is34, #is33, #is41, #is47, #is72, #is87, #is52").on("change", function () {
 
             if (this.checked) {
                 $(".not-complete").removeClass('d-none');
             }
         });
-        $("#is1, #is11, #is51, #is81").on("change", function () {
+        $("#is1, #is11, #is51, #is81, #is91").on("change", function () {
 
             if (this.checked) {
                 $(".not-complete").addClass('d-none');
@@ -137,7 +151,7 @@ $model->reason = null; // init reason to null for ckeditor value
                 $(".doc-approved").removeClass('d-none');
             }
         });
-        $(" #is47").on("change", function () {
+        $(" #is47, #is52").on("change", function () {
 
             if (this.checked) {
                 $(".doc-approved").addClass('d-none');

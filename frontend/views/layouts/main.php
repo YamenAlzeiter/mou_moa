@@ -42,18 +42,18 @@ AppAsset::register($this);
 <?php $this->beginBody() ?>
 <div class="background-image"></div>
 <!-- Preloader start -->
-<div id="preloader">
-    <div class="lds-ripple">
-        <div></div>
-        <div></div>
-    </div>
-</div>
+<!--<div id="preloader">-->
+<!--    <div class="lds-ripple">-->
+<!--        <div></div>-->
+<!--        <div></div>-->
+<!--    </div>-->
+<!--</div>-->
 <header>
     <?php
     NavBar::begin([
         'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar navbar-expand-md navbar-dark bg-dark fixed-top',
+            'class' => 'navbar navbar-expand-md  navbar-dark bg-dark fixed-top',
         ],
     ]);
     $menuItems = [
