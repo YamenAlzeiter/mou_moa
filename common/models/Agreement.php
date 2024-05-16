@@ -89,7 +89,7 @@ class Agreement extends ActiveRecord
     {
         return [
             [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
-            [['files_dp'], 'file', 'extensions' => 'docx, pdf', 'maxSize' => 1024 * 1024 * 10],
+            [['files_dp'], 'file', 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 10],
 
             [[ 'col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
@@ -121,6 +121,7 @@ class Agreement extends ActiveRecord
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
             [['reason'], 'default', 'value' => null],
+
         ];
     }
 

@@ -9,6 +9,18 @@ body{
     text-overflow: ellipsis;
 }
 
+.headerpg{
+    background: #18A594;
+}
+header{
+    min-height: 3.125rem;
+}
+.nav-link.active{
+    border-bottom: 3px solid white !important;
+
+    color: white !important;
+}
+
 .truncate:hover{
     overflow: visible;
     white-space: normal;
@@ -20,7 +32,6 @@ body{
     border: 0;
 }
 .btn-create{
-
     height: 70px;
     width:  70px;
     border: 0;
@@ -76,7 +87,7 @@ body{
     border-radius: .3rem;
 }
 .page-link .active, .active > .page-link {
-    background-color: teal !important;
+    background-color: #18A594 !important;
     color: white !important;
 }
 .mw-pill{
@@ -98,7 +109,7 @@ main > .container, main > .container-fluid
 }
 
 .nav-link.active{
-    border-bottom: 2px solid black !important;
+    border-bottom: 2px solid white !important;
 }
 
 .footer {

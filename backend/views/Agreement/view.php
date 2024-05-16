@@ -105,8 +105,15 @@ modal::end();
         <?php
         $folder = $model->applicant_doc;
         $files = [];
+        $totalSize = 0;
         if (is_dir($folder)) {
             $files = array_diff(scandir($folder), ['.', '..']);
+            foreach ($files as $file) {
+                $filePath = $folder . DIRECTORY_SEPARATOR . $file;
+                if (is_file($filePath)) {
+                    $totalSize += filesize($filePath);
+                }
+            }
         }
 
         if (!empty($files)) {
@@ -115,7 +122,7 @@ modal::end();
                     'allModels' => array_values($files),
                     'pagination' => false, // Disable pagination
                 ]),
-                'summary' => false,
+                'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
                 'columns' => [
                     [
                         'attribute' => 'file',
@@ -137,8 +144,15 @@ modal::end();
         <?php
         $folder = $model->dp_doc;
         $files = [];
+        $totalSize = 0;
         if (is_dir($folder)) {
             $files = array_diff(scandir($folder), ['.', '..']);
+            foreach ($files as $file) {
+                $filePath = $folder . DIRECTORY_SEPARATOR . $file;
+                if (is_file($filePath)) {
+                    $totalSize += filesize($filePath);
+                }
+            }
         }
 
         if (!empty($files)) {
@@ -147,7 +161,7 @@ modal::end();
                     'allModels' => array_values($files),
                     'pagination' => false, // Disable pagination
                 ]),
-                'summary' => false,
+                'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
                 'columns' => [
                     [
                         'attribute' => 'file',

@@ -1,9 +1,8 @@
 <?php
 
 use Carbon\Carbon;
-use common\models\Kcdio;
+use common\helpers\pocFieldMaker;
 use common\models\McomDate;
-use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -15,29 +14,26 @@ $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 
-$status = [
-    2  => 15,
-    12 => 15,
-    11 => 21,
-    33 => 21,
-    34 => 31,
-    47 => 46,
-    43 => 21,
-    51 => 61,
-    72 => 61,
-];
+$status = [2 => 15,
+       12 => 15,
+       11 => 21,
+       33 => 21,
+       34 => 31,
+       47 => 46,
+       43 => 21,
+       51 => 61,
+       72 => 61,];
 
-$additionalPoc = new \common\helpers\pocFieldMaker();
+$additionalPoc = new pocFieldMaker();
 
 $currentDate = Carbon::now();
 $nextTwoWeeks = $currentDate->copy()->addWeeks(2);
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
 
-$model->poc_kcdio_getter_x = $model->pi_kulliyyah_x;
-$model->poc_kcdio_getter_xx = $model->pi_kulliyyah_xx;
 $model->mcom_date = '';
+$additionalPoc = new \common\helpers\agreementPocMaker();
 ?>
-<?php $form = ActiveForm::begin(['id' => 'create-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
+<?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 
 <?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
@@ -61,7 +57,6 @@ $model->mcom_date = '';
             <?= $form->field($model, 'col_email')->textInput(['type => email', 'maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
-
     <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6]) ?>
     <div class="row">
         <div class="col-md-8">
@@ -73,25 +68,12 @@ $model->mcom_date = '';
     </div>
 
     <h4>Person In Charge Details</h4>
-    <div class="row">
-        <div class="col-md">
-            <?= $form->field($model, 'pi_name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false) ?>
-            <?= $form->field($model, 'pi_kulliyyah')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false) ?>
-            <?= $form->field($model, 'pi_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false) ?>
-            <?= $form->field($model, 'pi_phone_number')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-        </div>
-    </div>
+            <?php foreach ($modelsPoc as $index => $modelPoc):
+                $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
+                //id needed but it's not included in get methode ..........sadly
+                echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
+            endforeach; ?>
 
-    <?php
-    if ($model->pi_name_x) {
-        $additionalPoc->renderExtraFields($form, $model, '_x');
-
-    }
-
-    if ($model->pi_name_xx) {
-        $additionalPoc->renderExtraFields($form, $model, '_xx');
-    }
-    ?>
     <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
     <div class="row">
         <div class="col-md">
@@ -110,44 +92,31 @@ $model->mcom_date = '';
 
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
 
-<?php endif;?>
+<?php endif; ?>
 <?php
 if (in_array($model->status, [11, 33, 43])): ?>
 
-    <?= $form->field($model, 'mcom_date')->dropDownList(
-        ArrayHelper::map(
-            McomDate::find()
-                ->where(['<', 'counter', 10])
-                ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
-                ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
-                ->limit(3) // Limit the number of results to three
-                ->all(),
-            'date',
-            function ($model) {
-                return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
-            }
-        ),
-        ['prompt' => 'Select a Date', 'required' => true] // Adding 'required' => true here
+    <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where(['<', 'counter', 10])->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])->andWhere(['<', 'date', $nextTwoMonth->toDateString()])->limit(3) // Limit the number of results to three
+        ->all(), 'date', function ($model) {
+        return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
+    }), ['prompt' => 'Select a Date', 'required' => true] // Adding 'required' => true here
     ) ?>
 
 
 <?php
 elseif (in_array($model->status, [51, 72])): ?>
-    <?= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
+    <!--    --><?php //= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
     <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-    <?php echo $model->status?>
+    <?php echo $model->status ?>
 
 <?php
 elseif ($model->status == 110): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['91' => 'Yes', '92' => 'No'], [
-            'class' => 'gap-2 row', // Use flexbox
+        <?= $form->field($model, 'status')->radioList(['91' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
             'item' => function ($index, $label, $name, $checked, $value) {
-                return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name,
-                        $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
-            }
-        ])->label(false); ?>
+                return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
+            }])->label(false); ?>
         <div class="end_date d-none">
             <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
         </div>
@@ -157,29 +126,66 @@ endif; ?>
 
 <?php if ($model->status == 110): ?>
     <div class="modal-footer p-0">
-        <?= Html::submitButton('Submit',
-            ['class' => 'btn btn-success', 'name' => 'checked']) ?>
+        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn btn-success', 'name' => 'checked']) ?>
         <?php ActiveForm::end(); ?>
     </div>
 <?php else: ?>
     <div class="modal-footer p-0">
-        <?php echo  $status[$model->status]?>
-        <?= Html::submitButton('Submit',
-            ['class' => 'btn btn-success', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
+        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn btn-success', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
         <?php ActiveForm::end(); ?>
     </div>
 <?php endif; ?>
+<?php
+$existingFilesSize = 0;
+$baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/applicant/';
+$storedFiles = array_diff(scandir($baseUploadPath), ['.', '..']);
+
+foreach ($storedFiles as $file) {
+    $filePath = $baseUploadPath . DIRECTORY_SEPARATOR . $file;
+    if (is_file($filePath)) {
+        $existingFilesSize += filesize($filePath);
+    }
+}
+?>
+
 <script>
-    $("#is91").on("change", function () {
+    $(document).ready(function() {
 
-        if (this.checked) {
-            $(".end_date").removeClass('d-none');
-        }
-    });
-    $("#is92").on("change", function () {
+        const existingFilesSize = <?= $existingFilesSize ?>;
+        const submitButton = $('#form-update-submit');
+        console.log('files size: ' + existingFilesSize);
+        const sizeLimit = 10 * 1024 * 1024; // 1 MB in bytes
 
-        if (this.checked) {
-            $(".end_date").addClass('d-none');
-        }
+        $('input[type="file"][name="Agreement[files_applicant][]"]').on('change', function() {
+            let uploadedSize = 0;
+
+            const files = $(this)[0].files;
+            if (files.length > 0) {
+                for (let i = 0; i < files.length; i++) {
+                    uploadedSize += files[i].size;
+                }
+            }
+
+            const totalSize = existingFilesSize + uploadedSize;
+            console.log('Total size: ' + totalSize);
+
+            if (totalSize > sizeLimit) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'File Size Limit Exceeded',
+                    text: 'The total size of uploaded files exceeds the limit of 1 MB.',
+                }).then(() => {
+                    // Clear the file input if the limit is exceeded
+                    $(this).val('');
+                    submitButton.prop('disabled', true);
+                    submitButton.addClass('btn-danger');
+                    submitButton.removeClass('btn-sucess')
+                });
+
+            } else {
+                // Enable the submit button if the limit is not exceeded
+                submitButton.prop('disabled', false);
+            }
+        });
     });
 </script>

@@ -1,8 +1,11 @@
 <?php
 
 use Carbon\Carbon;
+use common\helpers\agreementPocMaker;
 use common\models\AgreementType;
+use common\models\Kcdio;
 use common\models\McomDate;
+use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -10,7 +13,7 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
 
-$additionalPoc = new \common\helpers\pocFieldMaker();
+$additionalPoc = new agreementPocMaker();
 
 $currentDate = Carbon::now();
 $nextTwoWeeks = $currentDate->copy()->addWeeks(2);
@@ -63,14 +66,52 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 </div>
 <h4>Person In Charge Details</h4>
 
-<div class="row">
-    <!--person in charge Builder-->
-<?php $additionalPoc->renderExtraFields($form, $model, '');?>
+<div id="poc-container">
+    <?php foreach ($modelsPoc as $index => $modelPoc):?>
+        <div class="row poc-row">
+
+            <div class="col-12 col-md-6">
+                <?= $form->field($modelPoc, "[$index]pi_kcdio")
+                    ->dropDownList(
+                        ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, function (data) {
+            $("select#agreement-poc_name_getter-' . $index . '").html(data);
+            $("select#agreement-poc_name_getter-' . $index . '").trigger("change");
+        })']) ?>
+            </div>
+            <div class="col-12 col-md-6">
+                <?= $form->field($modelPoc, "[$index]pi_name")->dropDownList(ArrayHelper::map(Poc::find()->where(['kcdio' => $modelPoc->pi_kcdio])->all(), 'id', 'name'), ['prompt' => 'Select POC', 'id' => 'agreement-poc_name_getter-'.$index, 'onchange' => '$.get("/agreement/get-poc-info", { id: $(this).val() })
+                        .done(function(data) {
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_name") . '").val(data.name);
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_address") . '").val(data.address);
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_email") . '").val(data.email);
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_phone") . '").val(data.phone_number);
+                })
+                              .fail(function() {
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_name") . '").val("");
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_address") . '").val("");
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_email") . '").val("");
+                    $("#' . Html::getInputId($modelPoc, "[$index]pi_phone") . '").val("");
+                });']) ?>
+
+            </div>
+
+            <?= $form->field($modelPoc, "[$index]pi_name", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput()->label(false) ?>
+            <div class="col-12 col-md-6">
+                <?= $form->field($modelPoc, "[$index]pi_email")->textInput(['maxlength' => true, 'readonly' => true])->label('Email') ?>
+            </div>
+            <div class="col-12 col-md-6">
+                <?= $form->field($modelPoc, "[$index]pi_phone")->textInput(['maxlength' => true, 'readonly' => true])->label('Phone Number') ?>
+            </div>
+            <div class="col-12 col-md-12">
+            </div>
+            <?= $form->field($modelPoc, "[$index]pi_address")->textInput(['maxlength' => true, 'readonly' => true])->label('Address') ?>
+        </div>
+    <?php endforeach; ?>
+</div>
+<div class="row mb-3">
+    <div class="col"><?= Html::button('Add another POC', ['class' => 'btn btn-outline-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?></div>
 </div>
 
-<div id="extra-pi-fields-container"></div>
-<button class="btn btn-lg btn-dark text-capitalize mb-3" onclick="handleAdd()" data-clicks="0">Add person in charge
-</button>
 <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
 <div class="row">
     <div class="col-md">
@@ -127,36 +168,28 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 
 <script>
-    let clicks = 0;
+    $(document).ready(function () {
+        var pocIndex = $('#poc-container .poc-row').length;
+        $("#agreement-poc_name_getter-0").trigger("change");
 
-    function handleAdd() {
-        event.preventDefault();
+        $('#add-poc-button').on('click', function () {
 
-        if (clicks >= 2) {
-            Swal.fire({
-                title: "Oops...!",
-                text: "You Can't Add More than 2 Person in Charge.",
-                icon: "error",
-            });
-            return;
-        }
+            if (pocIndex < 5) {
+                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, $modelPoc);?>`;
+                newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
+                newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
+                newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
+                $('#poc-container').append(newRow);
+                pocIndex++;
 
-        const newRow = document.createElement('div');
-        newRow.classList.add('row');
+            } else {
+                Swal.fire({
+                    title: "Oops...!",
+                    text: "You Can't Add More than 5 Person in Charge.",
+                    icon: "error",
+                });
 
-        let fieldsHtml;
-        switch (clicks + 1) {
-            case 1:
-                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_x');?>`;
-                break;
-            case 2:
-                fieldsHtml = `<?php $additionalPoc->renderExtraFields($form, $model, '_xx');?>`;
-                break;
-        }
-
-        newRow.innerHTML = fieldsHtml;
-        $('#extra-pi-fields-container').append(newRow);
-        clicks++;
-    }
-
+            }
+        });
+    });
 </script>

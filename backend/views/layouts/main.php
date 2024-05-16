@@ -18,6 +18,16 @@ AppAsset::register($this);
 <!DOCTYPE html>
 <html lang="<?= Yii::$app->language ?>" class="h-100">
 <head>
+    <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
+    <!-- Style css -->
+
+    <link href="https://style.iium.edu.my/css/iium.css" rel="stylesheet">
+    <!-- FONTS -->
+
+    <!-- BOOTSTRAP SELECT -->
+    <link href="https://style.iium.edu.my/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src = "https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <meta charset="<?= Yii::$app->charset ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -41,7 +51,7 @@ AppAsset::register($this);
 //        'brandLabel' => Yii::$app->name,
 //        'brandUrl' => Yii::$app->homeUrl,
         'options' => [
-            'class' => 'navbar navbar-expand-md bg-light px-5 fixed-top shadow',
+            'class' => 'navbar navbar-expand-md headerpg header fixed-top shadow p-0 px-5 ',
         ],
     ]);
     $menuItems = [
@@ -68,7 +78,7 @@ AppAsset::register($this);
         echo Html::beginForm(['/site/logout'], 'post', ['class' => 'd-flex'])
             . Html::submitButton(
                 'Logout (' . Yii::$app->user->identity->username . ' , '. Yii::$app->user->identity->type .')',
-                ['class' => 'btn btn-light logout text-decoration-none']
+                ['class' => 'btn  btn-outline-light logout text-decoration-none ']
             )
             . Html::endForm();
     }
@@ -77,7 +87,7 @@ AppAsset::register($this);
 </header>
 
 <main role="main" class="flex-shrink-0 content-body">
-    <div class="container">
+    <div class="px-5 mt-8">
         <?= Breadcrumbs::widget([
             'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
         ]) ?>

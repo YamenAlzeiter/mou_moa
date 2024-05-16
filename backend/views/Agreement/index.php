@@ -37,25 +37,27 @@ if ($type == "OLA") {
 }
 echo '</div>
     </div>';
-
-
-if (!Yii::$app->user->isGuest) {
-    if ($type == "IO" || $type == "RMC" || $type == "OIL") {
-        echo $this->render('_oscIndex', [
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
-        ]);
-    } elseif ($type == "OLA") {
-        echo $this->render('_olaIndex', [
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
-        ]);
-    } elseif ($type == "admin") {
-        echo $this->render('_admin', [
-            'dataProvider' => $dataProvider,
-            'searchModel' => $searchModel
-        ]);
-    }
-}
-echo '</div>';
 ?>
+
+    <?php
+    if (!Yii::$app->user->isGuest) {
+        if ($type == "IO" || $type == "RMC" || $type == "OIL") {
+            echo $this->render('_oscIndex', [
+                'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel
+            ]);
+        } elseif ($type == "OLA") {
+            echo $this->render('_olaIndex', [
+                'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel
+            ]);
+        } elseif ($type == "admin") {
+            echo $this->render('_admin', [
+                'dataProvider' => $dataProvider,
+                'searchModel' => $searchModel
+            ]);
+        }
+    }
+    ?>
+
+

@@ -261,7 +261,7 @@ class AgreementController extends Controller
                                 break;
                             }
                         }
-                        $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
+                        $this->multiFileHandler($model, 'files_applicant',  'applicant_doc');
                         $this->sendEmail($model, 5);
                         $transaction->commit();
                         return $this->redirect(['index']);
@@ -335,8 +335,11 @@ class AgreementController extends Controller
         }
     }
 
-    function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
+    function multiFileHandler($model, $attribute, $docAttribute)
     {
+
+
+
         $files = UploadedFile::getInstances($model, $attribute);
         if ($files) {
             $baseUploadPath = Yii::getAlias('@common/uploads');
@@ -402,18 +405,38 @@ class AgreementController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+
+        $modelsPoc = AgreementPoc::find()
+            ->where(['agreement_id' => $id])
+            ->orderBy(['id' => SORT_ASC])
+            ->all();
+
         $oldStatus = $model->status;
         if ($this->request->isPost && $model->load($this->request->post())) {
+
+            $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
+            $modelsPoc = [];
+
+            foreach ($modelsPocData as $data) {
+                $poc =  isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
+                $poc->load($data, '');
+                $modelsPoc[] = $poc;
+            }
+
+            foreach ($modelsPoc as $modelPoc) {
+                $modelPoc->save();
+            }
 
             $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
 
             $model->status == 91? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
 
-            $this->multiFileHandler($model, 'executedAgreement', 'ExecutedAgreement', 'applicant_doc');
-            $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
-            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
-            if ($model->save()) {
+            $this->multiFileHandler($model, 'executedAgreement', 'applicant_doc');
+            $this->multiFileHandler($model, 'files_applicant', 'applicant_doc');
 
+            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
+
+            if ($model->save()) {
                 if ($model->status == 15) $this->sendEmail($model, 6);
                 return $this->redirect(['index']);
             }
@@ -422,6 +445,7 @@ class AgreementController extends Controller
 
         return $this->renderAjax('update', [
             'model' => $model,
+            'modelsPoc' => $modelsPoc,
         ]);
     }
 

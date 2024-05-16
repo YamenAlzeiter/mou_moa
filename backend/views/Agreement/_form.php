@@ -158,3 +158,59 @@ $model->reason = null; // init reason to null for ckeditor value
             }
         });
     </script>
+
+
+    <?php
+    $existingFilesSize = 0;
+    $baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/applicant/';
+    $storedFiles = array_diff(scandir($baseUploadPath), ['.', '..']);
+
+    foreach ($storedFiles as $file) {
+        $filePath = $baseUploadPath . DIRECTORY_SEPARATOR . $file;
+        if (is_file($filePath)) {
+            $existingFilesSize += filesize($filePath);
+        }
+    }
+    ?>
+
+    <script>
+        $(document).ready(function() {
+
+            const existingFilesSize = <?= $existingFilesSize ?>;
+            const submitButton = $('#form-update-submit');
+            console.log('files size: ' + existingFilesSize);
+            const sizeLimit = 10 * 1024 * 1024; // 1 MB in bytes
+
+            $('input[type="file"][name="Agreement[files_applicant][]"]').on('change', function() {
+                let uploadedSize = 0;
+
+                const files = $(this)[0].files;
+                if (files.length > 0) {
+                    for (let i = 0; i < files.length; i++) {
+                        uploadedSize += files[i].size;
+                    }
+                }
+
+                const totalSize = existingFilesSize + uploadedSize;
+                console.log('Total size: ' + totalSize);
+
+                if (totalSize > sizeLimit) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'File Size Limit Exceeded',
+                        text: 'The total size of uploaded files exceeds the limit of 1 MB.',
+                    }).then(() => {
+                        // Clear the file input if the limit is exceeded
+                        $(this).val('');
+                        submitButton.prop('disabled', true);
+                        submitButton.addClass('btn-danger');
+                        submitButton.removeClass('btn-sucess')
+                    });
+
+                } else {
+                    // Enable the submit button if the limit is not exceeded
+                    submitButton.prop('disabled', false);
+                }
+            });
+        });
+    </script>

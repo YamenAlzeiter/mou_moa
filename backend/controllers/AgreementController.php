@@ -280,15 +280,9 @@ class AgreementController extends Controller
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);
-
-        $osc = Admin::find()->where(['type' => 'IO'])->all();
-
-        $ola = Admin::findOne(['type' => 'OLA']);
+        $pocs = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
 
         $body = $mail->body;
-
-        $poc1 = $model->pi_email_x != '' ? $model->pi_email_x : null;
-        $poc2 = $model->pi_email_xx != '' ? $model->pi_email_xx : '';
 
         $body = str_replace('{recipientName}', $model->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
@@ -305,17 +299,19 @@ class AgreementController extends Controller
             }
         }
 
-        // Handle optional CCs
-        if ($model->pi_email_x != '') {
-            $ccRecipients[] = $model->pi_email_x;
+        foreach ($pocs as $index => $poc) {
+            if($index == 0){
+                $mailer = Yii::$app->mailer
+                    ->compose(['html' => '@backend/views/email/emailTemplate.php'],
+                            ['subject' => $mail->subject,
+                                'recipientName' => $poc->pi_name,
+                                'reason' => $model->reason,
+                                'body' => $body])
+                    ->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
+                    ->setTo($poc->pi_email)
+                    ->setSubject($mail->subject);
+            }else  $ccRecipients[] = $poc->pi_email;
         }
-        if ($model->pi_email_xx != '') {
-            $ccRecipients[] = $model->pi_email_xx;
-        }
-
-        // Compose and send the email
-        $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $mail->subject, 'recipientName' => $model->pi_name, 'reason' => $model->reason, 'body' => $body])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($model->pi_email)->setSubject($mail->subject);
-
 
         $mailer->setCc($ccRecipients);
 
@@ -503,27 +499,49 @@ class AgreementController extends Controller
     {
         $to = $model->import_from;
         $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+        $insertedRowIds = []; // Array to store inserted row IDs
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
             unset($sheetData[1]);
 
-            $batchData = [];
             foreach ($sheetData as $row) {
-
                 if (!empty($row['A'])) {
                     $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? 'Error';
                     $pi_details = $this->applyExcelFormula($row['K']);
+                    var_dump($pi_details);
+                    $parts = explode(',', $row['K']);
+                    foreach ($parts as $part) {
+                        echo "<pre>";
+                        var_dump($part);
+                        echo "</pre>";
+                    }
+
+                    die();
 
                     $status = $row['L'] == "Active" ? 100 : 102;
 
-                    $batchData[] = [$row['B'], $row['C'], $row['D'], $kcdioName, $row['G'], $row['H'], $row['I'], $pi_details, $status, $to, $temp];
+                    $agreement = new Agreement();
+                    $agreement->agreement_type = $row['B'];
+                    $agreement->col_organization = $row['C'];
+                    $agreement->country = $row['D'];
+                    $agreement->pi_kulliyyah = $kcdioName;
+                    $agreement->sign_date = $row['G'];
+                    $agreement->end_date = $row['H'];
+                    $agreement->status = $status;
+                    $agreement->transfer_to = $to;
+                    $agreement->temp = $temp;
+
+                    // Save the agreement
+                    if ($agreement->save()) {
+                        $agreementPoc = new AgreementPoc();
+                        $agreementPoc->agreement_id = $agreement->id;
+                        $agreementPoc->save();
+                    } else {
+                        Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));
+                    }
                 }
-
             }
-
-            // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('agreement', ['agreement_type', 'col_organization', 'country', 'pi_kulliyyah', 'sign_date', 'end_date', 'collaboration_area', 'pi_details', 'status', 'transfer_to', 'temp'], $batchData)->execute();
 
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
@@ -531,7 +549,10 @@ class AgreementController extends Controller
             var_dump($e);
             die();
         }
+
+        return $insertedRowIds;
     }
+
 
     private function applyExcelFormula($value)
     {
