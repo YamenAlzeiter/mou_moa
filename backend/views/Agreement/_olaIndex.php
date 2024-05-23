@@ -14,7 +14,6 @@ echo '<div class="container-md my-3 p-4 rounded-3 bg-white shadow">';
 echo GridView::widget([
     'dataProvider' => $dataProvider,
     'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap rounded-3 overflow-hidden'],
-    'summary' => '',
     'rowOptions' => function ($model) {
         $build = new builders();
         return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder'] : [];
@@ -72,7 +71,7 @@ echo GridView::widget([
         'activePageCssClass' => ['class' => 'link-white active'],
         // additional pager options if needed
     ],
-    'layout' => "{items}\n{pager}",
+    'layout' => "{items}\n{summary}\n{pager}\n",
 ]);
 echo '</div>';
 ?>

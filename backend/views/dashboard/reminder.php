@@ -14,7 +14,7 @@ use yii\helpers\Url;
     );
     ?>
 </div>
-<hr class = "border border-black">
+<hr class = "border border-black ">
 <div class = " flex-column d-flex gap-2 overflow-auto" style="height: 300px; max-height: 300px">
     <?php
 

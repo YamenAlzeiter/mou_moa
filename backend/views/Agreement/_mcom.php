@@ -30,7 +30,7 @@ $nextTwoMonth = $currentDate->copy()->addMonths(2);
                 ->where(['<', 'counter', 10])
                 ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
                 ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
-                ->limit(3) // Limit the number of results to three
+                ->limit(3)
                 ->all(),
             'date',
             function ($model) {

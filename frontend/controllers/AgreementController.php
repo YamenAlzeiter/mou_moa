@@ -230,6 +230,7 @@ class AgreementController extends Controller
         $modelsPoc = [new AgreementPoc()];
         $model->scenario = 'uploadCreate';
 
+
         if ($this->request->isPost) {
             $model->load($this->request->post());
             $modelsPoc = [];
@@ -289,7 +290,7 @@ class AgreementController extends Controller
             foreach ($poc as $apoc) {
                 $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
             }
-        } else $options = "<option>Person In charge Not found</option>";
+        }
 
         echo $options;
     }

@@ -11,8 +11,8 @@ use yii\grid\GridView;
 echo '<div class="container-md my-3 p-4 rounded-3 bg-white shadow"> <div class="table-responsive">';
 echo GridView::widget([
     'dataProvider' => $dataProvider,
-    'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap  '],
-    'summary' => '',
+    'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap rounded-3 overflow-hidden'],
+
     'rowOptions' => function ($model) {
         $build = new builders();
         return $build->tableProbChanger($model->status, 'OSC') ? ['class' => 'need-action fw-bold'] : [];
@@ -67,7 +67,8 @@ echo GridView::widget([
 
 
         // additional pager options if needed
-    ], 'layout' => "{items}\n{pager}",
+    ],
+    'layout' => "{items}\n{summary}\n{pager}\n",
 ]);
 echo '</div></div>'
 ?>

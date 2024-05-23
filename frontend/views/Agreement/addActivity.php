@@ -39,7 +39,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     <?= $form->field($model, 'staff_number')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
     <?= $form->field($model, 'kcdio')->hiddenInput(['value' => $agreement->pi_kulliyyah])->label(false)?>
     <?= $form->field($model, 'mou_moa')->hiddenInput(['value' => $agreement->col_organization])->label(false)?>
-        <div class = "col-lg-4"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type']) ?></div>
+        <div class = "col"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type']) ?></div>
 </div>
 
 <section id = "section-1" class = "form-section d-none">

@@ -433,34 +433,32 @@ class AgreementController extends Controller
             foreach ($poc as $apoc) {
                 $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
             }
-        } else {
-            $options = "<option value=''>Person In charge Not found</option>";
         }
 
         echo $options;
     }
 
-    public function actionGetPocInfo($id)
-    {
+        public function actionGetPocInfo($id)
+        {
 
 
-        if(is_numeric($id))
-        $poc = Poc::findOne($id);
-        else
-            $poc = Poc::find()->where(['name' => $id])->one();
+            if(is_numeric($id))
+            $poc = Poc::findOne($id);
+            else
+                $poc = Poc::find()->where(['name' => $id])->one();
 
-        if ($poc) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return [
-                'name' => $poc->name,
-                'address' => $poc->address,
-                'email' => $poc->email,
-                'phone_number' => $poc->phone_number,
-            ];
-        } else {
-            return ['error' => 'POC not found'];
+            if ($poc) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return [
+                    'name' => $poc->name,
+                    'address' => $poc->address,
+                    'email' => $poc->email,
+                    'phone_number' => $poc->phone_number,
+                ];
+            } else {
+                return ['error' => 'POC not found'];
+            }
         }
-    }
 
 
     public function actionImport()

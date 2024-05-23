@@ -44,9 +44,12 @@ AppAsset::register($this);
 <header>
     <?php
     NavBar::begin([
-        'brandUrl' => Yii::$app->homeUrl,
+        'brandLabel' => Html::img('https://style.iium.edu.my/images/iium/iium-logo-v2.png', [
+            'alt' => Yii::$app->name,
+            'class' => 'navbar-brand-logo'
+        ]),
         'options' => [
-            'class' => 'navbar navbar-expand-md headerpg bg-dark head er fixed-top shadow p-0 px-5 ',
+            'class' => 'navbar navbar-expand-md headerpg  header fixed-top shadow p-0 px-5 ',
         ],
     ]);
     $menuItems = [

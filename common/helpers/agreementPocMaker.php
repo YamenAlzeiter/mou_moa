@@ -14,13 +14,20 @@ class agreementPocMaker
     { ?>
         <div class="row poc-row">
             <div class="col-12 col-md-6">
-                <?= $form->field($model, "[pocIndex]pi_kcdio")->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'id' => 'agreement-kcdio_name_getter-[pocIndex]', 'onchange' => '$.get("/agreement/get-kcdio-poc", { id: $(this).val() }, function (data) {
+                <?= $form->field($model, "[pocIndex]pi_kcdio")->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'id' => 'agreement-kcdio_name_getter-[pocIndex]', 'required' => true, 'onchange' => '$.get("/agreement/get-kcdio-poc", { id: $(this).val() }, function (data) {
                                 $("select#agreement-poc_name_getter-[pocIndex]").html(data);
                                 $("select#agreement-poc_name_getter-[pocIndex]").trigger("change");
                             })']) ?>
             </div>
             <div class="col-12 col-md-6">
-                <?= $form->field($model, "[pocIndex]pi_name")->dropDownList(ArrayHelper::map(Poc::find()->where(['kcdio' => $model->{"pi_kcdio"}])->all(), 'id', 'name'), ['prompt' => 'Select POC', 'id' => 'agreement-poc_name_getter-[pocIndex]', 'onchange' => '$.get("/agreement/get-poc-info", { id: $(this).val() })
+                <?= $form->field($model, "[pocIndex]pi_name")
+                    ->dropDownList(ArrayHelper::map(Poc::find()
+                        ->where(['kcdio' => $model->{"pi_kcdio"}])
+                        ->all(), 'id', 'name'),
+                        ['prompt' => 'Select POC',
+                            'id' => 'agreement-poc_name_getter-[pocIndex]',
+                            'required' => true,
+                            'onchange' => '$.get("/agreement/get-poc-info", { id: $(this).val() })
                                 .done(function(data) {
                                     $("#agreementpoc-[pocIndex]-pi_name").val(data.name);
                                     $("#agreementpoc-[pocIndex]-pi_address").val(data.address);
@@ -28,10 +35,10 @@ class agreementPocMaker
                                     $("#agreementpoc-[pocIndex]-pi_phone").val(data.phone_number);
                                 })
                                 .fail(function() {
-                                    $("#agreementpoc-[pocIndex]-pi_name").val(data.name);
-                                    $("#agreementpoc-[pocIndex]-pi_address").val("");
-                                    $("#agreementpoc-[pocIndex]-pi_email").val("");
-                                    $("#agreementpoc-[pocIndex]-pi_phone").val("");
+                                    $("#agreementpoc-[pocIndex]-pi_name").val(null);
+                                    $("#agreementpoc-[pocIndex]-pi_address").val(null);
+                                    $("#agreementpoc-[pocIndex]-pi_email").val(null);
+                                    $("#agreementpoc-[pocIndex]-pi_phone").val(null);
                                 });']) ?>
             </div>
             <?= $form->field($model, "[pocIndex]pi_name", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['maxlength' => true, 'readonly' => true])->label(false) ?>

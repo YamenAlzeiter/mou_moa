@@ -66,8 +66,15 @@ header{
     word-wrap: break-word;
 
 }
-.iium{
-    background: #00928f;
+.navbar-brand-logo {
+    max-width: 6.7rem;
+
+}
+
+.navbar-brand {
+    padding-right: 1rem;
+    display: flex;
+    align-items: center;
 }
 
 .iium .nav-link{
