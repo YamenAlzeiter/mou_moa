@@ -12,7 +12,7 @@ use yii\widgets\Pjax;
 /** @var yii\data\ActiveDataProvider $statusDataProvider */
 
 ?>
-<div class="overflow-auto rounded-2" style="max-height: 300px;">
+<div class="overflow-auto rounded-2"  style="max-height: 600px">
 
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
@@ -25,6 +25,7 @@ use yii\widgets\Pjax;
             [
                 'class' => ActionColumn::className(),
                 'template' => '{update}',
+                'contentOptions' => ['class' => 'text-end'],
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();

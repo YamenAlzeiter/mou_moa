@@ -23,7 +23,7 @@ echo GridView::widget([
             'enableSorting' => false,
         ],
         'country',
-        'pi_kulliyyah',
+        'champion',
         'agreement_type',
         [
             'label' => 'Status',
@@ -37,6 +37,7 @@ echo GridView::widget([
         [
             'class' => ActionColumn::className(),
             'template' => '{view}{log}',
+            'contentOptions' => ['class' => 'text-end'],
             'buttons' => [
                 'view' => function ($url, $model, $key) {
                     $build = new builders();

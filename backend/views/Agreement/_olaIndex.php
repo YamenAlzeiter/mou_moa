@@ -29,7 +29,7 @@ echo GridView::widget([
             'enableSorting' => false,
         ],
         'country',
-        'pi_kulliyyah',
+        'champion',
         'agreement_type',
         [
             'label' => 'Status',
@@ -43,6 +43,7 @@ echo GridView::widget([
         [
             'class' => ActionColumn::className(),
             'template' => '{update}{view}{MCOMDate}{log}',
+            'contentOptions' => ['class' => 'text-end'],
             'buttons' => [
                 'MCOMDate' => function ($url, $model, $key) {
                     $build = new builders();

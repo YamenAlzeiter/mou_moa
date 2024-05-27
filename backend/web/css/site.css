@@ -69,7 +69,6 @@ header{
     max-width: 6.7rem;
 
 }
-
 .navbar-brand {
     padding-right: 1rem;
     display: flex;
@@ -200,4 +199,7 @@ a.desc:after {
 
 .nav > li > form > button.logout:focus {
     outline: none;
+}
+.bg-indigo-subtle{
+    background: rgba(102, 16, 242, 0.11);
 }

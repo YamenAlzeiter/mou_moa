@@ -37,7 +37,28 @@ class AgreementController extends Controller
      */
     public function behaviors()
     {
-        return ['access' => ['class' => AccessControl::class, 'rules' => [['actions' => ['index', 'update', 'view', 'downloader', 'log', 'get-organization', 'import-excel', 'import-excel-activity', 'view-activities', 'import', 'mcom', 'update-poc', 'create-poc', 'create', 'get-poc-info', 'get-kcdio-poc', 'delete-file'], 'allow' => !Yii::$app->user->isGuest, 'roles' => ['@'],],],], 'verbs' => ['class' => VerbFilter::class, 'actions' => ['logout' => ['post'],],],];
+        return [
+        'access' => [
+            'class' => AccessControl::class,
+            'rules' => [
+                ['actions' =>
+                    [
+                        'index', 'update', 'view', 'downloader', 'log',
+                        'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
+                        'import', 'mcom', 'update-poc', 'create-poc', 'create',
+                        'get-poc-info', 'get-kcdio-poc', 'delete-file'
+                    ],
+                    'allow' => !Yii::$app->user->isGuest,
+                    'roles' => ['@'],
+                    ],
+                ],
+            ],
+        'verbs' => [
+            'class' => VerbFilter::class,
+            'actions' => ['logout' => ['post'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -495,6 +516,10 @@ class AgreementController extends Controller
 
     public function importExcel($filePath, $model)
     {
+        // to import an excel file to the system, the excel file need to be in this format
+
+        //#1 columns should follow the order in the for loop
+        //#2 details of person in charge should be in this order name, kcdio, address, phone, email between each one |
         $to = $model->import_from;
         $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
         $insertedRowIds = []; // Array to store inserted row IDs
@@ -507,15 +532,9 @@ class AgreementController extends Controller
                 if (!empty($row['A'])) {
                     $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? 'Error';
                     $pi_details = $this->applyExcelFormula($row['K']);
-                    var_dump($pi_details);
-                    $parts = explode(',', $row['K']);
-                    foreach ($parts as $part) {
-                        echo "<pre>";
-                        var_dump($part);
-                        echo "</pre>";
-                    }
 
-                    die();
+                    $parts = explode('|', $row['K']);
+
 
                     $status = $row['L'] == "Active" ? 100 : 102;
 
@@ -523,7 +542,7 @@ class AgreementController extends Controller
                     $agreement->agreement_type = $row['B'];
                     $agreement->col_organization = $row['C'];
                     $agreement->country = $row['D'];
-                    $agreement->pi_kulliyyah = $kcdioName;
+                    $agreement->champion = $kcdioName;
                     $agreement->sign_date = $row['G'];
                     $agreement->end_date = $row['H'];
                     $agreement->status = $status;
@@ -534,6 +553,19 @@ class AgreementController extends Controller
                     if ($agreement->save()) {
                         $agreementPoc = new AgreementPoc();
                         $agreementPoc->agreement_id = $agreement->id;
+                        foreach ($parts as $index => $part) {
+                            if ($index == 0) {
+                                $agreementPoc->pi_name = $part;
+                            } elseif($index == 1){
+                                $agreementPoc->pi_kcdio = $part;
+                            } elseif($index == 2){
+                                $agreementPoc->pi_address = $part;
+                            } elseif($index == 3){
+                                $agreementPoc->pi_phone = $part;
+                            } elseif($index == 4){
+                                $agreementPoc->pi_email = $part;
+                            }
+                        }
                         $agreementPoc->save();
                     } else {
                         Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));

@@ -1,7 +1,9 @@
 <?php
 
 use Carbon\Carbon;
+use common\helpers\agreementPocMaker;
 use common\helpers\pocFieldMaker;
+use common\models\Kcdio;
 use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -14,15 +16,7 @@ $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 
-$status = [2 => 15,
-       12 => 15,
-       11 => 21,
-       33 => 21,
-       34 => 31,
-       47 => 46,
-       43 => 21,
-       51 => 61,
-       72 => 61,];
+$status = [2 => 15, 12 => 15, 11 => 21, 33 => 21, 34 => 31, 47 => 46, 43 => 21, 51 => 61, 72 => 61,];
 
 $additionalPoc = new pocFieldMaker();
 
@@ -31,7 +25,7 @@ $nextTwoWeeks = $currentDate->copy()->addWeeks(2);
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
 
 $model->mcom_date = '';
-$additionalPoc = new \common\helpers\agreementPocMaker();
+$additionalPoc = new agreementPocMaker();
 ?>
 <?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
@@ -68,13 +62,20 @@ $additionalPoc = new \common\helpers\agreementPocMaker();
     </div>
 
     <h4>Person In Charge Details</h4>
-            <?php foreach ($modelsPoc as $index => $modelPoc):
-                $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
-                //id needed but it's not included in get methode ..........sadly
-                echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
-            endforeach; ?>
+    <?php foreach ($modelsPoc as $index => $modelPoc):
+        $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
+        //id needed but it's not included in get methode ..........sadly
+        echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
+    endforeach; ?>
 
-    <?= $form->field($model, 'project_title')->textarea(['rows' => 6]) ?>
+    <div class="row">
+        <div class="col-md-9">
+            <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
+        </div>
+        <div class="col-md-3">
+            <div class="col-md"><?= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?></div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md">
             <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
@@ -97,7 +98,7 @@ $additionalPoc = new \common\helpers\agreementPocMaker();
 if (in_array($model->status, [11, 33, 43])): ?>
 
     <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where(['<', 'counter', 10])->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])->andWhere(['<', 'date', $nextTwoMonth->toDateString()])->limit(3) // Limit the number of results to three
-        ->all(), 'date', function ($model) {
+    ->all(), 'date', function ($model) {
         return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
     }), ['prompt' => 'Select a Date', 'required' => true] // Adding 'required' => true here
     ) ?>
@@ -149,14 +150,14 @@ foreach ($storedFiles as $file) {
 ?>
 
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
 
         const existingFilesSize = <?= $existingFilesSize ?>;
         const submitButton = $('#form-update-submit');
         console.log('files size: ' + existingFilesSize);
         const sizeLimit = 10 * 1024 * 1024; // 1 MB in bytes
 
-        $('input[type="file"][name="Agreement[files_applicant][]"]').on('change', function() {
+        $('input[type="file"][name="Agreement[files_applicant][]"]').on('change', function () {
             let uploadedSize = 0;
 
             const files = $(this)[0].files;

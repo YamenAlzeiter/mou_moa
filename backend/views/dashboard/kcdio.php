@@ -13,7 +13,7 @@ use yii\widgets\Pjax;
 
 
 ?>
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center" >
         <h1 class="mb-0 fs-7 "><i class = "ti ti-clock "></i> K/C/D/I/O</h1>
         <?= Html::button('<i class="ti fs-7 ti-plus"></i>',
             [
@@ -25,7 +25,7 @@ use yii\widgets\Pjax;
         ?>
     </div>
     <hr class = "border border-black">
-<div class = " flex-column d-flex gap-2 overflow-auto" style="height: 300px; max-height: 300px">
+<div class = "flex-column d-flex gap-2 overflow-auto" style="max-height: 500px">
     <?php Pjax::begin(); ?>
     <?= GridView::widget([
         'dataProvider' => $kcdioDataProvider,
@@ -39,6 +39,7 @@ use yii\widgets\Pjax;
             [
                 'class' => ActionColumn::className(),
                 'template' => '{update}',
+                'contentOptions' => ['class' => 'text-end'],
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();

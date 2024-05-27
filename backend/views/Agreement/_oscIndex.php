@@ -25,7 +25,7 @@ echo GridView::widget([
             'contentOptions' => ['class' => 'truncate'],
         ],
         'country',
-        'pi_kulliyyah',
+        'champion',
         'agreement_type',
         [
             'label' => 'Status',
@@ -39,6 +39,7 @@ echo GridView::widget([
         [
             'class' => ActionColumn::className(),
             'template' => '{update}{addActivity}{view}{log}{updatePoc}',
+            'contentOptions' => ['class' => 'text-end'],
             'buttons' => [
                 'view' => function ($url, $model, $key) {
                     $build = new builders();

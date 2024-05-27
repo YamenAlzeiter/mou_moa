@@ -27,20 +27,7 @@ class m240315_030854_create_moua_table extends Migration
                 'col_email' => $this->string(512),
                 'country' => $this->string(522),
                 //primary person in charge
-                'pi_name' => $this->string(522),
-                'pi_kulliyyah' => $this->string(522),
-                'pi_phone_number' => $this->string(512),
-                'pi_email' => $this->string(512),
-                //secondary person in charge
-                'pi_name_x' => $this->string(522),
-                'pi_kulliyyah_x' => $this->string(522),
-                'pi_phone_number_x' => $this->string(512),
-                'pi_email_x' => $this->string(512),
-                //3rd person in charge
-                'pi_name_xx' => $this->string(522),
-                'pi_kulliyyah_xx' => $this->string(522),
-                'pi_phone_number_xx' => $this->string(512),
-                'pi_email_xx' => $this->string(512),
+                'champion' => $this->string(522),
                 //research/ project
                 'project_title' => $this->text(),
                 'grant_fund' => $this->string(),

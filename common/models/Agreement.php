@@ -20,23 +20,11 @@ use yii\helpers\FileHelper;
  * @property string|null $col_wire_up
  * @property string|null $col_phone_number
  * @property string|null $col_email
- * @property string|null $pi_name
- * @property string|null $pi_kulliyyah
+ * @property string|null $champion
+
  * @property string|null $updated_at
  * @property string|null $created_at
- * @property string|null $pi_phone_number
  * @property string|null $country
- * @property string|null $pi_email
- *
- * @property string|null $pi_name_x
- * @property string|null $pi_kulliyyah_x
- * @property string|null $pi_phone_number_x
- * @property string|null $pi_email_x
- *
- * @property string|null $pi_name_xx
- * @property string|null $pi_kulliyyah_xx
- * @property string|null $pi_phone_number_xx
- * @property string|null $pi_email_xx
  *
  * @property string|null $project_title
  * @property string|null $grant_fund
@@ -94,30 +82,29 @@ class Agreement extends ActiveRecord
             [[ 'col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
                 'col_wire_up','project_title',
-                'proposal', 'col_phone_number', 'col_email','pi_phone_number',
-                'pi_email',  'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country', 'files_applicant'],
+                'proposal', 'col_phone_number', 'col_email',
+                'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'files_applicant', 'champion'],
                 'required', 'on' => 'uploadCreate'],
 
             [[ 'col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'pi_name', 'pi_kulliyyah', 'project_title',
-                'proposal', 'col_phone_number', 'col_email','pi_phone_number',
-                'pi_email',  'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date', 'files_applicant'],
+                'col_wire_up', 'project_title',
+                'proposal', 'col_phone_number', 'col_email',
+                'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date', 'files_applicant', 'champion'],
                 'required', 'on' => 'createSpecial'],
 
-            [['pi_email', 'col_email', 'pi_email_x', 'pi_email_xx'], 'email'],
+            [['col_email'], 'email'],
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
             [['status'], 'default', 'value' => null],
             [['status'], 'integer'],
             [['col_organization', 'col_name', 'col_address', 'col_contact_details',
-                'col_collaborators_name', 'col_wire_up', 'pi_name', 'pi_kulliyyah',
+                'col_collaborators_name', 'col_wire_up', 'champion',
                 'ssm','dp_doc','applicant_doc', 'transfer_to', 'agreement_type', 'country',
-                'pi_name_x', 'pi_kulliyyah_x',  'pi_phone_number_x', 'pi_email_x',
-                'pi_name_xx', 'pi_kulliyyah_xx', 'pi_phone_number_xx', 'pi_email_xx'], 'string', 'max' => 522],
-            [['col_phone_number', 'col_email', 'pi_phone_number', 'pi_email'], 'string', 'max' => 512],
+                ], 'string', 'max' => 522],
+            [['col_phone_number', 'col_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
             [['reason'], 'default', 'value' => null],
@@ -140,20 +127,8 @@ class Agreement extends ActiveRecord
             'col_wire_up' => 'Wire Up',
             'col_phone_number' => 'Phone Number',
             'col_email' => 'Email',
-            'pi_name' => 'Name',
-            'pi_kulliyyah' => 'Champion',
-            'pi_phone_number' => 'Phone Number',
-            'pi_email' => 'Email',
+            'champion' => 'Champion',
 
-            'pi_name_x' => 'Name',
-            'pi_kulliyyah_x' => 'Champion',
-            'pi_phone_number_x' => 'Phone Number',
-            'pi_email_x' => 'Email',
-
-            'pi_name_xx' => 'Name',
-            'pi_kulliyyah_xx' => 'Champion',
-            'pi_phone_number_xx' => 'Phone Number',
-            'pi_email_xx' => 'Email',
 
             'project_title' => 'Project Title',
             'grant_fund' => 'Grant Fund',

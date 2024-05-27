@@ -9,7 +9,7 @@ use yii\widgets\Pjax;
 /** @var yii\data\ActiveDataProvider $emailDataProvider */
 
 ?>
-<div class="overflow-auto rounded-2 " style="max-height: 300px;">
+<div class="overflow-auto rounded-2 " style="max-height: 265px">
 
 
     <?php Pjax::begin(); ?>
@@ -23,6 +23,7 @@ use yii\widgets\Pjax;
             [
                 'class' => ActionColumn::className(),
                 'template' => '{update}{view}',
+                'contentOptions' => ['class' => 'text-end'],
                 'buttons' => [
                     'view' => function ($url, $model, $key) {
                         $build = new builders();

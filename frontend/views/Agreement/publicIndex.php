@@ -25,16 +25,53 @@ modal::end();
         <div class="table-responsive">
 
             <?= GridView::widget(['dataProvider' => $dataProvider, //    'filterModel' => $searchModel,
-                'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap rounded-3 overflow-hidden'], 'summary' => '', 'rowOptions' => function ($model) {
+                'tableOptions' => ['class' => 'table  table-borderless table-striped table-header-flex text-nowrap rounded-3 overflow-hidden'],
+                'summary' => '',
+                'rowOptions' => function ($model) {
                     $build = new builders();
                     return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder'] : [];
-                }, 'columns' => ['id', ['attribute' => 'col_organization', 'contentOptions' => ['class' => 'truncate'],], ['attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/m/y'], 'enableSorting' => false,], 'country', 'pi_kulliyyah', 'sign_date', 'end_date', 'agreement_type', ['label' => 'Status', 'attribute' => 'Status', 'format' => 'raw', 'value' => function ($model) {
-                    $statusHelper = new builders();
-                    return $statusHelper->pillBuilder($model->status);
-                },], ['class' => ActionColumn::className(), 'template' => '{view}', 'buttons' => ['view' => function ($url, $model, $key) {
-                    $build = new builders();
-                    return $build->actionBuilder($model, 'view');
-                },],],], 'pager' => ['class' => yii\bootstrap5\LinkPager::className(), 'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'], 'activePageCssClass' => ['class' => 'link-white active'],// additional pager options if needed
+                },
+                'columns' => [
+                        'id',
+                    [
+                        'attribute' => 'col_organization',
+                        'contentOptions' => ['class' => 'truncate'],
+                    ],
+                    [
+                        'attribute' => 'created_at',
+                        'label' => 'Date',
+                        'format' => ['date', 'php:d/m/y'],
+                        'enableSorting' => false,
+                    ],
+                    'country',
+                    'pi_kulliyyah',
+                    'sign_date',
+                    'end_date',
+                    'agreement_type',
+                    [
+                        'label' => 'Status',
+                        'attribute' => 'Status',
+                        'format' => 'raw',
+                        'value' => function ($model)
+                        {
+                            $statusHelper = new builders();
+                            return $statusHelper->pillBuilder($model->status);
+                        },
+                    ],
+                    [
+                        'class' => ActionColumn::className(),
+                        'template' => '{view}',
+                        'contentOptions' => ['class' => 'text-end'],
+                        'buttons' => ['view' => function ($url, $model, $key) {
+                            $build = new builders();
+                            return $build->actionBuilder($model, 'view');
+                        },
+                            ],
+                        ],
+                    ],
+                'pager' => ['class' => yii\bootstrap5\LinkPager::className(),
+                'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+                'activePageCssClass' => ['class' => 'link-white active'],
                 ], 'layout' => "{items}\n{pager}",]); ?>
 
         </div>

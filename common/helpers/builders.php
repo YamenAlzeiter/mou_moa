@@ -46,6 +46,8 @@ class builders
             'update'   => 'text-primary ti-edit-circle         ',
             'status-update'   => 'text-primary ti-edit-circle         ',
             'update-kcdio'   => 'text-primary ti-edit-circle         ',
+            'type-update'   => 'text-primary ti-edit-circle         ',
+            'poc-update' => 'text-primary ti-edit-circle         ',
             'update-email-template'     => 'text-primary ti-edit-circle           ',
             'log'      => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',

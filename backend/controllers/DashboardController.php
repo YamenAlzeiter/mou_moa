@@ -3,14 +3,19 @@
 namespace backend\controllers;
 
 use common\models\Agreement;
+use common\models\AgreementPoc;
+use common\models\AgreementType;
 use common\models\EmailTemplate;
 use common\models\Kcdio;
 use common\models\Log;
+use common\models\Poc;
 use common\models\Reminder;
 use common\models\search\AgreementSearch;
+use common\models\search\PocSearch;
 use common\models\Status;
 use Yii;
 use yii\data\ActiveDataProvider;
+use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -26,17 +31,28 @@ class DashboardController extends Controller
      */
     public function behaviors()
     {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
+        return [
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    ['actions' =>
+                        [
+                            'index', 'delete-reminder', 'update-reminder','update-email-template',
+                            'update-kcdio', 'status-update', 'poc-update', 'create-kcdio', 'create-reminder',
+                            'view-email-template', 'create-poc','type-update','create-type',
+                            'delete-type', 'delete-poc'
+                        ],
+                        'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
                     ],
                 ],
-            ]
-        );
+            ],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => ['logout' => ['post'],
+                ],
+            ],
+        ];
     }
 
     /**
@@ -94,6 +110,19 @@ class DashboardController extends Controller
                 'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
             ]
         ]);
+        $pocSearchModel = new PocSearch();
+        $pocDataProvider = $pocSearchModel->search($this->request->queryParams);
+
+        $agreTypeDataProvider = new ActiveDataProvider([
+            'query' => AgreementType::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
@@ -102,22 +131,9 @@ class DashboardController extends Controller
             'emailDataProvider' => $emailDataProvider,
             'reminderDataProvider' => $reminderDataProvider,
             'kcdioDataProvider' => $kcdioDataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Agreement model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        if (!Yii::$app->request->isAjax) {
-            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-        }
-        return $this->renderAjax('view', [
-            'model' => $this->findModel($id),
+            'pocDataProvider' => $pocDataProvider,
+            'agreTypeDataProvider' => $agreTypeDataProvider,
+            'pocSearchModel' => $pocSearchModel,
         ]);
     }
 
@@ -128,46 +144,7 @@ class DashboardController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionLog($id)
-    {
-        if (!Yii::$app->request->isAjax) {
-            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-        }
-        $logsDataProvider = new ActiveDataProvider([
-            'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
-                'pageSize' => 100,
-            ], 'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
-            ],
-        ]);
 
-        return $this->renderAjax('log', [
-            'logsDataProvider' => $logsDataProvider,
-        ]);
-    }
-
-
-    /**
-     * Creates a new Agreement model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
-    public function actionCreate()
-    {
-        $model = new Agreement();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
     public function actionCreateReminder()
     {
         $model = new Reminder();
@@ -200,26 +177,63 @@ class DashboardController extends Controller
             'model' => $model,
         ]);
     }
-    /**
-     * Updates an existing Agreement model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
+    public function actionCreateType()
     {
-        $model = $this->findModel($id);
+        $model = new AgreementType();
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
+            }
+        } else {
+            $model->loadDefaultValues();
         }
 
-        return $this->render('update', [
+        return $this->renderAjax('typeUpdate', [
             'model' => $model,
         ]);
     }
+    public function actionCreatePoc()
+    {
+        $type = Yii::$app->user->identity->type;
 
+        if ($type == "admin" || $type == 'OIL' || $type == 'RMC') {
+            $model = new Poc();
+
+            if ($this->request->isPost) {
+                if ($model->load($this->request->post()) && $model->save()) {
+                    return $this->redirect(['index']);
+                }
+            } else {
+                $model->loadDefaultValues();
+            }
+
+            return $this->renderAjax('createPoc', ['model' => $model,]);
+        } else throw new ForbiddenHttpException("you can't access this page");
+
+    }
+    public function actionPocUpdate($id){
+        $model = Poc::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('createPoc', [
+            'model' => $model,
+        ]);
+    }
+    public function actionTypeUpdate($id){
+        $model = AgreementType::findOne($id);
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        return $this->renderAjax('typeUpdate', [
+            'model' => $model,
+        ]);
+    }
     public function actionStatusUpdate($id){
         $model = Status::findOne($id);
 
@@ -268,24 +282,21 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Deletes an existing Agreement model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-
     public function actionDeleteReminder($id)
     {
         Reminder::findOne($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+    public function actionDeleteType($id)
+    {
+        AgreementType::findOne($id)->delete();
+
+        return $this->redirect(['index']);
+    }
+    public function actionDeletePoc($id)
+    {
+        Poc::findOne($id)->delete();
 
         return $this->redirect(['index']);
     }

@@ -3,6 +3,7 @@
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 ?>
+
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="mb-0 fs-7"><i class = "ti ti-clock "></i> Reminders</h1>
     <?= Html::button('<i class="ti fs-7 ti-plus"></i>',
@@ -15,7 +16,8 @@ use yii\helpers\Url;
     ?>
 </div>
 <hr class = "border border-black ">
-<div class = " flex-column d-flex gap-2 overflow-auto" style="height: 300px; max-height: 300px">
+
+<div class = " flex-column d-flex gap-2 overflow-auto"  style="max-height: 200px">
     <?php
 
 

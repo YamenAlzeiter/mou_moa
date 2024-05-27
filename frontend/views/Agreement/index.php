@@ -72,6 +72,7 @@ modal::end();
                 'attribute' => 'col_organization',
                 'contentOptions' => ['class' => 'truncate'],
             ],
+            'champion',
             [
                 'attribute' => 'created_at',
                 'label' => 'Date',
@@ -89,6 +90,7 @@ modal::end();
             ], [
                 'class' => ActionColumn::className(),
                 'template' => '{view}{addActivity}{MCOMDate}{update}{log}',
+                'contentOptions' => ['class' => 'text-end'],
                 'buttons' => [
                     'update' => function ($url, $model, $key) {
                         $build = new builders();

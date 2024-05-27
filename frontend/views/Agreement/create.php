@@ -1,8 +1,10 @@
 <?php
 
 use common\helpers\agreementPocMaker;
+use common\models\Kcdio;
 use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
@@ -71,7 +73,14 @@ $additionalPoc = new agreementPocMaker()
 </div>
 
 
-<?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
+<div class="row">
+    <div class="col-md-9">
+        <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
+    </div>
+    <div class="col-md-3">
+        <div class="col-md"><?= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?></div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md">
         <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '1000']) ?>
