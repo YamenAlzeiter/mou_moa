@@ -19,7 +19,7 @@ use yii\web\IdentityInterface;
  * @property string $email
  * @property string $type
  * @property string $staff_ID
- * @property bool $is_admin
+ * @property bool   $is_admin
  * @property string $auth_key
  * @property integer $status
  * @property integer $created_at

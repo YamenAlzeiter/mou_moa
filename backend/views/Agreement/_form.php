@@ -85,7 +85,6 @@ $model->reason = null; // init reason to null for ckeditor value
     <?php if (in_array($model->status, [72, 41])): ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => $approveMap[$model->status]])->label(false) ?>
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-        <?php echo $model->status?>
     <?php endif;?>
 
     <?php if(in_array($model->status, [46, 61])):?>

@@ -69,12 +69,13 @@ $additionalPoc = new agreementPocMaker();
     endforeach; ?>
 
     <div class="row">
-        <div class="col-md-9">
+        <div class="col-md-12">
             <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
         </div>
-        <div class="col-md-3">
-            <div class="col-md"><?= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?></div>
-        </div>
+<!--        <div class="col-md-3">-->
+<!--            <div class="col-md">--><?php //= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?><!--</div>-->
+<!--        </div>-->
+        <?= $form->field($model, 'champion')->hiddenInput(['value'=> Yii::$app->user->identity->type])->label(false) ?>
     </div>
     <div class="row">
         <div class="col-md">
@@ -107,8 +108,7 @@ if (in_array($model->status, [11, 33, 43])): ?>
 <?php
 elseif (in_array($model->status, [51, 72])): ?>
     <!--    --><?php //= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
-    <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
-    <?php echo $model->status ?>
+    <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput(['required' => true])->label('Document') ?>
 
 <?php
 elseif ($model->status == 110): ?>

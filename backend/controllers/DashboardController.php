@@ -35,21 +35,26 @@ class DashboardController extends Controller
             'access' => [
                 'class' => AccessControl::class,
                 'rules' => [
-                    ['actions' =>
-                        [
-                            'index', 'delete-reminder', 'update-reminder','update-email-template',
+                    [
+                        'actions' => [
+                            'index', 'delete-reminder', 'update-reminder', 'update-email-template',
                             'update-kcdio', 'status-update', 'poc-update', 'create-kcdio', 'create-reminder',
-                            'view-email-template', 'create-poc','type-update','create-type',
+                            'view-email-template', 'create-poc', 'type-update', 'create-type',
                             'delete-type', 'delete-poc'
                         ],
-                        'allow' => !Yii::$app->user->isGuest,
+                        'allow' => true,
                         'roles' => ['@'],
+                        'matchCallback' => function ($rule, $action) {
+            
+                            return !Yii::$app->user->isGuest && Yii::$app->user->identity->is_admin;
+                        }
                     ],
                 ],
             ],
             'verbs' => [
                 'class' => VerbFilter::class,
-                'actions' => ['logout' => ['post'],
+                'actions' => [
+                    'logout' => ['post'],
                 ],
             ],
         ];

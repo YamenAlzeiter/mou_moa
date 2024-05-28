@@ -305,7 +305,7 @@ class AgreementController extends Controller
 
         $body = $mail->body;
 
-        $body = str_replace('{recipientName}', $model->pi_name, $body);
+        $body = str_replace('{recipientName}', $pocs[0]->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
 //        $body = str_replace('{link}', $viewLink, $body);
 

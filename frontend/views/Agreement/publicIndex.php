@@ -44,7 +44,7 @@ modal::end();
                         'enableSorting' => false,
                     ],
                     'country',
-                    'pi_kulliyyah',
+                    'champion',
                     'sign_date',
                     'end_date',
                     'agreement_type',
