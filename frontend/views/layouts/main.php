@@ -52,9 +52,12 @@ AppAsset::register($this);
             'class' => 'navbar navbar-expand-md headerpg  header fixed-top shadow p-0 px-5 ',
         ],
     ]);
-    $menuItems = [
-        ['label' => 'Agreements', 'url' => Yii::$app->homeUrl,    'active' => in_array(\Yii::$app->controller->id, ['agreement']),],
-    ];
+    if (!Yii::$app->user->isGuest) {
+        $menuItems = [['label' => 'Agreements', 'url' => Yii::$app->homeUrl,    'active' => in_array(\Yii::$app->controller->id, ['agreement']),],];
+    }else{
+            $menuItems[] = '';
+    }
+
 
     echo Nav::widget([
         'options' => ['class' => 'navbar-nav me-auto mb-2 mb-md-0'],

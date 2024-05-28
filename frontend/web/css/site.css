@@ -38,8 +38,18 @@ header{
     background: teal;
     color: white;
 }
+
 .btn-crete:hover{
     background: #0a3622;
+}
+.btn-iium{
+    color: white;
+    background: teal;
+    border: 0px;
+    font-size: 16px;
+}
+.btn-iium:hover{
+    background: #016868;
 }
 .table-striped > tbody > tr.need-action {
     --bs-table-striped-bg: #FEFDF2 !important;
