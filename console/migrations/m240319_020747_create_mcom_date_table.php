@@ -15,7 +15,7 @@ class m240319_020747_create_mcom_date_table extends Migration
         $this->createTable('{{%mcom_date}}', [
             'id' => $this->primaryKey(),
             'date' => $this->date(),
-            'counter' => $this->integer()->unsigned()->check('counter <= 20'),
+            'counter' => $this->integer()->unsigned()->check('counter <= 10'),
         ]);
     }
 

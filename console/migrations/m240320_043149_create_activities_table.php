@@ -22,54 +22,54 @@ class m240320_043149_create_activities_table extends Migration
             'activity_type' => $this->string(522),
 
             //Student Mobility for Credited
-            'type'              => $this->string(10),
+            'type'              => $this->text    (),
             'number_students'   => $this->integer(3),
             'name_students'     => $this->text    (),
-            'semester'          => $this->string(10),
-            'year'              => $this->string    (),
+            'semester'          => $this->text    (),
+            'year'              => $this->text    (),
 
             //Student Mobility for Non_Credited
-            'non_type'            => $this->string(10),
+            'non_type'            => $this->text    (),
             'non_number_students' => $this->integer(3),
             'non_name_students'   => $this->text    (),
-            'non_semester'        => $this->string(10),
-            'non_year'            => $this->string    (),
-            'non_program_name'    => $this->string(522), //only for non-Credited
+            'non_semester'        => $this->text    (),
+            'non_year'            => $this->text    (),
+            'non_program_name'    => $this->text    (), //only for non-Credited
 
             //Staff Mobility (Inbound)
             'in_number_of_staff'    => $this->integer(3),
-            'in_staffs_name'        => $this->text(),
-            'in_department_office'  => $this->string(100),
+            'in_staffs_name'        => $this->text  (),
+            'in_department_office'  => $this->text  (),
 
             //Staff Mobility (Outbound)
             'out_number_of_staff'   => $this->integer(3),
             'out_staffs_name'       => $this->text(),
 
             //Seminar/Conference/Workshop/Training
-            'scwt_name_of_program'      => $this->string(522),
+            'scwt_name_of_program'      => $this->text(),
             'date_of_program'           => $this->date(),
-            'program_venue'             => $this->string(522),
+            'program_venue'             => $this->text(),
             'participants_number'       =>$this->integer(3),
-            'name_participants_involved'=> $this->string(),
+            'name_participants_involved'=> $this->text(),
 
             //Research
             'research_title' => $this->text(),
 
             //Publication
-            'publication_title' => $this->string(),
-            'publisher'         => $this->string(),
+            'publication_title' => $this->text(),
+            'publisher'         => $this->text(),
 
             //Consultancy
-            'consultancy_name' => $this->string(),
-            'project_duration' => $this->string(50),
+            'consultancy_name' => $this->text(),
+            'project_duration' => $this->text(),
 
             //Any other of Cooperation, Please specify
-            'other' => $this->string(),
+            'other' => $this->text(),
             'date' => $this->date(),
 
             //No Activity, Please specify
             'justification' => $this->text(),
-            'upload_files' => $this->string(522),
+            'upload_files' => $this->text(),
         ]);
         $this->addForeignKey(
             'fk_activity', // ForeignKey name
