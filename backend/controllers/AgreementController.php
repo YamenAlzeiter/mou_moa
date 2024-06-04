@@ -15,6 +15,8 @@ use common\models\Log;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
 use Exception;
+use Mpdf\HTMLParserMode;
+use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -38,24 +40,24 @@ class AgreementController extends Controller
     public function behaviors()
     {
         return [
-        'access' => [
-            'class' => AccessControl::class,
-            'rules' => [
-                ['actions' =>
-                    [
-                        'index', 'update', 'view', 'downloader', 'log',
-                        'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
-                        'import', 'mcom', 'update-poc', 'create-poc', 'create',
-                        'get-poc-info', 'get-kcdio-poc', 'delete-file'
-                    ],
-                    'allow' => !Yii::$app->user->isGuest,
-                    'roles' => ['@'],
+            'access' => [
+                'class' => AccessControl::class,
+                'rules' => [
+                    ['actions' =>
+                        [
+                            'index', 'update', 'view', 'downloader', 'log',
+                            'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
+                            'import', 'mcom', 'update-poc', 'create-poc', 'create',
+                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf'
+                        ],
+                        'allow' => !Yii::$app->user->isGuest,
+                        'roles' => ['@'],
                     ],
                 ],
             ],
-        'verbs' => [
-            'class' => VerbFilter::class,
-            'actions' => ['logout' => ['post'],
+            'verbs' => [
+                'class' => VerbFilter::class,
+                'actions' => ['logout' => ['post'],
                 ],
             ],
         ];
@@ -158,15 +160,15 @@ class AgreementController extends Controller
 
                 }
 
-                    $status = $this->request->post('checked');
-                    $model->status = $status;
-                    $model->status == 91 ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
-                    $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+                $status = $this->request->post('checked');
+                $model->status = $status;
+                $model->status == 91 ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
+                $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
 
                 $valid = Model::validateMultiple($modelsPoc);
 
                 if ($valid) {
-                    $transaction = \Yii::$app->db->beginTransaction();
+                    $transaction = Yii::$app->db->beginTransaction();
                     try {
                         if ($model->save(false)) {
                             foreach ($modelsPoc as $modelPoc) {
@@ -196,15 +198,16 @@ class AgreementController extends Controller
             ]);
         } else throw new forbiddenHttpException("You are not authorized to be in this page");
     }
+
     function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
         $files = UploadedFile::getInstances($model, $attribute);
         if ($files) {
             $baseUploadPath = Yii::getAlias('@common/uploads');
-            $path = $baseUploadPath. '/' . $model->id . '/higher/';
+            $path = $baseUploadPath . '/' . $model->id . '/higher/';
 
             foreach ($files as $file) {
-                $fileName = $file->baseName . '.'. $file->extension;
+                $fileName = $file->baseName . '.' . $file->extension;
 
                 $filePath = $path . $fileName;
                 if (!file_exists(dirname($filePath))) {
@@ -268,7 +271,7 @@ class AgreementController extends Controller
             $this->multiFileHandler($model, 'files_applicant', 'draft', 'dp_doc');
             $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
             if ($model->save()) {
-                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81])) {
+                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81, 11])) {
                     $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
                 }
                 return $this->redirect(['index']);
@@ -321,17 +324,17 @@ class AgreementController extends Controller
         }
 
         foreach ($pocs as $index => $poc) {
-            if($index == 0){
+            if ($index == 0) {
                 $mailer = Yii::$app->mailer
                     ->compose(['html' => '@backend/views/email/emailTemplate.php'],
-                            ['subject' => $mail->subject,
-                                'recipientName' => $poc->pi_name,
-                                'reason' => $model->reason,
-                                'body' => $body])
+                        ['subject' => $mail->subject,
+                            'recipientName' => $poc->pi_name,
+                            'reason' => $model->reason,
+                            'body' => $body])
                     ->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
                     ->setTo($poc->pi_email)
                     ->setSubject($mail->subject);
-            }else  $ccRecipients[] = $poc->pi_email;
+            } else  $ccRecipients[] = $poc->pi_email;
         }
 
         $mailer->setCc($ccRecipients);
@@ -352,15 +355,15 @@ class AgreementController extends Controller
             $modelsPoc = [];
 
             foreach ($modelsPocData as $data) {
-                $poc =  isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
+                $poc = isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
                 $poc->load($data, '');
                 $modelsPoc[] = $poc;
             }
-                foreach ($modelsPoc as $modelPoc) {
+            foreach ($modelsPoc as $modelPoc) {
 
-                    $modelPoc->save(false);
-                }
-                return $this->redirect(['index']);
+                $modelPoc->save(false);
+            }
+            return $this->redirect(['index']);
 
         }
 
@@ -377,7 +380,7 @@ class AgreementController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $model->status = 121;
-            $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
@@ -433,10 +436,18 @@ class AgreementController extends Controller
     {
 
 
-        $logsDataProvider = new ActiveDataProvider(['query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => ['pageSize' => 100,], 'sort' => ['defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
-        ],]);
+        $logsDataProvider = new ActiveDataProvider([
+            'query' => Log::find()->where(['agreement_id' => $id]),
+            'pagination' => ['pageSize' => 100,],
+            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
+            ],]);
 
-        return $this->renderAjax('log', ['logsDataProvider' => $logsDataProvider,]);
+        $logModel = Agreement::findOne($id);
+
+        return $this->renderAjax('log', [
+            'logsDataProvider' => $logsDataProvider,
+            'logModel' => $logModel
+        ]);
     }
 
 
@@ -459,27 +470,27 @@ class AgreementController extends Controller
         echo $options;
     }
 
-        public function actionGetPocInfo($id)
-        {
+    public function actionGetPocInfo($id)
+    {
 
 
-            if(is_numeric($id))
+        if (is_numeric($id))
             $poc = Poc::findOne($id);
-            else
-                $poc = Poc::find()->where(['name' => $id])->one();
+        else
+            $poc = Poc::find()->where(['name' => $id])->one();
 
-            if ($poc) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                return [
-                    'name' => $poc->name,
-                    'address' => $poc->address,
-                    'email' => $poc->email,
-                    'phone_number' => $poc->phone_number,
-                ];
-            } else {
-                return ['error' => 'POC not found'];
-            }
+        if ($poc) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+            return [
+                'name' => $poc->name,
+                'address' => $poc->address,
+                'email' => $poc->email,
+                'phone_number' => $poc->phone_number,
+            ];
+        } else {
+            return ['error' => 'POC not found'];
         }
+    }
 
 
     public function actionImport()
@@ -556,13 +567,13 @@ class AgreementController extends Controller
                         foreach ($parts as $index => $part) {
                             if ($index == 0) {
                                 $agreementPoc->pi_name = $part;
-                            } elseif($index == 1){
+                            } elseif ($index == 1) {
                                 $agreementPoc->pi_kcdio = $part;
-                            } elseif($index == 2){
+                            } elseif ($index == 2) {
                                 $agreementPoc->pi_address = $part;
-                            } elseif($index == 3){
+                            } elseif ($index == 3) {
                                 $agreementPoc->pi_phone = $part;
-                            } elseif($index == 4){
+                            } elseif ($index == 4) {
                                 $agreementPoc->pi_email = $part;
                             }
                         }
@@ -622,7 +633,7 @@ class AgreementController extends Controller
 
                     foreach ($agreements as $agreement) {
                         $similarity = similar_text($academy_name, $agreement->col_organization, $percent);
-                        if ($percent >= 40.0) {
+                        if ($percent >= 70.0) {
                             $similarities[$agreement->id] = $percent; // Store similarity percentage
                         }
                     }
@@ -758,5 +769,46 @@ class AgreementController extends Controller
 
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
     }
+
+    public function actionGeneratePdf($id)
+    {
+        // Fetch data for PDF
+        $logsDataProvider = new ActiveDataProvider([
+            'query' => Log::find()->where(['agreement_id' => $id]),
+            'pagination' => ['pageSize' => 100],
+            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC]],
+        ]);
+        $model = Agreement::findOne($id);
+
+        // Render PDF content
+        $content = $this->renderPartial('pdf_template', [
+            'logsDataProvider' => $logsDataProvider,
+            'model' => $model
+        ]);
+
+        // Path to CSS files
+        $cssFiles = [
+            Yii::getAlias('@webroot/css/styles.css'),
+        ];
+
+        // Initialize mPDF
+        $mpdf = new Mpdf();
+
+        // Write CSS to mPDF
+        foreach ($cssFiles as $cssFile) {
+            if (file_exists($cssFile)) {
+                $cssContent = file_get_contents($cssFile);
+                $mpdf->WriteHTML($cssContent, HTMLParserMode::HEADER_CSS);
+            }
+        }
+
+        // Write HTML content to mPDF
+        $mpdf->WriteHTML($content, HTMLParserMode::HTML_BODY);
+
+        // Output the PDF
+        $mpdf->Output();
+        exit;
+    }
+
 
 }

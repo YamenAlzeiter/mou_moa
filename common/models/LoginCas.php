@@ -13,7 +13,7 @@ use yii\helpers\Url;
 class LoginCas extends Model
 {
     private $_user;
-   // public $username;
+    // public $username;
 
     /**
      * @inheritdoc
@@ -50,7 +50,7 @@ class LoginCas extends Model
      */
     protected function getUser($user)
     {
-       // $user = $this->casAuthenticate();
+        // $user = $this->casAuthenticate();
         if ($this->_user === null) {
             $this->_user = User::findByUsername($user);
         }

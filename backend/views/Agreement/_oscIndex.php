@@ -1,6 +1,7 @@
 <?php
 
 use common\helpers\builders;
+use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
@@ -71,7 +72,7 @@ echo GridView::widget([
     ],
     'layout' => "{items}\n{summary}\n{pager}\n",
 ]);
-echo '</div></div>'
+echo '</div></div>';
 ?>
 
 

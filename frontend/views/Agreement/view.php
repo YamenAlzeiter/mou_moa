@@ -36,9 +36,9 @@ modal::end();
                     <span class='text-gray-dark fw-bolder fs-5'><?= $model->champion ?></span>
                 </p>
             <?php endif; ?>
-            <?php if (!Yii::$app->user->isGuest && $model->status == 21): ?>
+            <?php if (!Yii::$app->user->isGuest && $model->status == 21 || $model->status == 121): ?>
                 <p class="badge  fw-bolder mw-pill rounded-2 bg-dark-subtle text-light fs-5">
-                    MCOM:<span><?= Yii::$app->formatter->asDate($model->mcom_date, 'dd-MM-yyyy') ?></span></p>
+                    MCOM: <span><?= Yii::$app->formatter->asDate($model->mcom_date, 'dd-MM-yyyy') ?></span></p>
             <?php endif; ?>
             <span class='text-gray-dark fw-bolder fs-5'><?= $model->agreement_type ?></span>
 

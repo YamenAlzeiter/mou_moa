@@ -4,11 +4,18 @@
 
 use common\helpers\builders;
 use common\helpers\statusLable;
+use yii\bootstrap5\Html;
 use yii\grid\GridView;
 use yii\web\JqueryAsset;
 use yii\widgets\Pjax;
 
+
 ?>
+
+
+
+
+
 
     <div class="table-responsive">
         <?php Pjax::begin(['options' => ['id' => 'log']]); ?>

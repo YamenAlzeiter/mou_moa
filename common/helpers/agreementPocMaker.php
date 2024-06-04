@@ -113,7 +113,7 @@ class agreementPocMaker
 
                 <?= $form->field($model, "[$index]pi_name")
                     ->dropDownList(ArrayHelper::map(Poc::find()->where(['kcdio' => $model->pi_kcdio])->all(), 'name', 'name'),
-                        ['prompt' => 'asdf POC', 'id' => 'agreement-poc_name_getter-' . $index, 'options' => [$model->pi_name => ['Selected' => true]], 'onchange' => '$.get("/agreement/get-poc-info", { id: $(this).val() })
+                        ['prompt' => 'Select POC', 'id' => 'agreement-poc_name_getter-' . $index, 'options' => [$model->pi_name => ['Selected' => true]], 'onchange' => '$.get("/agreement/get-poc-info", { id: $(this).val() })
                         .done(function(data) {
                     $("#' . Html::getInputId($model, "[$index]pi_name") . '").val(data.name);
                     $("#' . Html::getInputId($model, "[$index]pi_address") . '").val(data.address);

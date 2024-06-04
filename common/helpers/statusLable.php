@@ -31,7 +31,7 @@ class statusLable
     {
         $classes = [
             1  =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
-            11 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OSC'      , 'to' => 'OLA'],
+            11 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
             21 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'applicant'],
             31 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OLA/MCOM'],
             41 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'OLA/UMC'],
