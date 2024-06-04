@@ -13,53 +13,53 @@ class m240315_030854_create_moua_table extends Migration
     public function safeUp()
     {
         $this->createTable('{{%agreement}}', [
-                'id' => $this->primaryKey(),
-                //status
-                'status' => $this->integer(),
-                //Collaborator Details
-                'col_organization' => $this->string(522),
-                'col_name' => $this->string(522),
-                'col_address' => $this->string(522),
-                'col_contact_details' => $this->string(522),
-                'col_collaborators_name' => $this->string(522),
-                'col_wire_up' => $this->string(522),
-                'col_phone_number' => $this->string(512),
-                'col_email' => $this->string(512),
-                'country' => $this->string(522),
-                //primary person in charge
-                'champion' => $this->string(522),
-                //research/ project
-                'project_title' => $this->text(),
-                'grant_fund' => $this->string(),
-                'sign_date' => $this->date(),
-                'end_date'  => $this->date(),
-                'member' => $this->string(2),
-                'progress' => $this ->text(),
-                //extra
-                'ssm' => $this->string(522),
-                'company_profile' => $this->string(),
-                'mcom_date' => $this->date(),
-                'meeting_link' => $this->string(),
-                'agreement_type' => $this->string(),
-                'transfer_to' => $this->string(),
-                'proposal' => $this->string(),
-                //docs
-                'applicant_doc' =>$this->text(),
-                'dp_doc' =>$this->text(),
-                //messages
-                'reason' => $this->text(),
-                //time
-                'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-                'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-                //details
-                'pi_details' => $this->text(),
-                'col_details' => $this->text(),
-                'collaboration_area' => $this->text(),
-                //reminder
-                'isReminded' => $this->integer(1)->defaultValue(0),//this for application
-                'last_reminder' => $this->date(),//this for activities
-                //temp
-                'temp' => $this->text(),
+            'id' => $this->primaryKey(),
+            //status
+            'status' => $this->integer(),
+            //Collaborator Details
+            'col_organization' => $this->string(522),
+            'col_name' => $this->string(522),
+            'col_address' => $this->string(522),
+            'col_contact_details' => $this->string(522),
+            'col_collaborators_name' => $this->string(522),
+            'col_wire_up' => $this->string(522),
+            'col_phone_number' => $this->string(512),
+            'col_email' => $this->string(512),
+            'country' => $this->string(522),
+            //primary person in charge
+            'champion' => $this->string(522),
+            //research/ project
+            'project_title' => $this->text(),
+            'grant_fund' => $this->string(),
+            'sign_date' => $this->date(),
+            'end_date' => $this->date(),
+            'member' => $this->string(2),
+            'progress' => $this->text(),
+            //extra
+            'ssm' => $this->string(522),
+            'company_profile' => $this->string(),
+            'mcom_date' => $this->date(),
+            'meeting_link' => $this->string(),
+            'agreement_type' => $this->string(),
+            'transfer_to' => $this->string(),
+            'proposal' => $this->string(),
+            //docs
+            'applicant_doc' => $this->text(),
+            'dp_doc' => $this->text(),
+            //messages
+            'reason' => $this->text(),
+            //time
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            //details
+            'pi_details' => $this->text(),
+            'col_details' => $this->text(),
+            'collaboration_area' => $this->text(),
+            //reminder
+            'isReminded' => $this->integer(1)->defaultValue(0),//this for application
+            'last_reminder' => $this->date(),//this for activities
+            //temp
+            'temp' => $this->text(),
 
         ]);
 
@@ -118,63 +118,76 @@ class m240315_030854_create_moua_table extends Migration
 //            EXECUTE FUNCTION clear_draft_fields();
 //        ");
         $this->execute("
-         CREATE OR REPLACE FUNCTION create_status_log()
+CREATE OR REPLACE FUNCTION create_status_log()
 RETURNS trigger AS $$ 
 BEGIN
    -- Access changed attributes using special variables
-IF (TG_OP = 'INSERT' AND NEW.status = 10) OR 
-     (TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) OR
+   IF (TG_OP = 'INSERT' AND NEW.status = 10) OR 
+      (TG_OP = 'INSERT' AND NEW.status = 91) OR
+      (TG_OP = 'INSERT' AND NEW.status = 100) OR
+      (TG_OP = 'INSERT' AND NEW.status = 102) OR
       (TG_OP = 'UPDATE' AND OLD.status != NEW.status)
    THEN
        DECLARE
-           old_status INTEGER := (CASE WHEN TG_OP = 'UPDATE' THEN OLD.status ELSE 0 END);
+           old_status INTEGER := CASE WHEN TG_OP = 'UPDATE' THEN OLD.status ELSE 0 END;
            new_status INTEGER := NEW.status;
            reason TEXT := NEW.reason;
+           creator TEXT := NEW.temp;
            log_message TEXT;
-         resubmitted bool;
-         imported bool;
-         inserted bool;
+           resubmitted BOOLEAN;
+           imported BOOLEAN;
+           inserted BOOLEAN;
+           special BOOLEAN;
 
        BEGIN 
+           -- Determine boolean flags based on conditions
+           IF (OLD.status = 2 AND NEW.status = 15) THEN 
+               resubmitted := TRUE;
+           ELSE 
+               resubmitted := FALSE;
+           END IF;
 
-       IF (OLD.status = 2 AND NEW.status = 15) THEN resubmitted = TRUE;
-                                        ELSE resubmitted = FALSE;
-       END IF;
-       IF (TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) THEN imported = TRUE;
-                                        ELSE imported = FALSE;
-       END IF;
-       IF (TG_OP = 'INSERT' AND NEW.status = 10) THEN inserted = TRUE;
-                                        ELSE inserted = FALSE;
-       END IF;
-       --what status need reason message 
-         IF ( resubmitted = TRUE
-                      OR imported = TRUE
-                      OR TG_OP = 'INSERT' 
-                      OR NEW.status = 2 -- Not Recommended from OSC
-                     OR NEW.status = 12 -- Not Recommended from OLA
-                     OR NEW.status = 42 -- Rejected After UMC
-                     OR NEW.status = 43 -- KIV After UMC
-                     OR NEW.status = 82 -- Newer Draft Not Recommended
-         ) THEN 
-          -- Build the log message
-           log_message := CASE 
-                            WHEN inserted = TRUE THEN 'New Application Submitted' 
-                     WHEN resubmitted = TRUE THEN 'Application Resubmitted'
-                     WHEN imported = TRUE THEN 'Application Imported'
-                            ELSE reason 
-                          END;
-       END IF;
-           -- Insert into log table 
-           INSERT INTO log (agreement_id, old_status, new_status, message)
-           VALUES (NEW.id, old_status, new_status, log_message);
+           IF (TG_OP = 'INSERT' AND (NEW.status = 100 OR NEW.status = 102)) THEN 
+               imported := TRUE;
+           ELSE 
+               imported := FALSE;
+           END IF;
+
+           IF (TG_OP = 'INSERT' AND NEW.status = 10) THEN 
+               inserted := TRUE;
+           ELSE 
+               inserted := FALSE;
+           END IF;
+
+           IF (TG_OP = 'INSERT' AND NEW.status = 91) THEN 
+               special := TRUE;
+           ELSE 
+               special := FALSE;
+           END IF;
+
+           -- Determine if a log message is needed
+           IF resubmitted OR imported OR TG_OP = 'INSERT' OR 
+              NEW.status IN (2, 12, 31, 32, 33, 34, 41, 42, 43, 82)
+           THEN 
+               -- Build the log message
+               log_message := CASE 
+                   WHEN inserted THEN 'New Application Submitted' 
+                   WHEN resubmitted THEN 'Application Resubmitted'
+                   WHEN imported THEN 'Application Imported'
+                   WHEN special THEN 'Application has been created by OLA skipping all normal process.'
+                   ELSE reason 
+               END;
+
+               -- Insert into log table 
+               INSERT INTO log (agreement_id, old_status, new_status, message, created_by)
+               VALUES (NEW.id, old_status, new_status, log_message, creator);
+           END IF;
        END;
    END IF;
 
    RETURN NEW; 
 END;
 $$ LANGUAGE plpgsql;
-       
-      
         ");
         $this->execute("
              CREATE TRIGGER log
@@ -183,7 +196,7 @@ $$ LANGUAGE plpgsql;
             EXECUTE PROCEDURE create_status_log();
         ");
 
-}
+    }
 
     /**
      * {@inheritdoc}
@@ -193,3 +206,68 @@ $$ LANGUAGE plpgsql;
         $this->dropTable('{{%agreement}}');
     }
 }
+
+//
+//BEGIN
+//-- Access changed attributes using special variables
+//IF (TG_OP = 'INSERT' AND NEW.status = 10) OR (TG_OP = 'INSERT' AND NEW.status = 91) OR
+//(TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) OR
+//(TG_OP = 'UPDATE' AND OLD.status != NEW.status)
+//   THEN
+//       DECLARE
+//       old_status INTEGER := (CASE WHEN TG_OP = 'UPDATE' THEN OLD.status ELSE 0 END);
+//           new_status INTEGER := NEW.status;
+//           reason TEXT := NEW.reason;
+//           log_message TEXT;
+//         resubmitted bool;
+//         imported bool;
+//         inserted bool;
+//		 specail bool;
+//		 creator TEXT = NEW.temp;
+//
+//       BEGIN
+//
+//       IF (OLD.status = 2 AND NEW.status = 15) THEN resubmitted = TRUE;
+//                                        ELSE resubmitted = FALSE;
+//       END IF;
+//       IF (TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) THEN imported = TRUE;
+//                                        ELSE imported = FALSE;
+//       END IF;
+//       IF (TG_OP = 'INSERT' AND NEW.status = 10) THEN inserted = TRUE;
+//                                        ELSE inserted = FALSE;
+//       END IF;
+//	   IF(TG_OP = 'INSERT' AND NEW.status = 91)THEN specail = TRUE;
+//	   									ELSE specail = FALSE;
+//		END IF;
+//       --what status need reason message
+//         IF ( resubmitted = TRUE
+//             OR imported = TRUE
+//             OR TG_OP = 'INSERT'
+//             OR NEW.status = 2 -- Not Recommended from OSC
+//           OR NEW.status = 12 -- Not Recommended from OLA
+//           OR NEW.status = 31 -- Approved After MCOM
+//           OR new.status = 32 -- Rejected After MCOM
+//           OR new.status = 33 -- KIV After MCOM
+//           OR new.status = 34 -- Conditional Approve After Mcom
+//           OR new.status = 41 -- Approved After UMC
+//           OR NEW.status = 42 -- Rejected After UMC
+//           OR NEW.status = 43 -- KIV After UMC
+//           OR NEW.status = 82 -- Newer Draft Not Recommended
+//         ) THEN
+//           -- Build the log message
+//           log_message := CASE
+//                            WHEN inserted = TRUE THEN 'New Application Submitted'
+//                     WHEN resubmitted = TRUE THEN 'Application Resubmitted'
+//                     WHEN imported = TRUE THEN 'Application Imported'
+//					 WHEN specail = TRUE THEN 'Applicatoin has been created by OLA skipping all normal process.'
+//                            ELSE reason
+//                          END;
+//       END IF;
+//           -- Insert into log table
+//           INSERT INTO log (agreement_id, old_status, new_status, message, created_by)
+//           VALUES (NEW.id, old_status, new_status, log_message, creator);
+//       END;
+//   END IF;
+//
+//   RETURN NEW;
+//END;

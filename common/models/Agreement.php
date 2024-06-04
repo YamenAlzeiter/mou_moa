@@ -196,7 +196,7 @@ class Agreement extends ActiveRecord
 
         //delete draft files when status become 91 AKA ACTV
 //        if($this->status == 91) $this->deleteDrafts();
-        if($this->status == 21) $this->increaseMCOMDate();
+        if($this->status == 21 || $this->status == 121) $this->increaseMCOMDate();
     }
 
     protected function increaseMCOMDate(){
