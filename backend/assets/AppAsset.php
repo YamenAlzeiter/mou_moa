@@ -20,6 +20,7 @@ class AppAsset extends AssetBundle
         'js/sweet-alert.js',
     ];
     public $depends = [
+
         'yii\web\YiiAsset',
         'yii\bootstrap5\BootstrapAsset',
     ];

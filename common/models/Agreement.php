@@ -130,7 +130,7 @@ class Agreement extends ActiveRecord
             'champion' => 'Champion',
 
 
-            'project_title' => 'Project Title',
+            'project_title' => 'Project Title / Research Title',
             'grant_fund' => 'Grant Fund',
             'sign_date' => 'Sign Date',
             'end_date' => 'End Date',

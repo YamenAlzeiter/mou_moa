@@ -78,7 +78,7 @@ class AgreementController extends Controller
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
         // Define the statuses to be always on top
-        $type != "OLA" ? $topStatuses = [10, 15, 81] : $topStatuses = [1, 21, 31, 41, 61];
+        $type != "OLA" ? $topStatuses = [10, 15, 81] : $topStatuses = [1, 21, 31, 41, 61, 121];
 
         if ($type != 'OLA' && $type != 'admin') {
             $dataProvider->query->andWhere(['transfer_to' => $type]);
@@ -286,21 +286,21 @@ class AgreementController extends Controller
     private function sendEmail($model, $needCC)
     {
         $mailMap = [//$model->status => emailTemplate->id//
-            1 => 5,     // new application    from OSC to OLA
-            2 => 4,     // not complete       from OSC to Applicant
-            12 => 4,    // not complete       from OLA to OSC CC Applicant
-            11 => 2,    // Pick date          from OLA
-            31 => 2,    // MCOM Recommended   from OLA to Applicant CC OSC
-            32 => 1,    // MCOM Reject        from OLA to Applicant CC OSC
-            33 => 4,    // MCOM not Complete  from OLA to Applicant CC OSC
-            34 => 2,    // MCOM Special       from OLA to Applicant CC OSC
-            41 => 9,    // Approved UMC       from OLA to Applicant CC OSC
-            42 => 1,    // UMC Reject         from OLA to Applicant CC OSC
-            43 => 4,    // UMC not Complete   from OLA to Applicant CC OSC
-            51 => 3,    // draft uploaded     from OLA to Applicant CC OSC
-            72 => 7,    // draft rejected     from OLA to OSC
-            81 => 8,    // final Draft uploaded from OLA to Applicant CC OSC
-            121 => 11,  // MCOM Date Updated  from OLA to Applicant cc OSC
+            1   =>  5,    // new application    from OSC to OLA
+            2   =>  4,    // not complete       from OSC to Applicant
+            12  =>  4,    // not complete       from OLA to OSC CC Applicant
+            11  =>  2,    // Pick date          from OLA
+            31  =>  2,    // MCOM Recommended   from OLA to Applicant CC OSC
+            32  =>  1,    // MCOM Reject        from OLA to Applicant CC OSC
+            33  =>  4,    // MCOM not Complete  from OLA to Applicant CC OSC
+            34  =>  2,    // MCOM Special       from OLA to Applicant CC OSC
+            41  =>  9,    // Approved UMC       from OLA to Applicant CC OSC
+            42  =>  1,    // UMC Reject         from OLA to Applicant CC OSC
+            43  =>  4,    // UMC not Complete   from OLA to Applicant CC OSC
+            51  =>  3,    // draft uploaded     from OLA to Applicant CC OSC
+            72  =>  7,    // draft rejected     from OLA to OSC
+            81  =>  8,    // final Draft uploaded from OLA to Applicant CC OSC
+            121 => 11,    // MCOM Date Updated  from OLA to Applicant cc OSC
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);

@@ -33,6 +33,12 @@ return [
                 ],
             ],
         ],
+        'formatter' => [
+            'class' => 'yii\i18n\Formatter',
+            'defaultTimeZone' => 'UTC',
+            'timeZone' => 'Asia/Kuala_Lumpur',
+            'datetimeFormat' => 'php:Y-m-d H:i:s',
+        ],
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],

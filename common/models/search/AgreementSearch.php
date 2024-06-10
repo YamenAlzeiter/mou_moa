@@ -71,29 +71,36 @@ class   AgreementSearch extends Agreement
         }
 
         // grid filtering conditions
-        $query->andFilterWhere(['id' => $this->id, 'sign_date' => $this->sign_date, 'end_date' => $this->end_date, 'mcom_date' => $this->mcom_date, 'agreement_type' => $this->agreement_type]);
+        $query->andFilterWhere([
 
-        $query->orFilterWhere(['ilike', 'col_organization', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_name', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_address', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_contact_details', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_collaborators_name', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_wire_up', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_phone_number', $this->full_info])
-            ->orFilterWhere(['ilike', 'col_email', $this->full_info])
-            ->orFilterWhere(['ilike', 'project_title', $this->full_info])
-            ->orFilterWhere(['ilike', 'grant_fund', $this->full_info])
-            ->orFilterWhere(['ilike', 'member', $this->full_info])
-            ->orFilterWhere(['ilike', 'proposal', $this->full_info])
-            ->orFilterWhere(['ilike', 'ssm', $this->full_info])
-            ->orFilterWhere(['ilike', 'company_profile', $this->full_info])
-            ->orFilterWhere(['ilike', 'meeting_link', $this->full_info])
-            ->orFilterWhere(['ilike', 'reason', $this->full_info])
-            ->orFilterWhere(['ilike', 'country', $this->full_info])
-            ->orFilterWhere(['ilike', 'agreement_type', $this->full_info])
+            'agreement.sign_date' => $this->sign_date,
+            'agreement.end_date' => $this->end_date,
+            'agreement.mcom_date' => $this->mcom_date,
+            'agreement.agreement_type' => $this->agreement_type]);
+
+        $query
+            ->orFilterWhere(['ilike', 'agreement.col_organization', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_address', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_contact_details', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_collaborators_name', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_wire_up', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_phone_number', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.col_email', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.project_title', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.grant_fund', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.member', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.proposal', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.ssm', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.company_profile', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.meeting_link', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.reason', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.country', $this->full_info])
+            ->orFilterWhere(['ilike', 'agreement.agreement_type', $this->full_info])
             ->orFilterWhere(['agreement_poc.pi_name' => $this->full_info])
             ->orFilterWhere(['agreement_poc.pi_kcdio' => $this->full_info])
             ->andFilterWhere(['ilike', 'transfer_to', $this->transfer_to])
+            ->andFilterWhere(['agreement.id' => $this->id])
             ;
 
 

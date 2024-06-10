@@ -52,7 +52,7 @@ use yii\widgets\ActiveForm;
             '1 Year' => '1 Year', '6 Month' => '6 Month', '3 Month' => '3 Month', '2 Month' => '2 Month',
             '1 Month' => '1 Month'
         ], [
-            'class' => 'form-select', 'prompt' => 'Pick Type', // Placeholder text
+            'class' => 'form-select', 'prompt' => 'Pick End Date', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
         <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array) McomDate::find()->all(), 'date',

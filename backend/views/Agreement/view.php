@@ -89,7 +89,7 @@ modal::end();
 <?= $view->renderer($model->grant_fund, 'Fund') ?>
 <?= $view->renderer($model->member, 'Number of Members') ?>
 <?= $view->renderer($model->proposal, 'Proposal') ?>
-<?= $view->renderer($model->project_title, 'Project Title') ?>
+<?= $view->renderer($model->project_title, $model->transfer_to == "OIL"? 'Research Title': 'Project Title') ?>
 <?= $view->renderer($model->ssm, 'SSM') ?>
 <?= $view->renderer($model->company_profile, 'Company Profile') ?>
 <?= $view->renderer($model->mcom_date, 'MCOM Date') ?>

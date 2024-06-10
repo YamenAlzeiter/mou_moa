@@ -1279,3 +1279,191 @@ EC78 .|    <= ''
 4F4A .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
 4F4A .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
 4F4A .|    <= ''
+ABCA .START (2024-06-05 10:27:09) phpCAS-1.3.8 ****************** [CAS.php:475]
+ABCA .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+ABCA .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+ABCA .|    |    Session is not authenticated [Client.php:938]
+ABCA .|    <= ''
+ABCA .<= ''
+ABCA .=> phpCAS::setCasServerCACert('C:/xampp/apache/conf/ssl.crt/') [LoginCas.php:75]
+ABCA .<= ''
+ABCA .=> phpCAS::forceAuthentication() [LoginCas.php:77]
+ABCA .|    => CAS_Client::forceAuthentication() [CAS.php:1120]
+ABCA .|    |    => CAS_Client::isAuthenticated() [Client.php:1286]
+ABCA .|    |    |    => CAS_Client::_wasPreviouslyAuthenticated() [Client.php:1398]
+ABCA .|    |    |    |    no user found [Client.php:1640]
+ABCA .|    |    |    <= false
+ABCA .|    |    |    no ticket found [Client.php:1499]
+ABCA .|    |    <= false
+ABCA .|    |    => CAS_Client::redirectToCas(false) [Client.php:1295]
+ABCA .|    |    |    => CAS_Client::getServerLoginURL(false, false) [Client.php:1661]
+ABCA .|    |    |    |    => CAS_Client::getURL() [Client.php:342]
+ABCA .|    |    |    |    |    Final URI: http://myadmin.iium/site/login [Client.php:3585]
+ABCA .|    |    |    |    <= 'http://myadmin.iium/site/login'
+ABCA .|    |    |    <= 'https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin'
+ABCA .|    |    |    Redirect to : https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin [Client.php:1668]
+ABCA .|    |    |    exit()
+ABCA .|    |    |    -
+ABCA .|    |    -
+ABCA .|    -
+013E .START (2024-06-05 10:30:12) phpCAS-1.3.8 ****************** [CAS.php:475]
+013E .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+013E .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+013E .|    |    Session is not authenticated [Client.php:938]
+013E .|    <= ''
+013E .<= ''
+013E .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+013E .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+013E .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+013E .|    <= ''
+6609 .START (2024-06-05 10:30:16) phpCAS-1.3.8 ****************** [CAS.php:475]
+6609 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+6609 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+6609 .|    |    Session is not authenticated [Client.php:938]
+6609 .|    <= ''
+6609 .<= ''
+6609 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+6609 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+6609 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+6609 .|    <= ''
+C2E1 .START (2024-06-05 10:30:16) phpCAS-1.3.8 ****************** [CAS.php:475]
+C2E1 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+C2E1 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+C2E1 .|    |    Session is not authenticated [Client.php:938]
+C2E1 .|    <= ''
+C2E1 .<= ''
+C2E1 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+C2E1 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+C2E1 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+C2E1 .|    <= ''
+B6D4 .START (2024-06-05 10:30:17) phpCAS-1.3.8 ****************** [CAS.php:475]
+B6D4 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+B6D4 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+B6D4 .|    |    Session is not authenticated [Client.php:938]
+B6D4 .|    <= ''
+B6D4 .<= ''
+B6D4 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+B6D4 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+B6D4 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+B6D4 .|    <= ''
+2DB3 .START (2024-06-05 10:30:17) phpCAS-1.3.8 ****************** [CAS.php:475]
+2DB3 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+2DB3 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+2DB3 .|    |    Session is not authenticated [Client.php:938]
+2DB3 .|    <= ''
+2DB3 .<= ''
+2DB3 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+2DB3 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+2DB3 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+2DB3 .|    <= ''
+294C .START (2024-06-05 10:30:22) phpCAS-1.3.8 ****************** [CAS.php:475]
+294C .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+294C .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+294C .|    |    Session is not authenticated [Client.php:938]
+294C .|    <= ''
+294C .<= ''
+294C .=> phpCAS::setCasServerCACert('C:/xampp/apache/conf/ssl.crt/') [LoginCas.php:75]
+294C .<= ''
+294C .=> phpCAS::forceAuthentication() [LoginCas.php:77]
+294C .|    => CAS_Client::forceAuthentication() [CAS.php:1120]
+294C .|    |    => CAS_Client::isAuthenticated() [Client.php:1286]
+294C .|    |    |    => CAS_Client::_wasPreviouslyAuthenticated() [Client.php:1398]
+294C .|    |    |    |    no user found [Client.php:1640]
+294C .|    |    |    <= false
+294C .|    |    |    no ticket found [Client.php:1499]
+294C .|    |    <= false
+294C .|    |    => CAS_Client::redirectToCas(false) [Client.php:1295]
+294C .|    |    |    => CAS_Client::getServerLoginURL(false, false) [Client.php:1661]
+294C .|    |    |    |    => CAS_Client::getURL() [Client.php:342]
+294C .|    |    |    |    |    Final URI: http://myadmin.iium/site/login [Client.php:3585]
+294C .|    |    |    |    <= 'http://myadmin.iium/site/login'
+294C .|    |    |    <= 'https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin'
+294C .|    |    |    Redirect to : https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin [Client.php:1668]
+294C .|    |    |    exit()
+294C .|    |    |    -
+294C .|    |    -
+294C .|    -
+AE9E .START (2024-06-05 10:30:27) phpCAS-1.3.8 ****************** [CAS.php:475]
+AE9E .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+AE9E .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+AE9E .|    |    Session is not authenticated [Client.php:938]
+AE9E .|    <= ''
+AE9E .<= ''
+AE9E .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+AE9E .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+AE9E .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+AE9E .|    <= ''
+3EA5 .START (2024-06-05 10:30:28) phpCAS-1.3.8 ****************** [CAS.php:475]
+3EA5 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+3EA5 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+3EA5 .|    |    Session is not authenticated [Client.php:938]
+3EA5 .|    <= ''
+3EA5 .<= ''
+3EA5 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+3EA5 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+3EA5 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+3EA5 .|    <= ''
+766D .START (2024-06-05 10:30:28) phpCAS-1.3.8 ****************** [CAS.php:475]
+766D .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+766D .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+766D .|    |    Session is not authenticated [Client.php:938]
+766D .|    <= ''
+766D .<= ''
+766D .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+766D .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+766D .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\mou_moa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+766D .|    <= ''
+F585 .START (2024-06-05 10:30:31) phpCAS-1.3.8 ****************** [CAS.php:475]
+F585 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+F585 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+F585 .|    |    Session is not authenticated [Client.php:938]
+F585 .|    <= ''
+F585 .<= ''
+F585 .=> phpCAS::setCasServerCACert('C:/xampp/apache/conf/ssl.crt/') [LoginCas.php:75]
+F585 .<= ''
+F585 .=> phpCAS::forceAuthentication() [LoginCas.php:77]
+F585 .|    => CAS_Client::forceAuthentication() [CAS.php:1120]
+F585 .|    |    => CAS_Client::isAuthenticated() [Client.php:1286]
+F585 .|    |    |    => CAS_Client::_wasPreviouslyAuthenticated() [Client.php:1398]
+F585 .|    |    |    |    no user found [Client.php:1640]
+F585 .|    |    |    <= false
+F585 .|    |    |    no ticket found [Client.php:1499]
+F585 .|    |    <= false
+F585 .|    |    => CAS_Client::redirectToCas(false) [Client.php:1295]
+F585 .|    |    |    => CAS_Client::getServerLoginURL(false, false) [Client.php:1661]
+F585 .|    |    |    |    => CAS_Client::getURL() [Client.php:342]
+F585 .|    |    |    |    |    Final URI: http://myadmin.iium/site/login [Client.php:3585]
+F585 .|    |    |    |    <= 'http://myadmin.iium/site/login'
+F585 .|    |    |    <= 'https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin'
+F585 .|    |    |    Redirect to : https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin [Client.php:1668]
+F585 .|    |    |    exit()
+F585 .|    |    |    -
+F585 .|    |    -
+F585 .|    -
+F4C4 .START (2024-06-05 12:25:26) phpCAS-1.3.8 ****************** [CAS.php:475]
+F4C4 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+F4C4 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:365]
+F4C4 .|    |    Session is not authenticated [Client.php:938]
+F4C4 .|    <= ''
+F4C4 .<= ''
+F4C4 .=> phpCAS::setCasServerCACert('C:/xampp/apache/conf/ssl.crt/') [LoginCas.php:75]
+F4C4 .<= ''
+F4C4 .=> phpCAS::forceAuthentication() [LoginCas.php:77]
+F4C4 .|    => CAS_Client::forceAuthentication() [CAS.php:1120]
+F4C4 .|    |    => CAS_Client::isAuthenticated() [Client.php:1286]
+F4C4 .|    |    |    => CAS_Client::_wasPreviouslyAuthenticated() [Client.php:1398]
+F4C4 .|    |    |    |    no user found [Client.php:1640]
+F4C4 .|    |    |    <= false
+F4C4 .|    |    |    no ticket found [Client.php:1499]
+F4C4 .|    |    <= false
+F4C4 .|    |    => CAS_Client::redirectToCas(false) [Client.php:1295]
+F4C4 .|    |    |    => CAS_Client::getServerLoginURL(false, false) [Client.php:1661]
+F4C4 .|    |    |    |    => CAS_Client::getURL() [Client.php:342]
+F4C4 .|    |    |    |    |    Final URI: http://myadmin.iium/site/login [Client.php:3585]
+F4C4 .|    |    |    |    <= 'http://myadmin.iium/site/login'
+F4C4 .|    |    |    <= 'https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin'
+F4C4 .|    |    |    Redirect to : https://cas.iium.edu.my:8448/cas/login?service=http%3A%2F%2Fmyadmin.iium%2Fsite%2Flogin [Client.php:1668]
+F4C4 .|    |    |    exit()
+F4C4 .|    |    |    -
+F4C4 .|    |    -
+F4C4 .|    -

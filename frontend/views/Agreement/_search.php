@@ -42,9 +42,16 @@ use yii\widgets\ActiveForm;
         </div>
     <?php endif; ?>
     <div class="d-flex align-items-center gap-3">
+
         <?= $form->field($model, 'full_info', ['options' => ['mb-0']])->textInput([
             'class' => 'form-control', // Add class for styling
             'placeholder' => 'Search', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+        ])->label(false) ?>
+
+        <?= $form->field($model, 'id', ['options' => ['mb-0']])->textInput([
+            'class' => 'form-control', // Add class for styling
+            'placeholder' => 'ID', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 

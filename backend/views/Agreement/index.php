@@ -12,7 +12,7 @@ $this->title = 'Agreements';
 
 $type = Yii::$app->user->identity->type;
 $build = new \common\helpers\builders();
-
+Pjax::begin();
 echo '<div class="table-responsive">';
 echo '<div class="container-md my-3 p-3 rounded-3 bg-light shadow">
         <div class="row align-items-end">
@@ -58,6 +58,7 @@ echo '</div>
             ]);
         }
     }
+    Pjax::end();
     ?>
 
 
