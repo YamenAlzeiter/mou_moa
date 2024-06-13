@@ -17,7 +17,7 @@ echo '<div class="table-responsive">';
 echo '<div class="container-md my-3 p-3 rounded-3 bg-light shadow">
         <div class="row align-items-end">
             <div class="col-md-9 col-sm-12">
-                '.$this->render('_search', ['model' => $searchModel]).'
+                '.$this->render('_search', ['model' => $searchModel]). '
             </div>';
 
 if ($type == "IO" || $type == "RMC" || $type == "OIL") {
@@ -32,6 +32,13 @@ if ($type == "OLA") {
     echo '<div class="col-md-3 col-sm-12 ">
             <div class="d-flex flex-column align-items-center justify-content-center gap-2">'
         . $build->createButton(['create'], 'ti-plus', 'Create Special Record', 'Create Special Record', ['class' => 'btn btn-lg btn-primary w-100']) .
+        '</div>
+           </div>';
+}
+if($type == 'admin'){
+    echo '<div class="bulk-delete-container col-md-3 col-sm-12 d-none">
+            <div class="d-flex flex-column align-items-end justify-content-end gap-2">'
+        . Html::button('<i class="ti ti-trash fs-7"></i>', ['id' => 'bulk-delete', 'class' => 'btn btn-danger']) .
         '</div>
            </div>';
 }

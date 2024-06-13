@@ -89,7 +89,7 @@ modal::end();
 <?= $view->renderer($model->grant_fund, 'Fund') ?>
 <?= $view->renderer($model->member, 'Number of Members') ?>
 <?= $view->renderer($model->proposal, 'Proposal') ?>
-<?= $view->renderer($model->project_title, $model->transfer_to == "OIL"? 'Research Title': 'Project Title') ?>
+<?= $view->renderer($model->project_title, $model->transfer_to == "OIL" ? 'Research Title' : 'Project Title') ?>
 <?= $view->renderer($model->ssm, 'SSM') ?>
 <?= $view->renderer($model->company_profile, 'Company Profile') ?>
 <?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
@@ -142,13 +142,39 @@ modal::end();
             }
 
             if (!empty($files)) {
-                echo GridView::widget(['dataProvider' => new ArrayDataProvider(['allModels' => array_values($files), 'pagination' => false, // Disable pagination
-                ]), 'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize), 'columns' => [['attribute' => 'file', 'label' => 'File Name', 'value' => function ($file) use ($model) {
-                    $build = new builders();
-                    return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
-                }, 'format' => 'raw',], ['class' => 'yii\grid\ActionColumn', 'template' => '{delete}', 'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
-                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filename' => $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
-                },],],],]);
+                echo GridView::widget(
+                    [
+                        'dataProvider' => new ArrayDataProvider(['allModels' => array_values($files), 'pagination' => false]),
+                        'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
+                        'columns' => [
+                            ['attribute' => 'file',
+                                'label' => 'File Name',
+                                'value' => function ($file) use ($model) {
+                                    $build = new builders();
+                                    return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                                },
+                                'format' => 'raw',
+                            ],
+                            [
+                                'label' => 'File Size',
+                                'value' => function ($file) use ($model) {
+                                $filePath = $model->dp_doc . DIRECTORY_SEPARATOR . $file;
+                                if (is_file($filePath)) {
+                                    return Yii::$app->formatter->asShortSize(filesize($filePath));
+                                }
+                                return 'N/A';
+                            },],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => '{delete}',
+                                'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
+                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filename' => $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
+                                },
+                                    ],
+                                ],
+                            ],
+                        ]
+                );
             }
             ?>
         </div>

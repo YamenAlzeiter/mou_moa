@@ -111,17 +111,20 @@ if (is_dir($folder)) {
     $files = array_diff(scandir($folder), ['.', '..']);
     foreach ($files as $file) {
         $filePath = $folder . DIRECTORY_SEPARATOR . $file;
-        if (is_file($filePath)) {
-            $totalSize += filesize($filePath);
-        }
+            if (is_file($filePath)) {
+                $totalSize += filesize($filePath);
+            }
     }
 }
 
 if (!empty($files)) {
-    echo GridView::widget(['dataProvider' => new ArrayDataProvider(['allModels' => array_values($files), 'pagination' => false,]), 'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize), 'columns' => [['attribute' => 'file', 'label' => 'File Name', 'value' => function ($file) use ($model) {
+    echo GridView::widget(
+            ['dataProvider' => new ArrayDataProvider(['allModels' => array_values($files), 'pagination' => false,]), 'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize), 'columns' => [['attribute' => 'file', 'label' => 'File Name', 'value' => function ($file) use ($model) {
         $build = new builders();
         return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
-    }, 'format' => 'raw',], ['label' => 'File Size', 'value' => function ($file) use ($model) {
+    }, 'format' => 'raw',],
+                [
+                        'label' => 'File Size', 'value' => function ($file) use ($model) {
         $filePath = $model->applicant_doc . DIRECTORY_SEPARATOR . $file;
         if (is_file($filePath)) {
             return Yii::$app->formatter->asShortSize(filesize($filePath));

@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use common\helpers\agreementPocMaker;
 use common\helpers\pocFieldMaker;
+use common\models\AgreementType;
 use common\models\Kcdio;
 use common\models\McomDate;
 use yii\bootstrap5\ActiveForm;
@@ -33,11 +34,21 @@ $additionalPoc = new agreementPocMaker();
 <?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
     <div class="row">
         <div class="col-md-4">
-            <?= $form->field($model, 'agreement_type')->dropDownList(['MOU (Academic)' => 'MOU (Academic)', 'MOU (Non-Academic)' => 'MOU (Non-Academic)', 'MOA (Academic)' => 'MOA (Academic)', 'MOA (Non-Academic)' => 'MOA (Non-Academic)'], ['prompt' => 'Select Type']) ?>
-
+            <?= $form->field($model, 'agreement_type')->dropDownList(
+                ArrayHelper::merge(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'),['other' => 'Other']),
+                [
+                    'prompt' => 'Select Type',
+                    'id' => 'agreement-type-dropdown'
+                ]
+            ) ?>
         </div>
-        <div class="col-md-8">
-            <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+        <div id="other-agreement-type" class="col-md-8">
+            <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+        </div>
+
+        <div class="col-md-12">
+            <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
+            ]) ?>
         </div>
     </div>
 
@@ -190,3 +201,24 @@ foreach ($storedFiles as $file) {
         });
     });
 </script>
+
+<?php
+$script = <<< JS
+$('#agreement-type-dropdown').change(function(){
+     if ($(this).val() === 'other') {
+        $('#other-agreement-type input').prop('disabled', false);
+    } else {
+        $('#other-agreement-type input').prop('disabled', true);
+    }
+}).change(); // Trigger change event initially to set initial state
+
+$('#{$form->id}').on('beforeSubmit', function(){
+    if ($('#agreement-type-dropdown').val() === 'other') {
+        var otherValue = $('#{$model->formName()}-agreement_type_other').val();
+        $('#{$model->formName()}-agreement_type').val(otherValue);
+    }
+    return true;
+});
+JS;
+$this->registerJs($script);
+?>

@@ -28,13 +28,21 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <div class="row">
     <div class="col-md-4">
-        <?= $form->field($model, 'agreement_type')->dropDownList(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'), ['prompt' => 'Select Type', 'options' => ['MOU (Academic)' => ['selected' => true]]]) ?>
-
+        <?= $form->field($model, 'agreement_type')->dropDownList(
+            ArrayHelper::merge(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'),['other' => 'Other']),
+            [
+                'prompt' => 'Select Type',
+                'id' => 'agreement-type-dropdown'
+            ]
+        ) ?>
     </div>
-    <div class="col-md-8">
+    <div id="other-agreement-type" class="col-md-8">
+        <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+    </div>
+
+    <div class="col-md-12">
         <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
         ]) ?>
-
     </div>
 </div>
 
@@ -193,3 +201,24 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
         });
     });
 </script>
+
+<?php
+$script = <<< JS
+$('#agreement-type-dropdown').change(function(){
+     if ($(this).val() === 'other') {
+        $('#other-agreement-type input').prop('disabled', false);
+    } else {
+        $('#other-agreement-type input').prop('disabled', true);
+    }
+}).change(); // Trigger change event initially to set initial state
+
+$('#{$form->id}').on('beforeSubmit', function(){
+    if ($('#agreement-type-dropdown').val() === 'other') {
+        var otherValue = $('#{$model->formName()}-agreement_type_other').val();
+        $('#{$model->formName()}-agreement_type').val(otherValue);
+    }
+    return true;
+});
+JS;
+$this->registerJs($script);
+?>

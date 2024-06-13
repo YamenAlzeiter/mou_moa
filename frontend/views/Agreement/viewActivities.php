@@ -141,7 +141,20 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'No Activity, Please specify') {
-        echo '<div class="d-flex gap-3"> <h4>No Activities</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo '
+            <div class="d-flex justify-content-between align-items-center">
+             <div class="d-flex gap-3">
+             <h4>No Activities</h4>
+              <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i>
+</div>
+                <div>
+                ' . Html::button('<i class="ti ti-trash fs-5"></i>', [
+                'class' => 'btn  mb-2',
+                'id' => 'delete-button',
+                'data-id' => $activity->id,
+            ]) . '
+</div>
+</div>';
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -165,3 +178,59 @@ $this->registerJs(<<<JS
 JS
 );
 ?>
+
+
+<script>
+    $(document).ready(function() {
+        $('#delete-button').on('click', function() {
+            var activityId = $(this).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You will not be able to recover this activity!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send AJAX request
+                    $.ajax({
+                        url: '/agreement/delete-activity', // Adjust the URL to your controller action
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: activityId,
+                            _csrf: '<?= Yii::$app->request->csrfToken ?>', // Ensure CSRF token is included
+                        },
+                        success: function(data) {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    'The activity has been deleted.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload(); // Refresh page or redirect
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'An error occurred while deleting the activity.',
+                                    'error'
+                                );
+                            }
+                        },
+                        error: function() {
+                            Swal.fire(
+                                'Error!',
+                                'Failed to delete the activity. Please try again later.',
+                                'error'
+                            );
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>

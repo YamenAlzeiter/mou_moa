@@ -48,7 +48,7 @@ class AgreementController extends Controller
                             'index', 'update', 'view', 'downloader', 'log',
                             'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
                             'import', 'mcom', 'update-poc', 'create-poc', 'create',
-                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf'
+                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -432,6 +432,25 @@ class AgreementController extends Controller
         return $this->redirect(['index']);
     }
 
+    public function actionBulkDelete()
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $ids = Yii::$app->request->post('ids', []);
+        if (empty($ids)) {
+            return ['success' => false, 'message' => 'No items selected.'];
+        }
+
+        foreach ($ids as $id) {
+            $model = $this->findModel($id);
+            if ($model !== null) {
+                $model->delete();
+            }
+        }
+
+        return ['success' => true, 'message' => 'Selected items have been deleted.'];
+    }
+
     public function actionLog($id)
     {
 
@@ -525,7 +544,7 @@ class AgreementController extends Controller
 
     }
 
-    public function importExcel($filePath, $model)
+    public function importExcel1($filePath, $model)
     {
         // to import an excel file to the system, the excel file need to be in this format
 
@@ -577,6 +596,58 @@ class AgreementController extends Controller
                                 $agreementPoc->pi_email = $part;
                             }
                         }
+                        $agreementPoc->save();
+                    } else {
+                        Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));
+                    }
+                }
+            }
+
+            Yii::$app->session->setFlash('success', 'Data imported successfully.');
+
+        } catch (Exception $e) {
+            var_dump($e);
+            die();
+        }
+
+        return $insertedRowIds;
+    }
+
+    public function importExcel($filePath, $model){
+        // to import an excel file to the system, the excel file need to be in this format
+
+        //#1 columns should follow the order in the for loop
+        //#2 details of person in charge should be in this order name, kcdio, address, phone, email between each one |
+        $to = $model->import_from;
+        $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+        $insertedRowIds = []; // Array to store inserted row IDs
+        try {
+            $spreadsheet = IOFactory::load($filePath);
+            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+            unset($sheetData[1]);
+
+            foreach ($sheetData as $row) {
+                if (!empty($row['A'])) {
+                    $kcdioName = Kcdio::findOne(['kcdio' => $row['F']])->tag ?? 'Error';
+
+
+
+
+                    $status = $row['D'] == "Signed & Stamped " || $row['D'] == "SIGNED & STAMPED" ? 100 : 102;
+                    var_dump($row['D']);
+                    $agreement = new Agreement();
+                    $agreement->agreement_type = $row['C'];
+                    $agreement->col_organization = $row['B'];
+                    $agreement->champion = $row['F'];
+                    $agreement->status = $status;
+                    $agreement->transfer_to = $to;
+                    $agreement->temp = $temp;
+
+                    // Save the agreement
+                    if ($agreement->save()) {
+                        $agreementPoc = new AgreementPoc();
+                        $agreementPoc->agreement_id = $agreement->id;
+                        $agreementPoc->pi_name = $row['E'];
                         $agreementPoc->save();
                     } else {
                         Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));

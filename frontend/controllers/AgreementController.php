@@ -44,7 +44,7 @@ class AgreementController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file'
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file','delete-activity'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -217,7 +217,19 @@ class AgreementController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionDeleteActivity()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
+        $id = Yii::$app->request->post('id');
+        $activity = Activities::findOne($id);
+
+        if ($activity && $activity->delete()) {
+            return ['success' => true];
+        } else {
+            return ['success' => false];
+        }
+    }
 
     /**
      * Creates a new Agreement model.
@@ -247,7 +259,9 @@ class AgreementController extends Controller
             $status = $this->request->post('checked');
             $model->status = $status;
             $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
-
+            if ($model->agreement_type == 'other') {
+                $model->agreement_type = $model->agreement_type_other;
+            }
 
             $valid = Model::validateMultiple($modelsPoc);
 

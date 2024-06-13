@@ -2,11 +2,9 @@
 
 namespace common\models;
 
-use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
-use yii\helpers\FileHelper;
 
 /**
  * This is the model class for table "agreement".
@@ -21,7 +19,6 @@ use yii\helpers\FileHelper;
  * @property string|null $col_phone_number
  * @property string|null $col_email
  * @property string|null $champion
-
  * @property string|null $updated_at
  * @property string|null $created_at
  * @property string|null $country
@@ -42,7 +39,6 @@ use yii\helpers\FileHelper;
  *
  * @property string|null $dp_doc
  * @property string|null $applicant_doc
-
  * @property string|null $reason
  * @property string|null $transfer_to
  * @property string|null $temp
@@ -55,6 +51,7 @@ class Agreement extends ActiveRecord
 
     public $files_applicant;
     public $files_dp;
+    public $agreement_type_other;
     public $poc_kcdio_getter;
     public $poc_kcdio_getter_x;
     public $poc_kcdio_getter_xx;
@@ -79,22 +76,26 @@ class Agreement extends ActiveRecord
             [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
             [['files_dp'], 'file', 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 10],
 
-            [[ 'col_organization',
+            [['col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up','project_title',
+                'col_wire_up', 'project_title',
                 'proposal', 'col_phone_number', 'col_email',
                 'grant_fund', 'member', 'transfer_to',
                 'agreement_type', 'country', 'files_applicant', 'champion'],
                 'required', 'on' => 'uploadCreate'],
 
-            [[ 'col_organization',
+            [['col_organization',
                 'col_name', 'col_address', 'col_collaborators_name',
                 'col_wire_up', 'project_title',
                 'proposal', 'col_phone_number', 'col_email',
                 'grant_fund', 'member', 'transfer_to',
                 'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date', 'files_applicant', 'champion'],
                 'required', 'on' => 'createSpecial'],
-
+            [['agreement_type_other'], 'required', 'when' => function ($model) {
+                return $model->agreement_type == 'other';
+            }, 'whenClient' => "function (attribute, value) {
+    return $('#agreement-type-dropdown').val() == 'other';
+}"],
             [['col_email'], 'email'],
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
             [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
@@ -102,8 +103,8 @@ class Agreement extends ActiveRecord
             [['status'], 'integer'],
             [['col_organization', 'col_name', 'col_address', 'col_contact_details',
                 'col_collaborators_name', 'col_wire_up', 'champion',
-                'ssm','dp_doc','applicant_doc', 'transfer_to', 'agreement_type', 'country',
-                ], 'string', 'max' => 522],
+                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country',
+            ], 'string', 'max' => 522],
             [['col_phone_number', 'col_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
@@ -153,8 +154,8 @@ class Agreement extends ActiveRecord
             'country' => 'Country',
             'isReminded' => 'Reminder Step',
             'temp_attribute_poc' => 'KCDIO',
-            'temp_attribute' => 'person in charge name'
-
+            'temp_attribute' => 'person in charge name',
+            'agreement_type_other' => 'Other'
         ];
     }
 
@@ -167,6 +168,7 @@ class Agreement extends ActiveRecord
     {
         return $this->hasMany(Activities::class, ['agreement_id' => 'id']);
     }
+
     public function getAgreementPoc()
     {
         return $this->hasMany(AgreementPoc::class, ['agreement_id' => 'id']);
@@ -196,10 +198,11 @@ class Agreement extends ActiveRecord
 
         //delete draft files when status become 91 AKA ACTV
 //        if($this->status == 91) $this->deleteDrafts();
-        if($this->status == 21 || $this->status == 121) $this->increaseMCOMDate();
+        if ($this->status == 21 || $this->status == 121) $this->increaseMCOMDate();
     }
 
-    protected function increaseMCOMDate(){
+    protected function increaseMCOMDate()
+    {
         $mcom = McomDate::findOne(['date' => $this->mcom_date]);
         $mcom->counter++;
         $mcom->save();
