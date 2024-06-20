@@ -101,6 +101,11 @@ $additionalPoc = new agreementPocMaker();
         </div>
     </div>
 
+    <div id="oil-additional-info" class="row d-none">
+        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+    </div>
+
     <?= $form->field($model, 'proposal')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
@@ -210,7 +215,15 @@ $('#agreement-type-dropdown').change(function(){
     } else {
         $('#other-agreement-type input').prop('disabled', true);
     }
-}).change(); // Trigger change event initially to set initial state
+}).change();
+
+$('#transfer-to-dropdown').change(function(){
+    if ($(this).val() === 'OIL') {
+        $('#oil-additional-info').removeClass('d-none');
+    } else {
+        $('#oil-additional-info').addClass('d-none');
+    }
+}).change(); 
 
 $('#{$form->id}').on('beforeSubmit', function(){
     if ($('#agreement-type-dropdown').val() === 'other') {

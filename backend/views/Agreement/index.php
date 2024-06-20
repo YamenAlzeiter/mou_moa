@@ -14,7 +14,7 @@ $type = Yii::$app->user->identity->type;
 $build = new \common\helpers\builders();
 Pjax::begin();
 echo '<div class="table-responsive">';
-echo '<div class="container-md my-3 p-3 rounded-3 bg-light shadow">
+echo '<div class="container-md my-3 p-3 rounded-3 glass shadow">
         <div class="row align-items-end">
             <div class="col-md-9 col-sm-12">
                 '.$this->render('_search', ['model' => $searchModel]). '

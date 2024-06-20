@@ -332,7 +332,6 @@ $tooltip-arrow-color:               $tooltip-bg;
 .btn-check:checked + .btn-bb, :not(.btn-check) + .btn-bb:active, .btn-bb:first-child:active, .btn-bb.active, .btn-bb.show {
   color: var(--bs-black);
   border: none;
-  background-color: 2px solid var(--bs-gray-200);
+  background-color: var(--bs-gray-200);
 }
-
 

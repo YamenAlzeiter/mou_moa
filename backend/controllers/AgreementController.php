@@ -544,7 +544,7 @@ class AgreementController extends Controller
 
     }
 
-    public function importExcel1($filePath, $model)
+    public function importExcel($filePath, $model)
     {
         // to import an excel file to the system, the excel file need to be in this format
 
@@ -613,7 +613,7 @@ class AgreementController extends Controller
         return $insertedRowIds;
     }
 
-    public function importExcel($filePath, $model){
+    public function importExcel1($filePath, $model){
         // to import an excel file to the system, the excel file need to be in this format
 
         //#1 columns should follow the order in the for loop

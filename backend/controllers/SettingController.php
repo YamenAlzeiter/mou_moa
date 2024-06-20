@@ -22,9 +22,9 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * DashboardController implements the CRUD actions for Agreement model.
+ * SettingController implements the CRUD actions for Agreement model.
  */
-class DashboardController extends Controller
+class SettingController extends Controller
 {
     /**
      * @inheritDoc
@@ -40,7 +40,7 @@ class DashboardController extends Controller
                             'index', 'delete-reminder', 'update-reminder', 'update-email-template',
                             'update-kcdio', 'status-update', 'poc-update', 'create-kcdio', 'create-reminder',
                             'view-email-template', 'create-poc', 'type-update', 'create-type',
-                            'delete-type', 'delete-poc'
+                            'delete-type', 'delete-poc','status','email-template','others','poc','kcdio'
                         ],
                         'allow' => true,
                         'roles' => ['@'],
@@ -141,6 +141,87 @@ class DashboardController extends Controller
             'pocSearchModel' => $pocSearchModel,
         ]);
     }
+    public function actionStatus(){
+        $statusDataProvider = new ActiveDataProvider([
+            'query' => Status::find(),
+            'pagination' => [
+                'pageSize' => 50
+            ],
+
+        ]);
+
+        return $this->render('vstatus', [
+            'statusDataProvider' => $statusDataProvider,
+        ]);
+    }
+    public function actionEmailTemplate()
+    {
+        $emailDataProvider = new ActiveDataProvider([
+            'query' => EmailTemplate::find(),
+            'pagination' => [
+                'pageSize' => 50
+            ],
+
+        ]);
+        return $this->render('vemailTemplate', [
+            'emailDataProvider' => $emailDataProvider,
+        ]);
+    }
+
+    public function actionOthers()  {
+
+        $reminderDataProvider = new ActiveDataProvider([
+            'query' => Reminder::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
+
+        $agreTypeDataProvider = new ActiveDataProvider([
+            'query' => AgreementType::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
+        return $this->render('vother', [
+            'agreTypeDataProvider' => $agreTypeDataProvider,
+            'reminderDataProvider' => $reminderDataProvider,
+        ]);
+
+    }
+    public function actionPoc(){
+        $pocSearchModel = new PocSearch();
+        $pocDataProvider = $pocSearchModel->search($this->request->queryParams);
+
+        return $this->render('vpoc', [
+            'pocDataProvider' => $pocDataProvider,
+            'pocSearchModel' => $pocSearchModel,
+        ]);
+
+    }
+    public function actionKcdio(){
+        $kcdioDataProvider = new ActiveDataProvider([
+            'query' => Kcdio::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
+        return $this->render('vkcdio', [
+            'kcdioDataProvider' => $kcdioDataProvider,
+        ]);
+    }
 
     public function actionViewEmailTemplate($id)
     {
@@ -202,7 +283,6 @@ class DashboardController extends Controller
     {
         $type = Yii::$app->user->identity->type;
 
-        if ($type == "admin" || $type == 'OIL' || $type == 'RMC') {
             $model = new Poc();
 
             if ($this->request->isPost) {
@@ -214,7 +294,6 @@ class DashboardController extends Controller
             }
 
             return $this->renderAjax('createPoc', ['model' => $model,]);
-        } else throw new ForbiddenHttpException("you can't access this page");
 
     }
     public function actionPocUpdate($id){

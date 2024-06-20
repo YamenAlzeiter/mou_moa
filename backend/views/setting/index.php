@@ -5,7 +5,7 @@ use yii\bootstrap5\Modal;
 use yii\bootstrap5\Offcanvas;
 use yii\helpers\Url;
 
-$this->title = 'Dashboard';
+    $this->title = 'Dashboard';
 
 /** @var yii\web\View $this */
 /** @var common\models\search\AgreementSearch $searchModel */

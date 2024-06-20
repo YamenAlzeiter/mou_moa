@@ -97,10 +97,6 @@ $model->reason = null; // init reason to null for ckeditor value
             <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
             <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
         </div>
-        <div class="row">
-            <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
-            <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
-        </div>
         <?= $form->field($model, 'status')->hiddenInput(['value' =>$approveMap[$model->status]])->label(false)?>
 
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>

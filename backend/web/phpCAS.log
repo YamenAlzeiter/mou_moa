@@ -1467,3 +1467,13 @@ F4C4 .|    |    |    exit()
 F4C4 .|    |    |    -
 F4C4 .|    |    -
 F4C4 .|    -
+37E3 .START (2024-06-15 22:25:27) phpCAS-1.3.8 ****************** [CAS.php:475]
+37E3 .=> phpCAS::client('S1', 'cas.iium.edu.my', 8448, '/cas') [LoginCas.php:74]
+37E3 .|    => CAS_Client::__construct('S1', false, 'cas.iium.edu.my', 8448, '/cas', true) [CAS.php:364]
+37E3 .|    |    Session is not authenticated [Client.php:938]
+37E3 .|    <= ''
+37E3 .<= ''
+37E3 .=> phpCAS::setCasServerCACert('C:/laragon/etc/ssl/ssl-bundle.crt') [LoginCas.php:75]
+37E3 .|    => phpCAS::error('CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest') [CAS.php:1648]
+37E3 .|    |    CAS_InvalidArgumentException: Certificate file does not exist CAS_Request_CurlRequest in C:\xampp\htdocs\moumoa\common\models\LoginCas.phpon line 75 [CAS.php:573]
+37E3 .|    <= ''

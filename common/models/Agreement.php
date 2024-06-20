@@ -73,45 +73,59 @@ class Agreement extends ActiveRecord
     public function rules()
     {
         return [
+            // File validation rules
             [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
             [['files_dp'], 'file', 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 10],
 
-            [['col_organization',
-                'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'project_title',
-                'proposal', 'col_phone_number', 'col_email',
-                'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country', 'files_applicant', 'champion'],
-                'required', 'on' => 'uploadCreate'],
+            // Required fields for 'uploadCreate' scenario
+            [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
+                'col_wire_up', 'project_title', 'proposal', 'col_phone_number',
+                'col_email', 'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'files_applicant', 'champion'], 'required', 'on' => 'uploadCreate'],
 
-            [['col_organization',
-                'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'project_title',
-                'proposal', 'col_phone_number', 'col_email',
-                'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date', 'files_applicant', 'champion'],
-                'required', 'on' => 'createSpecial'],
+            // Required fields for 'createSpecial' scenario
+            [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
+                'col_wire_up', 'project_title', 'proposal', 'col_phone_number',
+                'col_email', 'grant_fund', 'member', 'transfer_to',
+                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date',
+                'files_applicant', 'champion'], 'required', 'on' => 'createSpecial'],
+
+            // Conditional required rules
             [['agreement_type_other'], 'required', 'when' => function ($model) {
                 return $model->agreement_type == 'other';
             }, 'whenClient' => "function (attribute, value) {
-    return $('#agreement-type-dropdown').val() == 'other';
-}"],
+            return $('#agreement-type-dropdown').val() == 'other';
+        }"],
+            [['ssm', 'company_profile'], 'required', 'when' => function ($model) {
+                return $model->transfer_to === 'OIL';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#transfer-to-dropdown').val() === 'OIL';
+        }"],
+
+            // Email validation rule
             [['col_email'], 'email'],
+
+            // String type rules
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
-            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
-            [['status'], 'default', 'value' => null],
-            [['status'], 'integer'],
             [['col_organization', 'col_name', 'col_address', 'col_contact_details',
                 'col_collaborators_name', 'col_wire_up', 'champion',
-                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country',
-            ], 'string', 'max' => 522],
+                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
-            [['reason'], 'default', 'value' => null],
 
+            // Safe fields
+            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
+
+            // Default and integer rules
+            [['status'], 'default', 'value' => null],
+            [['status'], 'integer'],
+
+            // Default value rules
+            [['reason'], 'default', 'value' => null],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -148,7 +162,7 @@ class Agreement extends ActiveRecord
 
             'reason' => 'Reason',
             'transfer_to' => 'OSC',
-            'agreement_type' => 'type',
+            'agreement_type' => 'Type',
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
             'country' => 'Country',

@@ -78,7 +78,7 @@ $additionalPoc = new agreementPocMaker()
 </div>
 
 <div class="row mb-3">
-    <div class="col"><?= Html::button('Add another POC', ['class' => 'btn btn-outline-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?></div>
+    <div class="col"><?= Html::button('Add person in charge', ['class' => 'btn btn-outline-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?></div>
 </div>
 
 
@@ -86,9 +86,9 @@ $additionalPoc = new agreementPocMaker()
     <div class="col-md-12">
         <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
     </div>
-<!--    <div class="col-md-3">-->
-<!--        <div class="col-md">--><?php //= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?><!--</div>-->
-<!--    </div>-->
+    <!--    <div class="col-md-3">-->
+    <!--        <div class="col-md">--><?php //= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?><!--</div>-->
+    <!--    </div>-->
     <?= $form->field($model, 'champion')->hiddenInput(['value'=> Yii::$app->user->identity->type])->label(false) ?>
 </div>
 <div class="row">
@@ -100,17 +100,19 @@ $additionalPoc = new agreementPocMaker()
         <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '10']) ?>
     </div>
     <div class="col-md">
-        <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select OSC', 'options' => ['IO' => ['selected' => true] // Set 'IO' as default
-        ]]) ?>
-
+        <?= $form->field($model, 'transfer_to')->dropDownList(
+            ['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'],
+            ['prompt' => 'Select OSC', 'options' => ['IO' => ['selected' => true]], 'id' => 'transfer-to-dropdown']
+        ) ?>
     </div>
 </div>
 
+<div id="oil-additional-info" class="row d-none">
+    <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+    <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+</div>
 
 <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'value' => 'proposal.....................']) ?>
-
-
-
 <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
 
 <div class="modal-footer p-0">
@@ -152,15 +154,23 @@ $('#agreement-type-dropdown').change(function(){
     } else {
         $('#other-agreement-type input').prop('disabled', true);
     }
-}).change(); // Trigger change event initially to set initial state
+}).change();
+
+$('#transfer-to-dropdown').change(function(){
+    if ($(this).val() === 'OIL') {
+        $('#oil-additional-info').removeClass('d-none');
+    } else {
+        $('#oil-additional-info').addClass('d-none');
+    }
+}).change(); 
 
 $('#{$form->id}').on('beforeSubmit', function(){
     if ($('#agreement-type-dropdown').val() === 'other') {
         var otherValue = $('#{$model->formName()}-agreement_type_other').val();
         $('#{$model->formName()}-agreement_type').val(otherValue);
     }
-    return true;
 });
+
 JS;
 $this->registerJs($script);
 ?>

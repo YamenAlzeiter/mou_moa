@@ -112,7 +112,10 @@ main > .container, main > .container-fluid
 {
     padding: 75px 15px 20px;
 }
-
+.glass{
+    background-color : transparent;
+    backdrop-filter : blur(3px);
+}
 
 
 .footer {

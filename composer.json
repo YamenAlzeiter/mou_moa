@@ -24,8 +24,7 @@
         "dominus77/yii2-sweetalert2-widget": "2.0",
         "wbraganca/yii2-dynamicform": "*",
         "guzzlehttp/guzzle": "^7.8",
-        "apereo/phpcas": "1.3.8",
-        "mpdf/mpdf": "^8.2"
+        "apereo/phpcas": "1.3.8"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

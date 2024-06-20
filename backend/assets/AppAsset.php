@@ -12,15 +12,15 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        'https://style.iium.edu.my/css/style.css',
         'css/site.css',
         'css/tabler-icons.css',
         'css/styles.css',
     ];
     public $js = [
-        'js/sweet-alert.js',
+        'js/global.js',
     ];
     public $depends = [
-
         'yii\web\YiiAsset',
         'yii\bootstrap5\BootstrapAsset',
     ];
