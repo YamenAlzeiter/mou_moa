@@ -308,9 +308,9 @@ class AgreementController extends Controller
 
         $body = $mail->body;
 
-        $body = str_replace('{recipientName}', $pocs[0]->pi_name, $body);
+        $body = str_replace('{user}', $pocs[0]->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
-//        $body = str_replace('{link}', $viewLink, $body);
+        $body = str_replace('{id}', $model->id, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
@@ -544,7 +544,7 @@ class AgreementController extends Controller
 
     }
 
-    public function importExcel($filePath, $model)
+    public function importExcel1($filePath, $model)
     {
         // to import an excel file to the system, the excel file need to be in this format
 
@@ -613,7 +613,7 @@ class AgreementController extends Controller
         return $insertedRowIds;
     }
 
-    public function importExcel1($filePath, $model){
+    public function importExcel($filePath, $model){
         // to import an excel file to the system, the excel file need to be in this format
 
         //#1 columns should follow the order in the for loop
@@ -628,17 +628,26 @@ class AgreementController extends Controller
 
             foreach ($sheetData as $row) {
                 if (!empty($row['A'])) {
-                    $kcdioName = Kcdio::findOne(['kcdio' => $row['F']])->tag ?? 'Error';
+                    $kcdioName = Kcdio::findOne(['kcdio' => $row['D']])->tag ?? 'Error';
 
+                    $status = $row['S'] == "Active" ? 100 : 102;
 
-
-
-                    $status = $row['D'] == "Signed & Stamped " || $row['D'] == "SIGNED & STAMPED" ? 100 : 102;
-                    var_dump($row['D']);
                     $agreement = new Agreement();
-                    $agreement->agreement_type = $row['C'];
+                    $agreement->agreement_type = $row['A'];
                     $agreement->col_organization = $row['B'];
-                    $agreement->champion = $row['F'];
+                    $agreement->country = $row['C'];
+                    $agreement->champion = $row['D'];
+                    $agreement->project_title = $row['E'];
+                    $agreement->grant_fund = $row['F'];
+                    $agreement->member = $row['G'];
+                    $agreement->col_name = $row['L'];
+                    $agreement->col_email = $row['M'];
+                    $agreement->col_address = $row['N'];
+                    $agreement->col_collaborators_name = $row['O'];
+                    $agreement->col_wire_up = $row['P'];
+                    $agreement->sign_date = $row['Q'];
+                    $agreement->end_date = $row['R'];
+
                     $agreement->status = $status;
                     $agreement->transfer_to = $to;
                     $agreement->temp = $temp;
@@ -647,7 +656,11 @@ class AgreementController extends Controller
                     if ($agreement->save()) {
                         $agreementPoc = new AgreementPoc();
                         $agreementPoc->agreement_id = $agreement->id;
-                        $agreementPoc->pi_name = $row['E'];
+                        $agreementPoc->pi_name = $row['H'];
+                        $agreementPoc->pi_email = $row['I'];
+                        $agreementPoc->pi_address = $row['J'];
+                        $agreementPoc->pi_phone = $row['K'];
+                        $agreementPoc->pi_kcdio = $row['D'];
                         $agreementPoc->save();
                     } else {
                         Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));

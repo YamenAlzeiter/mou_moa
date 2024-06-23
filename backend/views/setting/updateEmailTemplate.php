@@ -23,8 +23,18 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'body')->widget(
         CKEditor::className(),
-        ['preset' => 'basic',]
-    )->label(false)?>
+        [
+            'preset' => 'basic',
+            'options' => ['id' => 'email_template'],
+            'clientOptions' => [
+                'extraPlugins' => 'insertId', // Register the custom plugin
+                'toolbar' => [
+                    ['name' => 'clipboard', 'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']],
+                    ['name' => 'insert', 'items' => ['InsertId', 'InsertUser', 'InsertReason']],
+                ],
+            ],
+        ]
+    )->label(false) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

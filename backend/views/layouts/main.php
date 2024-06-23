@@ -235,20 +235,19 @@ Modal::end();
 
 
             if (Yii::$app->user->identity->is_admin) {
-                $menuItems[] = ['title' => 'Admin'];
-                $menuItems[] = ['url' => 'setting', 'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg', 'optionTitle' => 'Setting v1'];
-                $menuItems[] =
-                    [
-                        'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg',
-                        'optionTitle' => 'Settings v2',
-                        'items' => [
-                            ['url' => 'setting/poc', 'optionTitle' => 'Person in Charge'],
-                            ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
-                            ['url' => 'setting/kcdio', 'optionTitle' => 'K/C/D/I/O'],
-                            ['url' => 'setting/status', 'optionTitle' => 'Status'],
-                            ['url' => 'setting/others', 'optionTitle' => 'Others'],
-                        ]
-                ];
+                $menuItems[] = ['url' => 'setting', 'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg', 'optionTitle' => 'Setting'];
+//                $menuItems[] =
+//                    [
+//                        'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg',
+//                        'optionTitle' => 'Settings v2',
+//                        'items' => [
+//                            ['url' => 'setting/poc', 'optionTitle' => 'Person in Charge'],
+//                            ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
+//                            ['url' => 'setting/kcdio', 'optionTitle' => 'K/C/D/I/O'],
+//                            ['url' => 'setting/status', 'optionTitle' => 'Status'],
+//                            ['url' => 'setting/others', 'optionTitle' => 'Others'],
+//                        ]
+//                ];
             }
 
         // Render the Sidebar widget with the menu items

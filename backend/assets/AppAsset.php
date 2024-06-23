@@ -18,6 +18,7 @@ class AppAsset extends AssetBundle
         'css/styles.css',
     ];
     public $js = [
+        'js/email-template.js',
         'js/global.js',
     ];
     public $depends = [
