@@ -12,6 +12,7 @@ use common\models\EmailTemplate;
 use common\models\Import;
 use common\models\Kcdio;
 use common\models\Log;
+use common\models\McomDate;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
 use Exception;
@@ -378,6 +379,17 @@ class AgreementController extends Controller
     {
         $model = $this->findModel($id);
 
+        $nextTwoWeeks = Carbon::now()->addWeeks(2)->toDateTimeString();
+        $nextTwoMonths = Carbon::now()->addMonths(2)->toDateTimeString();
+
+        $mcomDates = McomDate::find()
+            ->where(['<', 'counter', 10])
+            ->andWhere(['>', 'date_from', $nextTwoWeeks])
+            ->andWhere(['<', 'date_from', $nextTwoMonths])
+            ->limit(3)
+            ->all();
+
+
         if ($this->request->isPost && $model->load($this->request->post())) {
             $model->status = 121;
             $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
@@ -390,7 +402,7 @@ class AgreementController extends Controller
 
         }
 
-        return $this->renderAjax('_mcom', ['model' => $model,]);
+        return $this->renderAjax('_mcom', ['model' => $model, 'mcomDates' => $mcomDates]);
     }
 
     /**

@@ -146,9 +146,7 @@ Modal::end();
     <html lang="<?= Yii::$app->language ?>" class="h-100">
     <head>
         <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
-        <!-- Style css -->
 
-<!--        <link href = "https://style.iium.edu.my/css/style.css" rel = "stylesheet">-->
         <link href = "https://style.iium.edu.my/css/iium.css" rel = "stylesheet">
 
 
@@ -236,18 +234,18 @@ Modal::end();
 
             if (Yii::$app->user->identity->is_admin) {
                 $menuItems[] = ['url' => 'setting', 'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg', 'optionTitle' => 'Setting'];
-//                $menuItems[] =
-//                    [
-//                        'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg',
-//                        'optionTitle' => 'Settings v2',
-//                        'items' => [
-//                            ['url' => 'setting/poc', 'optionTitle' => 'Person in Charge'],
-//                            ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
-//                            ['url' => 'setting/kcdio', 'optionTitle' => 'K/C/D/I/O'],
-//                            ['url' => 'setting/status', 'optionTitle' => 'Status'],
-//                            ['url' => 'setting/others', 'optionTitle' => 'Others'],
-//                        ]
-//                ];
+                $menuItems[] =
+                    [
+                        'icon' => 'https://style.iium.edu.my/images/iconly/light/Setting.svg',
+                        'optionTitle' => 'Settings v2',
+                        'items' => [
+                            ['url' => 'setting/poc', 'optionTitle' => 'Person in Charge'],
+                            ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
+                            ['url' => 'setting/kcdio', 'optionTitle' => 'K/C/D/I/O'],
+                            ['url' => 'setting/status', 'optionTitle' => 'Status'],
+                            ['url' => 'setting/others', 'optionTitle' => 'Others'],
+                        ]
+                ];
             }
 
         // Render the Sidebar widget with the menu items

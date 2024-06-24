@@ -8,6 +8,7 @@ use common\models\AgreementType;
 use common\models\EmailTemplate;
 use common\models\Kcdio;
 use common\models\Log;
+use common\models\McomDate;
 use common\models\Poc;
 use common\models\Reminder;
 use common\models\search\AgreementSearch;
@@ -37,15 +38,37 @@ class SettingController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'delete-reminder', 'update-reminder', 'update-email-template',
-                            'update-kcdio', 'status-update', 'poc-update', 'create-kcdio', 'create-reminder',
-                            'view-email-template', 'create-poc', 'type-update', 'create-type',
-                            'delete-type', 'delete-poc','status','email-template','others','poc','kcdio'
+                            'index',
+
+                            // kcdio
+                            'kcdio', 'create-kcdio', 'update-kcdio',
+
+                            // reminders
+                            'create-reminder', 'update-reminder', 'delete-reminder',
+
+                            // poc
+                            'poc', 'create-poc', 'delete-poc', 'poc-update',
+
+                            // agreement type
+                            'create-type', 'type-update', 'delete-type',
+
+                            // mcom dates
+                            'create-mcom', 'mcom-update', 'delete-mcom',
+
+                            // email template
+                            'email-template', 'view-email-template', 'update-email-template',
+
+                            // status
+                            'status', 'status-update',
+
+                            'others',
                         ],
+
+
                         'allow' => true,
                         'roles' => ['@'],
                         'matchCallback' => function ($rule, $action) {
-            
+
                             return !Yii::$app->user->isGuest && Yii::$app->user->identity->is_admin;
                         }
                     ],
@@ -191,9 +214,21 @@ class SettingController extends Controller
                 'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
             ]
         ]);
+
+        $mcomDataProvider = new ActiveDataProvider([
+            'query' => McomDate::find(),
+
+            'pagination' => [
+                'pageSize' => 50
+            ],
+            'sort' => [ // Add the 'sort' configuration
+                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
+            ]
+        ]);
         return $this->render('vother', [
             'agreTypeDataProvider' => $agreTypeDataProvider,
             'reminderDataProvider' => $reminderDataProvider,
+            'mcomDataProvider' => $mcomDataProvider,
         ]);
 
     }
@@ -237,7 +272,7 @@ class SettingController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+                return $this->redirect(['others']);
             }
         } else {
             $model->loadDefaultValues();
@@ -247,13 +282,29 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionCreateMcom()
+    {
+        $model = new McomDate();
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['others']);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->renderAjax('updateMcom', [
+            'model' => $model,
+        ]);
+    }
     public function actionCreateKcdio()
     {
         $model = new Kcdio();
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+                return $this->redirect(['others']);
             }
         } else {
             $model->loadDefaultValues();
@@ -269,7 +320,7 @@ class SettingController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
+                return $this->redirect(['others']);
             }
         } else {
             $model->loadDefaultValues();
@@ -287,7 +338,7 @@ class SettingController extends Controller
 
             if ($this->request->isPost) {
                 if ($model->load($this->request->post()) && $model->save()) {
-                    return $this->redirect(['index']);
+                    return $this->redirect(['vpoc']);
                 }
             } else {
                 $model->loadDefaultValues();
@@ -300,7 +351,7 @@ class SettingController extends Controller
         $model = Poc::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['vpoc']);
         }
 
         return $this->renderAjax('createPoc', [
@@ -311,7 +362,7 @@ class SettingController extends Controller
         $model = AgreementType::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['others']);
         }
 
         return $this->renderAjax('typeUpdate', [
@@ -322,7 +373,7 @@ class SettingController extends Controller
         $model = Status::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['status']);
         }
 
         return $this->renderAjax('statusUpdate', [
@@ -333,7 +384,7 @@ class SettingController extends Controller
         $model = Kcdio::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['vkcdio']);
         }
 
         return $this->renderAjax('updateKcdio', [
@@ -345,7 +396,7 @@ class SettingController extends Controller
         $model = EmailTemplate::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['viewEmailTemplate']);
         }
 
         return $this->renderAjax('updateEmailTemplate', [
@@ -358,31 +409,48 @@ class SettingController extends Controller
         $model = Reminder::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['index']);
+            return $this->redirect(['others']);
         }
 
         return $this->renderAjax('updateReminder', [
             'model' => $model,
         ]);
     }
+    public function actionMcomUpdate($id)
+    {
+        $model = McomDate::findOne($id);
 
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['others']);
+        }
+
+        return $this->renderAjax('updateMcom', [
+            'model' => $model,
+        ]);
+    }
     public function actionDeleteReminder($id)
     {
         Reminder::findOne($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['others']);
+    }
+    public function actionDeleteMcom($id)
+    {
+        McomDate::findOne($id)->delete();
+
+        return $this->redirect(['others']);
     }
     public function actionDeleteType($id)
     {
         AgreementType::findOne($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['others']);
     }
     public function actionDeletePoc($id)
     {
         Poc::findOne($id)->delete();
 
-        return $this->redirect(['index']);
+        return $this->redirect(['vpoc']);
     }
     /**
      * Finds the Agreement model based on its primary key value.

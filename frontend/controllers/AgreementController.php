@@ -9,6 +9,7 @@ use common\models\Agreement;
 use common\models\AgreementPoc;
 use common\models\EmailTemplate;
 use common\models\Log;
+use common\models\McomDate;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
 use Exception;
@@ -421,6 +422,17 @@ class AgreementController extends Controller
     {
         $model = $this->findModel($id);
 
+        $nextTwoWeeks = Carbon::now()->addWeeks(2)->toDateTimeString();
+        $nextTwoMonths = Carbon::now()->addMonths(2)->toDateTimeString();
+
+        $mcomDates = McomDate::find()
+            ->where(['<', 'counter', 10])
+            ->andWhere(['>', 'date_from', $nextTwoWeeks])
+            ->andWhere(['<', 'date_from', $nextTwoMonths])
+            ->limit(3)
+            ->all();
+
+
         $modelsPoc = AgreementPoc::find()
             ->where(['agreement_id' => $id])
             ->orderBy(['id' => SORT_ASC])
@@ -461,6 +473,7 @@ class AgreementController extends Controller
         return $this->renderAjax('update', [
             'model' => $model,
             'modelsPoc' => $modelsPoc,
+            'mcomDates' => $mcomDates,
         ]);
     }
 

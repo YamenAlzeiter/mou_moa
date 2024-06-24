@@ -1,0 +1,109 @@
+
+.fc-content{
+    padding: .5rem;
+}
+.fc-day-grid-event{
+    border: 0;
+    margin-right: 1rem;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+    border-left: 3px solid;
+    font-weight: bold;
+}
+.text-through{
+    text-decoration-line: line-through
+}
+.task-blue{
+    background: #cce0ff !important;
+    color: #09326c !important;
+    border-color: #09326c !important;
+}
+.task-crayon{
+    background: #c6edfb !important;
+    color: #164555 !important;
+    border-color: #164555 !important;
+}
+.task-green{
+    background: #baf3db !important;
+    color: #164b35 !important;
+    border-color: #164b35 !important;
+}
+.task-gold{
+    background: #f8e6a0 !important;
+    color: #533f04 !important;
+    border-color: #533f04 !important;
+
+}
+.task-orange{
+    background: #fedec8 !important;
+    color: #702e00 !important;
+    border-color: #702e00 !important;
+}
+.task-red{
+    background: #ffd5d2 !important;
+    color: #5d1f1a !important;
+    border-color: #5d1f1a !important;
+}
+.task-purpole{
+    background: #dfd8fd !important;
+    color: #352c63 !important;
+    border-color: #352c63 !important;
+}
+.task-blue:hover{
+    background: rgba(233, 242, 255, 0.58) !important;
+    color: #09326c !important;
+}
+.task-crayon:hover{
+    background: rgba(233, 242, 255, 0.58) !important;
+    color: #164555 !important;
+}
+.task-green:hover{
+    background: rgba(233, 242, 255, 0.58) !important;
+    color: #164b35 !important;
+}
+.task-gold:hover{
+    background: rgba(233, 242, 255, 0.58) !important;
+    color: #533f04 !important;
+}
+.task-orange:hover{
+     background: rgba(233, 242, 255, 0.58) !important;
+    color: #702e00 !important;
+}
+.task-red:hover{
+      background: rgba(233, 242, 255, 0.58) !important;
+    color: #5d1f1a !important;
+}
+.task-purpole:hover{
+    background: rgba(233, 242, 255, 0.58) !important;
+    color: #352c63 !important;
+}
+.fc-day-number{
+    color: rgba(90,106,133);
+}
+.fc button{
+    height: 3rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    background: #212529;
+    border: 0;
+    color: white;
+}
+
+.fc td {
+    border: 1px solid #ebf1f6;
+    padding: 0;
+    vertical-align: top;
+
+}
+.fc th{
+    border: 1px solid #ebf1f6;
+    height: 56px;
+    background-color: #ebf1f6;
+    vertical-align: middle;
+    color: #5a6a85;
+    text-transform: uppercase;
+}
+.fc-center{
+    font-weight: bold;
+    color: #212529;
+}

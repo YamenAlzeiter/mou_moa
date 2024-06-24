@@ -48,7 +48,7 @@ use yii\db\Expression;
  */
 class Agreement extends ActiveRecord
 {
-
+    public $hasMatchingMcomDate;
     public $files_applicant;
     public $files_dp;
     public $agreement_type_other;
@@ -188,6 +188,10 @@ class Agreement extends ActiveRecord
         return $this->hasMany(AgreementPoc::class, ['agreement_id' => 'id']);
     }
 
+    public function getMcomDate()
+    {
+        return $this->hasOne(McomDate::class, ['date_from' => 'mcom_date']);
+    }
     /**
      * Gets query for [[Logs]].
      *
@@ -217,7 +221,7 @@ class Agreement extends ActiveRecord
 
     protected function increaseMCOMDate()
     {
-        $mcom = McomDate::findOne(['date' => $this->mcom_date]);
+        $mcom = McomDate::findOne(['date_from' => $this->mcom_date]);
         $mcom->counter++;
         $mcom->save();
     }

@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Agreement;
+use yii\db\Expression;
 
 /**
  * AgreementSearch represents the model behind the search form of `common\models\Agreement`.
@@ -43,6 +44,8 @@ class   AgreementSearch extends Agreement
     public function search($params)
     {
         $query = Agreement::find()->joinWith('agreementPoc');
+
+//        $query->leftJoin('mcom_date md1', new Expression('md1.date_from::date = agreement.mcom_date'));
 
 
         // add conditions that should always apply here

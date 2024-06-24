@@ -53,6 +53,7 @@ class builders
             'update' => 'text-primary ti-edit-circle         ',
             'status-update' => 'text-primary ti-edit-circle         ',
             'update-kcdio' => 'text-primary ti-edit-circle         ',
+            'mcom-update' => 'text-primary ti-edit-circle         ',
             'type-update' => 'text-primary ti-edit-circle         ',
             'poc-update' => 'text-primary ti-edit-circle         ',
             'update-email-template' => 'text-primary ti-edit-circle           ',
@@ -60,6 +61,7 @@ class builders
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',
             'create' => 'text-primary ti-eye              ',
+
         ];
 
 

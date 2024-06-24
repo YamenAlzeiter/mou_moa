@@ -4,6 +4,7 @@ namespace console\controllers;
 
 use Carbon\Carbon;
 use common\models\Agreement;
+use common\models\AgreementPoc;
 use common\models\EmailTemplate;
 use common\models\Reminder;
 use Yii;
@@ -23,33 +24,36 @@ class ReminderController extends Controller
         }
 
         $reminders = Reminder::find()->all();
-        $users = Agreement::find()->where(['not', ['end_date' => null]])->all();
+        $models = Agreement::find()->where(['not', ['end_date' => null]])->all();
 
-        foreach ($users as $user) {
-            $endDate = Carbon::createFromFormat('Y-m-d', $user->end_date);
+        foreach ($models as $model) {
+            $endDate = Carbon::createFromFormat('Y-m-d', $model->end_date);
             foreach ($reminders as $index => $reminder) {
                 $remindDate = $reminder->type === 'MONTH' ? $endDate->copy()->subMonths($reminder->reminder_before)->startOfDay() : $endDate->copy()->subDays($reminder->reminder_before)->startOfDay();
                 $currentDate = Carbon::now()->startOfDay();
 
-                if ($currentDate->eq($remindDate) && ($user->status == 91 || $user->status == 100)) {
+                if ($currentDate->eq($remindDate) && ($model->status == 91 || $model->status == 100)) {
+                    $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
                     // Send email reminder
-                    $this->sendEmailReminder($user, $remindEmailTemplate);
-                    $user->isReminded += 1;
-                    $user->status = 110;
-                    $user->save();
-                } elseif ($currentDate->greaterThan($remindDate) && ($user->status == 91 || $user->status == 110) && !($currentDate > $user->end_date)) {
-                    if ($user->isReminded == $index) {
-                        $this->sendEmailReminder($user, $remindEmailTemplate);
-                        $user->isReminded += 1;
-                        $user->status = 110;
-                        $user->save();
+                    $this->sendEmailReminder($users, $remindEmailTemplate);
+                    $model->isReminded += 1;
+                    $model->status = 110;
+                    $model->save();
+                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == 91 || $model->status == 110) && !($currentDate > $model->end_date)) {
+                    if ($model->isReminded == $index) {
+                        $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
+                        $this->sendEmailReminder($users, $remindEmailTemplate);
+                        $model->isReminded += 1;
+                        $model->status = 110;
+                        $model->save();
                     }
                 }
 
-                if ($currentDate > $user->end_date && ($user->status == 91 || $user->status == 110 || $user->status == 100)) {
-                    $this->sendEmailReminder($user, $expiredEmailTemplate);
-                    $user->status = 92;
-                    $user->save();
+                if ($currentDate > $model->end_date && ($model->status == 91 || $model->status == 110 || $model->status == 100)) {
+                    $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
+                    $this->sendEmailReminder($users, $remindEmailTemplate);
+                    $model->status = 92;
+                    $model->save();
                 }
             }
         }
@@ -57,13 +61,16 @@ class ReminderController extends Controller
         echo "Reminders sent successfully.\n";
     }
 
-    private function sendEmailReminder($user, $emailTemplate)
+    private function sendEmailReminder($users, $emailTemplate)
     {
-        if ($user->pi_email != null) {
-            echo $user->pi_email . "\n";
-            $body = str_replace('{recipientName}', $user->pi_name, $emailTemplate->body);
-            Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $emailTemplate->subject, 'body' => $body])->setFrom(["noreply@example.com" => "My Application"])->setTo($user->pi_email)->setSubject($emailTemplate->subject)->send();
-        }
+      foreach ($users as $user){
+          if ($user->pi_email != null) {
+              echo $user->pi_email . "\n";
+              $body = str_replace('{user}', $user->pi_name, $emailTemplate->body);
+              $body = str_replace('{id}', $user->agreement_id, $body);
+              Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $emailTemplate->subject, 'body' => $body])->setFrom(["noreply@example.com" => "My Application"])->setTo($user->pi_email)->setSubject($emailTemplate->subject)->send();
+          }
+      }
     }
 
     public function actionSendActivityReminders()
@@ -86,7 +93,9 @@ class ReminderController extends Controller
             } else {
                 $currentDate = Carbon::now()->startOfDay();
                 if ($currentDate->eq($user->last_reminder)) {
-                    $this->sendEmailReminder($user, $activityReminderEmailTemplate);
+                    $pocs = AgreementPoc::find()->where(['agreement_id' => $user->id])->all();
+
+                    $this->sendEmailReminder($pocs, $activityReminderEmailTemplate);
                     $user->last_reminder = Carbon::createFromFormat('Y-m-d', $user->last_reminder)->copy()->addMonths(3)->toDateString();
                     $user->save();
                 }

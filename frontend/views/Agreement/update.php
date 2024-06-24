@@ -114,10 +114,13 @@ $additionalPoc = new agreementPocMaker();
 <?php
 if (in_array($model->status, [11, 33, 43])): ?>
 
-    <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map(McomDate::find()->where(['<', 'counter', 10])->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])->andWhere(['<', 'date', $nextTwoMonth->toDateString()])->limit(3) // Limit the number of results to three
-    ->all(), 'date', function ($model) {
-        return 'Date: ' . ' ' . $model->date . ', available: ' . ' ' . (10 - $model->counter);
-    }), ['prompt' => 'Select a Date', 'required' => true] // Adding 'required' => true here
+    <?= $form->field($model, 'mcom_date')->dropDownList(
+        ArrayHelper::map($mcomDates, 'date_from', function ($model) {
+            $dateFrom = new DateTime($model->date_from);
+            $dateUntil = new DateTime($model->date_until);
+            return 'Date: ' . ' ' . $dateFrom->format('Y/M/d H:i') .", Time: " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i') .  ', available: ' . ' ' . (10 - $model->counter);
+        }),
+        ['prompt' => 'Select a Date', 'required' => true]
     ) ?>
 
 
