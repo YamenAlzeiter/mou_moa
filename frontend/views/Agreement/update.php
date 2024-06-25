@@ -235,6 +235,17 @@ $('#{$form->id}').on('beforeSubmit', function(){
     }
     return true;
 });
+
+ $('input[name="Agreement[status]"]').on('change', function() {
+        if ($('#is91').is(':checked')) {
+            $('.end_date').removeClass('d-none');
+        } else {
+            $('.end_date').addClass('d-none');
+        }
+    });
+
+    
+
 JS;
 $this->registerJs($script);
 ?>

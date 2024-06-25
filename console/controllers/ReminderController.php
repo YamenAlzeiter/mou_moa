@@ -29,8 +29,15 @@ class ReminderController extends Controller
         foreach ($models as $model) {
             $endDate = Carbon::createFromFormat('Y-m-d', $model->end_date);
             foreach ($reminders as $index => $reminder) {
-                $remindDate = $reminder->type === 'MONTH' ? $endDate->copy()->subMonths($reminder->reminder_before)->startOfDay() : $endDate->copy()->subDays($reminder->reminder_before)->startOfDay();
+                if ($reminder->type === 'MONTH') {
+                    $remindDate = $endDate->copy()->subMonths($reminder->reminder_before)->startOfDay();
+                } else {
+                    $remindDate = $endDate->copy()->subDays($reminder->reminder_before)->startOfDay();
+                }
+
                 $currentDate = Carbon::now()->startOfDay();
+
+//                var_dump('record is : ' . $model->id . " " . $model->end_date . " " . $remindDate);
 
                 if ($currentDate->eq($remindDate) && ($model->status == 91 || $model->status == 100)) {
                     $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
@@ -39,7 +46,8 @@ class ReminderController extends Controller
                     $model->isReminded += 1;
                     $model->status = 110;
                     $model->save();
-                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == 91 || $model->status == 110) && !($currentDate > $model->end_date)) {
+                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == 91 || $model->status == 100) && !($currentDate > $model->end_date)) {
+
                     if ($model->isReminded == $index) {
                         $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
                         $this->sendEmailReminder($users, $remindEmailTemplate);
