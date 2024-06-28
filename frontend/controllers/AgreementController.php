@@ -66,36 +66,6 @@ class AgreementController extends Controller
         ];
     }
 
-
-    /**
-     * Lists all Agreement models.
-     *
-     * @return string
-     * @return Response
-     */
-    public function actionPublicIndex()
-    {
-        $searchModel = new AgreementSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
-
-        $dataProvider->sort->defaultOrder = ['id' => SORT_DESC];
-
-        $dataProvider->query->andWhere(['status' => 100])
-                            ->orWhere(['status' => 91]);
-        $dataProvider->pagination = [
-            'pageSize' => 11,
-        ];
-        if (Yii::$app->user->isGuest) {
-            return $this->render('publicIndex', [
-                'searchModel' => $searchModel,
-                'dataProvider' => $dataProvider,
-            ]);
-        } else {
-            return $this->redirect('agreement/index');
-        }
-    }
-
     /**
      * Lists all Agreement models.
      *

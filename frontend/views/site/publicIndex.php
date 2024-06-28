@@ -18,7 +18,7 @@ modal::end();
 ?>
 <?php Pjax::begin(); ?>
     <div class="my-3 p-3 border-2 rounded-3 bg-light-gray shadow">
-        <?= $this->render('_search', ['model' => $searchModel]); ?>
+        <?= $this->render('/agreement/_search', ['model' => $searchModel]); ?>
     </div>
     <div class="container-md my-3 p-4 rounded-3 bg-white shadow">
         <div class="table-responsive">
