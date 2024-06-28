@@ -2,7 +2,8 @@
 
 namespace common\models;
 
-use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the model class for table "activities".
@@ -21,19 +22,19 @@ use Yii;
  * @property string|null $semester
  * @property string|null $year
  *
- *  @property string|null $non_type
- *  @property int|null $non_number_students
- *  @property string|null $non_name_students
- *  @property string|null $non_semester
- *  @property string|null $non_year
+ * @property string|null $non_type
+ * @property int|null $non_number_students
+ * @property string|null $non_name_students
+ * @property string|null $non_semester
+ * @property string|null $non_year
  * @property string|null $non_program_name
  *
  * @property int|null $in_number_of_staff
  * @property string|null $in_staffs_name
  * @property string|null $in_department_office
  *
- *  @property int|null $out_number_of_staff
- *  @property string|null $out_staffs_name
+ * @property int|null $out_number_of_staff
+ * @property string|null $out_staffs_name
  *
  * @property string|null $scwt_name_of_program
  * @property string|null $date_of_program
@@ -52,7 +53,7 @@ use Yii;
  *
  * @property Agreement $agreement
  */
-class Activities extends \yii\db\ActiveRecord
+class Activities extends ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -69,20 +70,61 @@ class Activities extends \yii\db\ActiveRecord
     {
         return [
             [['activity_type'], 'required'],
-            [['type', 'number_students', 'name_students', 'semester'],  'required', 'on' => 'section-1'],
-            [['non_type', 'non_number_students', 'non_semester', 'non_program_name'], 'required', 'on' => 'section-2'],
-            [['in_number_of_staff', 'in_staffs_name'], 'required', 'on' => 'section-3'],
-            [['out_number_of_staff', 'out_staffs_name'], 'required', 'on' => 'section-4'],
-            [['scwt_name_of_program', 'date_of_program', 'program_venue', 'participants_number', 'name_participants_involved'], 'required', 'on' => 'section-5'],
-            [['research_title'], 'required', 'on' => 'section-6'],
-            [['publication_title', 'publisher'], 'required', 'on' => 'section-7'],
-            [['consultancy_name', 'project_duration'], 'required', 'on' => 'section-8'],
-            [['other', 'date'], 'required', 'on' => 'section-9'],
-            [['justification'], 'required', 'on' => 'section-10'],
+            [['type', 'number_students', 'name_students', 'semester'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Student Mobility for Credited';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Student Mobility for Credited';
+        }"],
+            [['non_type', 'non_number_students', 'non_semester', 'non_program_name'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Student Mobility Non-Credited';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Student Mobility Non-Credited';
+        }"],
+            [['in_number_of_staff', 'in_staffs_name'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Staff Mobility (Inbound)';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Staff Mobility (Inbound)';
+        }"],
+            [['out_number_of_staff', 'out_staffs_name'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Staff Mobility (Outbound)';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Staff Mobility (Outbound)';
+        }"],
+            [['scwt_name_of_program', 'date_of_program', 'program_venue', 'participants_number', 'name_participants_involved'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Seminar/Conference/Workshop/Training';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Seminar/Conference/Workshop/Training';
+        }"],
+            [['research_title'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Research';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Research';
+        }"],
+            [['publication_title', 'publisher'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Publication';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Publication';
+        }"],
+            [['consultancy_name', 'project_duration'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Consultancy';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Consultancy';
+        }"],
+            [['other', 'date'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'Any other of Cooperation, Please specify';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'Any other of Cooperation, Please specify';
+        }"],
+            [['justification'], 'required', 'when' => function ($model) {
+                return $model->activity_type == 'No Activity, Please specify';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#activity-type-dropdown').val() == 'No Activity, Please specify';
+        }"],
 
-            [['agreement_id', 'number_students', 'non_number_students','in_number_of_staff','out_number_of_staff', 'participants_number'], 'default', 'value' => null],
-            [['agreement_id', 'number_students', 'non_number_students','in_number_of_staff','out_number_of_staff', 'participants_number'], 'integer'],
-            [['name_students', 'non_name_students', 'in_staffs_name',  'out_staffs_name', 'research_title', 'justification'], 'string'],
+
+            [['agreement_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'default', 'value' => null],
+            [['agreement_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'integer'],
+            [['name_students', 'non_name_students', 'in_staffs_name', 'out_staffs_name', 'research_title', 'justification'], 'string'],
             [['date_of_program', 'date', 'year', 'non_year'], 'safe'],
             [['name', 'kcdio', 'mou_moa', 'activity_type', 'non_program_name', 'scwt_name_of_program', 'program_venue', 'upload_files', 'staff_number'], 'string', 'max' => 522],
             [['type', 'non_type', 'semester', 'non_semester'], 'string', 'max' => 10],
@@ -144,7 +186,7 @@ class Activities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Agreement]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAgreement()
     {

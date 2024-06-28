@@ -45,6 +45,6 @@ return [
         ],
 
     ],
-    'defaultRoute' => 'agreement/public-index', // Setting the default route here
+
     'params' => $params,
 ];

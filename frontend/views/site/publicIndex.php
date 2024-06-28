@@ -2,7 +2,6 @@
 
 use common\helpers\builders;
 use yii\bootstrap5\Modal;
-use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
@@ -19,7 +18,7 @@ modal::end();
 ?>
 <?php Pjax::begin(); ?>
     <div class="my-3 p-3 border-2 rounded-3 bg-light-gray shadow">
-        <?= $this->render('_search', ['model' => $searchModel]); ?>
+        <?= $this->render('/agreement/_search', ['model' => $searchModel]); ?>
     </div>
     <div class="container-md my-3 p-4 rounded-3 bg-white shadow">
         <div class="table-responsive">
@@ -32,7 +31,7 @@ modal::end();
                     return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder'] : [];
                 },
                 'columns' => [
-                        'id',
+                    'id',
                     [
                         'attribute' => 'col_organization',
                         'contentOptions' => ['class' => 'truncate'],
@@ -53,30 +52,10 @@ modal::end();
                     'sign_date',
                     'end_date',
                     'agreement_type',
-                    [
-                        'label' => 'Status',
-                        'attribute' => 'Status',
-                        'format' => 'raw',
-                        'value' => function ($model)
-                        {
-                            $statusHelper = new builders();
-                            return $statusHelper->pillBuilder($model->status);
-                        },
-                    ],
-                    [
-                        'class' => ActionColumn::className(),
-                        'template' => '{view}',
-                        'contentOptions' => ['class' => 'text-end'],
-                        'buttons' => ['view' => function ($url, $model, $key) {
-                            $build = new builders();
-                            return $build->actionBuilder($model, 'view');
-                        },
-                            ],
-                        ],
-                    ],
+                ],
                 'pager' => ['class' => yii\bootstrap5\LinkPager::className(),
-                'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
-                'activePageCssClass' => ['class' => 'link-white active'],
+                    'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+                    'activePageCssClass' => ['class' => 'link-white active'],
                 ], 'layout' => "{items}\n{pager}",]); ?>
 
         </div>

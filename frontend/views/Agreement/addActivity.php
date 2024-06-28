@@ -32,14 +32,14 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
         [
             'template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>",
             'labelOptions' => ['class' => ''],],
-            'id' =>'add_activity']); ?>
+            ]); ?>
 
 <div class="header-section">
     <?= $form->field($model, 'name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
     <?= $form->field($model, 'staff_number')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
     <?= $form->field($model, 'kcdio')->hiddenInput(['value' => $agreement->champion])->label(false)?>
     <?= $form->field($model, 'mou_moa')->hiddenInput(['value' => $agreement->col_organization])->label(false)?>
-        <div class = "col"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type']) ?></div>
+        <div class = "col"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type', 'id' => 'activity-type-dropdown']) ?></div>
 </div>
 
 <section id = "section-1" class = "form-section d-none">
@@ -220,27 +220,21 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
             'No Activity, Please specify': '10'
         };
 
-        $('#activities-activity_type').change(function() {
+        $('#activity-type-dropdown').change(function() {
             const selectedOption = $(this).val();
             const sectionNumber = sectionMap[selectedOption];
 
             // Reset previous section (more efficient than a general reset)
             const prevSection = $('.form-section:not(.d-none)');
             prevSection.addClass('d-none');
-            prevSection.find('input, select, textarea').prop('required', false);
             prevSection.find('input, select, textarea').val('');  // Clear values
             prevSection.find('input[type="radio"], input[type="checkbox"]').prop('checked', false); // Reset checkboxes/radios
 
             // Show selected section
             const currentSection = $('#section-' + sectionNumber);
             currentSection.removeClass('d-none');
-            currentSection.find('input, select, textarea').prop('required', true);
+            // currentSection.find('input, select, textarea').prop('required', true);
 
-            // Input Validation Event Listener - attach to new section's inputs
-            currentSection.find('input').on('blur', function() {
-                const isEmpty = $(this).val().trim() === '';
-                $(this).toggleClass('is-invalid', isEmpty);
-            });
         });
     });
 

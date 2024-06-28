@@ -456,12 +456,47 @@ class AgreementController extends Controller
         foreach ($ids as $id) {
             $model = $this->findModel($id);
             if ($model !== null) {
+                // Delete associated files
+                $folderPath = Yii::getAlias('@common/uploads/' . $id);
+                if (is_dir($folderPath)) {
+                    $this->deleteDirectory($folderPath);
+                }
+
+                // Delete the model
                 $model->delete();
             }
         }
 
         return ['success' => true, 'message' => 'Selected items have been deleted.'];
     }
+
+    protected function deleteDirectory($dir)
+    {
+        if (!file_exists($dir)) {
+            return true;
+        }
+
+        if (!is_dir($dir) || is_link($dir)) {
+            return unlink($dir);
+        }
+
+        foreach (scandir($dir) as $item) {
+            if ($item == '.' || $item == '..') {
+                continue;
+            }
+
+            if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                chmod($dir . DIRECTORY_SEPARATOR . $item, 0777);
+
+                if (!$this->deleteDirectory($dir . DIRECTORY_SEPARATOR . $item)) {
+                    return false;
+                }
+            }
+        }
+
+        return rmdir($dir);
+    }
+
 
     public function actionLog($id)
     {

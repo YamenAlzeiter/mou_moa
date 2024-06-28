@@ -14,8 +14,8 @@ use yii\bootstrap5\NavBar;
 AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
-    <!DOCTYPE html>
-    <html lang="<?= Yii::$app->language ?>" class="h-100">
+    <!DOCTYPE>
+    <html lang="<?= Yii::$app->language ?>" class="h-100" >
     <head>
         <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
 
@@ -35,8 +35,15 @@ AppAsset::register($this);
     <header class="header body-pd" id="header">
         <div class="header__toggle">
             <?php if (!Yii::$app->user->isGuest): ?>
+
                 <i class='ti ti-menu' id="header-toggle"></i>
                 <?php else:?>
+                <?php        $logoUrl = Yii::getAlias('@web') . '/iiumLogo.svg';
+                $logo2Url = Yii::getAlias('@web') . '/iiumLogo2.svg';
+                echo \yii\helpers\Html::a(
+                    Html::img($logoUrl, ['class' => 'ti ti-letter-t fs-7 n']) .
+                    Html::tag('span',
+                        Html::img($logo2Url, ['class' => '']) ), '/agreement/index', ['class' => '']);?>
                 <ul>
                     <li class="nav__link text-decoration-none">Login</li>
                 </ul>
