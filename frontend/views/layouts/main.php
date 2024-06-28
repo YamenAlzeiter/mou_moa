@@ -15,7 +15,7 @@ AppAsset::register($this);
 ?>
 <?php $this->beginPage() ?>
     <!DOCTYPE>
-    <html lang="<?= Yii::$app->language ?>" class="h-100" >
+    <html lang="<?= Yii::$app->language ?>">
     <head>
         <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
 
@@ -26,29 +26,25 @@ AppAsset::register($this);
         <title><?= Html::encode($this->title) ?></title>
         <?php $this->head() ?>
     </head>
-    <body id="body-pd" class="<?= Yii::$app->user->isGuest ? '' : 'body-pd' ?>">
+    <body id="body-pd">
 
     <?php $this->beginBody() ?>
     <div class="background-image"></div>
 
-    <header class="header body-pd" id="header">
+    <header class="header" id="header">
+        <?php if (!Yii::$app->user->isGuest): ?>
         <div class="header__toggle">
-            <?php if (!Yii::$app->user->isGuest): ?>
-
-                <i class='ti ti-menu' id="header-toggle"></i>
-                <?php else:?>
-                <?php        $logoUrl = Yii::getAlias('@web') . '/iiumLogo.svg';
-                $logo2Url = Yii::getAlias('@web') . '/iiumLogo2.svg';
-                echo \yii\helpers\Html::a(
-                    Html::img($logoUrl, ['class' => 'ti ti-letter-t fs-7 n']) .
-                    Html::tag('span',
-                        Html::img($logo2Url, ['class' => '']) ), '/agreement/index', ['class' => '']);?>
-                <ul>
-                    <li class="nav__link text-decoration-none">Login</li>
-                </ul>
-            <?php endif; ?>
-
+            <i class='ti ti-menu' id="header-toggle"></i>
         </div>
+        <?php else:?>
+            <div class="ms-auto">
+                <ul class="list-unstyled mb-0">
+                    <li class="d-inline-block">
+                        <a href="/site/login" class="text-decoration-none text-white fs-6 ">Login</a>
+                    </li>
+                </ul>
+            </div>
+        <?php endif; ?>
     </header>
 
     <?php if(!Yii::$app->user->isGuest){
@@ -61,7 +57,7 @@ AppAsset::register($this);
     }
     ?>
 
-    <main role="main" class="flex-shrink-0 mt-4">
+    <main role="main" class="mt-4">
         <div class="container">
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],

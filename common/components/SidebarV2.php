@@ -22,7 +22,7 @@ class SidebarV2 extends Widget
     {
         return Html::tag('div',
             $this->renderNavBar(),
-            ['class' => 'l-navbar show-sidenav', 'id' => 'nav-bar']
+            ['class' => 'l-navbar', 'id' => 'nav-bar']
         );
     }
 
