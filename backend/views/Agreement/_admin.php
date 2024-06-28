@@ -47,7 +47,7 @@ $(document).ready(function() {
         }
         Swal.fire({
             title: 'Are you sure?',
-            text: "You won't be able to revert this!",
+              text: "All data and associated files will be permanently deleted from the server. This action cannot be undone!",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -115,7 +115,7 @@ echo GridView::widget([
         ],
         [
             'class' => ActionColumn::className(),
-            'template' => '{view}{log}',
+            'template' => '{view}{log}{updatePoc}',
             'contentOptions' => ['class' => 'text-end'],
             'buttons' => [
                 'view' => function ($url, $model, $key) {
@@ -126,6 +126,10 @@ echo GridView::widget([
                     $build = new builders();
                     return $build->actionBuilder($model, 'log');
                 },
+                'updatePoc' => function ($url, $model, $key) {
+                    $build = new builders();
+                    return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'update-poc') : null;
+                }
             ],
         ],
     ],

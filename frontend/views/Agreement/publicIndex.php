@@ -2,7 +2,6 @@
 
 use common\helpers\builders;
 use yii\bootstrap5\Modal;
-use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 
@@ -32,7 +31,7 @@ modal::end();
                     return $build->tableProbChanger($model->status, 'OLA') ? ['class' => 'need-action fw-bolder'] : [];
                 },
                 'columns' => [
-                        'id',
+                    'id',
                     [
                         'attribute' => 'col_organization',
                         'contentOptions' => ['class' => 'truncate'],
@@ -48,30 +47,10 @@ modal::end();
                     'sign_date',
                     'end_date',
                     'agreement_type',
-                    [
-                        'label' => 'Status',
-                        'attribute' => 'Status',
-                        'format' => 'raw',
-                        'value' => function ($model)
-                        {
-                            $statusHelper = new builders();
-                            return $statusHelper->pillBuilder($model->status);
-                        },
-                    ],
-                    [
-                        'class' => ActionColumn::className(),
-                        'template' => '{view}',
-                        'contentOptions' => ['class' => 'text-end'],
-                        'buttons' => ['view' => function ($url, $model, $key) {
-                            $build = new builders();
-                            return $build->actionBuilder($model, 'view');
-                        },
-                            ],
-                        ],
-                    ],
+                ],
                 'pager' => ['class' => yii\bootstrap5\LinkPager::className(),
-                'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
-                'activePageCssClass' => ['class' => 'link-white active'],
+                    'listOptions' => ['class' => 'pagination justify-content-center gap-2 borderless'],
+                    'activePageCssClass' => ['class' => 'link-white active'],
                 ], 'layout' => "{items}\n{pager}",]); ?>
 
         </div>

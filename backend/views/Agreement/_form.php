@@ -52,9 +52,10 @@ $form = ActiveForm::begin(['id' => 'actiontaken', 'validateOnBlur' => false, 'va
 
 if (!in_array($model->status, [51, 72, 81, 41])) {
 
-    $tag = (in_array($model->status, [21, 31])) ? 'KIV' : 'Not Complete';
+    $rejectTag = (in_array($model->status, [21, 31])) ? 'KIV' : 'Not Complete';
+    $recommendedTag = !(in_array($model->status, [31])) ? 'Recommended' : 'Approve';
 
-    $options = [$approveMap[$model->status] => 'Recommended', $notCompleteMap[$model->status] => $tag,];
+    $options = [$approveMap[$model->status] => $recommendedTag, $notCompleteMap[$model->status] => $rejectTag,];
 
     if (in_array($model->status, [21, 31, 121])) {
         if ($model->status == 21)
