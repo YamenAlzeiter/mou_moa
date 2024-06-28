@@ -45,7 +45,7 @@ modal::end();
                     'value' => Url::to(['create']),
                     'class' => 'btn btn-lg btn-success w-100', // Adjust width as needed
                     'id' => 'modalButton',
-                    'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>Create</h1>');",
+                    'onclick' => "$('#modal').modal('show').find('#modalContent').load($(this).attr('value')); $('#modal').find('.modal-title').html('<h1>New Agreement Record</h1>');",
                     'data-bs-toggle' => 'tooltip',
                     'data-bs-placement' => 'top',
                     'title' => 'Add New Record'
@@ -72,7 +72,12 @@ modal::end();
                 'attribute' => 'col_organization',
                 'contentOptions' => ['class' => 'truncate'],
             ],
-            'champion',
+            [
+                'label' => 'Champion',
+                'value' => function ($model) {
+                    return $model->primaryAgreementPoc ? $model->primaryAgreementPoc->pi_kcdio : null;
+                },
+            ],
             [
                 'attribute' => 'created_at',
                 'label' => 'Date',

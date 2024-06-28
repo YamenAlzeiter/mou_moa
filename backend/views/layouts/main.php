@@ -149,8 +149,6 @@ Modal::end();
 
         <link href = "https://style.iium.edu.my/css/iium.css" rel = "stylesheet">
 
-
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <meta charset="<?= Yii::$app->charset ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">

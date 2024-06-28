@@ -20,6 +20,7 @@ AppAsset::register($this);
         <link rel="shortcut icon" type="image/png" href="https://style.iium.edu.my/images/iium/iium-logo.png">
 
         <link href="https://style.iium.edu.my/css/iium.css" rel="stylesheet">
+
         <meta charset="<?= Yii::$app->charset ?>">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <?php $this->registerCsrfMetaTags() ?>

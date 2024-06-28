@@ -76,7 +76,12 @@ class ReminderController extends Controller
               echo $user->pi_email . "\n";
               $body = str_replace('{user}', $user->pi_name, $emailTemplate->body);
               $body = str_replace('{id}', $user->agreement_id, $body);
-              Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], ['subject' => $emailTemplate->subject, 'body' => $body])->setFrom(["noreply@example.com" => "My Application"])->setTo($user->pi_email)->setSubject($emailTemplate->subject)->send();
+              Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'],
+                  ['subject' => $emailTemplate->subject, 'body' => $body])
+                  ->setFrom(["noreply@example.com" => "My Application"])
+                  ->setTo($user->pi_email)
+                  ->setSubject($emailTemplate->subject)
+                  ->send();
           }
       }
     }

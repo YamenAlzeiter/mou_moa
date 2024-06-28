@@ -31,33 +31,43 @@ class m240315_030854_create_moua_table extends Migration
             //research/ project
             'project_title' => $this->text(),
             'grant_fund' => $this->string(),
-            'sign_date' => $this->date(),
-            'end_date' => $this->date(),
             'member' => $this->string(2),
             'progress' => $this->text(),
-            //extra
-            'ssm' => $this->string(522),
-            'company_profile' => $this->string(),
-            'mcom_date' => $this->date(),
-            'meeting_link' => $this->string(),
+
             'agreement_type' => $this->string(),
             'transfer_to' => $this->string(),
             'proposal' => $this->string(),
+
+            //rmc additional requirement
+            'project_start_date' => $this->date(),
+            'project_end_date' => $this->date(),
+
+            //oil additional requirement
+            'ssm' => $this->string(522),
+            'company_profile' => $this->string(),
+
+            // dates
+            'sign_date' => $this->date(),
+            'end_date' => $this->date(),
+            'execution_date' => $this->date(),
+            'last_reminder' => $this->date(), //activity
+
+            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+
             //docs
             'applicant_doc' => $this->text(),
             'dp_doc' => $this->text(),
+
             //messages
             'reason' => $this->text(),
-            //time
-            'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
-            'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
+
             //details
-            'pi_details' => $this->text(),
-            'col_details' => $this->text(),
             'collaboration_area' => $this->text(),
+
             //reminder
-            'isReminded' => $this->integer(1)->defaultValue(0),//this for application
-            'last_reminder' => $this->date(),//this for activities
+            'isReminded' => $this->integer(1)->defaultValue(0),// application reminder counter
+
             //temp
             'temp' => $this->text(),
 

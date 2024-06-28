@@ -14,6 +14,8 @@ use Yii;
  * @property string|null $pi_phone
  * @property string|null $pi_kcdio
  * @property string|null $pi_address
+ * @property string|null $role
+ * @property boolean|null $is_primary
  *
  * @property Agreement $agreement
  */
@@ -36,10 +38,11 @@ class AgreementPoc extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address'], 'string', 'max' => 255],
-//            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio'], 'required'],
+            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'role'], 'string', 'max' => 255],
+            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'role'], 'required'],
             [['agreement_id'], 'default', 'value' => null],
             [['agreement_id'], 'integer'],
+            [['is_primary'], 'boolean'],
             [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],
         ];
     }
@@ -52,11 +55,13 @@ class AgreementPoc extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'agreement_id' => 'Agreement ID',
-            'pi_name' => 'Pi Name',
-            'pi_email' => 'Pi Email',
-            'pi_phone' => 'Pi Phone',
-            'pi_kcdio' => 'Pi Kcdio',
-            'pi_address' => 'Pi Address',
+            'pi_name' => 'Person in Charge Name',
+            'pi_email' => 'Person in Charge Email',
+            'pi_phone' => 'Person in Charge Phone',
+            'pi_kcdio' => 'Person in Charge Kcdio',
+            'pi_address' => 'Person in Charge Address',
+            'role' => 'Role',
+            'is_primary' => 'prime? '
         ];
     }
 

@@ -20,7 +20,9 @@ class m240513_042118_create_agreement_poc_table extends Migration
             'pi_phone' => $this->string(),
             'pi_kcdio' => $this->string(),
             'pi_address' => $this->string(),
-        ]);
+            'role' => $this->string(),
+            'is_primary' => $this->boolean(),
+            ]);
         $this->addForeignKey(
             'fk-agreement_poc',
             '{{agreement_poc}}',
