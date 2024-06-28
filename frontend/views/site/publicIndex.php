@@ -43,7 +43,12 @@ modal::end();
                         'enableSorting' => false,
                     ],
                     'country',
-                    'champion',
+                    [
+                        'label' => 'Champion',
+                        'value' => function ($model) {
+                            return $model->primaryAgreementPoc ? $model->primaryAgreementPoc->pi_kcdio : null;
+                        },
+                    ],
                     'sign_date',
                     'end_date',
                     'agreement_type',

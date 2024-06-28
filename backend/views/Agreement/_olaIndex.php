@@ -29,7 +29,12 @@ echo GridView::widget([
             'enableSorting' => false,
         ],
         'country',
-        'champion',
+        [
+            'label' => 'Champion',
+            'value' => function ($model) {
+                return $model->primaryAgreementPoc ? $model->primaryAgreementPoc->pi_kcdio : null;
+            },
+        ],
         'agreement_type',
         [
             'label' => 'Status',

@@ -36,7 +36,9 @@ use yii\db\Expression;
  * @property string|null $mcom_date
  * @property string|null $meeting_link
  * @property string|null $agreement_type
- *
+ * @property string|null $execution_date
+ * @property string|null $project_start_date
+ * @property string|null $project_end_date
  * @property string|null $dp_doc
  * @property string|null $applicant_doc
  * @property string|null $reason
@@ -79,14 +81,14 @@ class Agreement extends ActiveRecord
 
             // Required fields for 'uploadCreate' scenario
             [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'project_title', 'proposal', 'col_phone_number',
-                'col_email', 'grant_fund', 'member', 'transfer_to',
-                'agreement_type', 'country', 'files_applicant', 'champion'], 'required', 'on' => 'uploadCreate'],
+                'col_wire_up',  'proposal', 'col_phone_number',
+                'col_email', 'transfer_to', 'agreement_type', 'country',
+                'files_applicant', 'champion'], 'required', 'on' => 'uploadCreate'],
 
             // Required fields for 'createSpecial' scenario
             [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'project_title', 'proposal', 'col_phone_number',
-                'col_email', 'grant_fund', 'member', 'transfer_to',
+                'col_wire_up', 'proposal', 'col_phone_number',
+                'col_email', 'transfer_to',
                 'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date',
                 'files_applicant', 'champion'], 'required', 'on' => 'createSpecial'],
 
@@ -100,6 +102,16 @@ class Agreement extends ActiveRecord
                 return $model->transfer_to === 'OIL';
             }, 'whenClient' => "function (attribute, value) {
             return $('#transfer-to-dropdown').val() === 'OIL';
+        }"],
+            [['member', 'grant_fund', 'project_title'], 'required', 'when' => function ($model) {
+                return $model->transfer_to !== 'RMC';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#transfer-to-dropdown').val() !== 'RMC';
+        }"],
+            [['project_start_date', 'project_end_date'], 'required', 'when' => function ($model) {
+                return $model->transfer_to == 'RMC';
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#transfer-to-dropdown').val() == 'RMC';
         }"],
 
             // Email validation rule
@@ -139,17 +151,19 @@ class Agreement extends ActiveRecord
             'col_address' => 'Address',
             'col_contact_details' => 'Contact Details',
             'col_collaborators_name' => 'Collaborators Name',
-            'col_wire_up' => 'Wire Up',
+            'col_wire_up' => 'Write Up',
             'col_phone_number' => 'Phone Number',
             'col_email' => 'Email',
             'champion' => 'Champion',
 
-
+            'project_end_date' => 'End Date',
+            'project_start_date' => 'Start Date',
+            'execution_date' => 'Execution Date',
             'project_title' => 'Project Title / Research Title',
             'grant_fund' => 'Grant Fund',
             'sign_date' => 'Sign Date',
             'end_date' => 'End Date',
-            'member' => 'Member',
+            'member' => 'No. of Project Members',
             'proposal' => 'proposal',
             'status' => 'Status',
             'ssm' => 'SSM',
@@ -191,6 +205,11 @@ class Agreement extends ActiveRecord
     public function getMcomDate()
     {
         return $this->hasOne(McomDate::class, ['date_from' => 'mcom_date']);
+    }
+
+    public function getPrimaryAgreementPoc()
+    {
+        return $this->hasOne(AgreementPoc::className(), ['agreement_id' => 'id'])->andWhere(['is_primary' => true]);
     }
     /**
      * Gets query for [[Logs]].

@@ -20,6 +20,7 @@ class AppAsset extends AssetBundle
     public $js = [
         'js/email-template.js',
         'js/global.js',
+        'https://cdn.jsdelivr.net/npm/sweetalert2@11',
     ];
     public $depends = [
         'yii\web\YiiAsset',

@@ -35,79 +35,91 @@ $additionalPoc = new agreementPocMaker();
     <div class="row">
         <div class="col-md-4">
             <?= $form->field($model, 'agreement_type')->dropDownList(
-                ArrayHelper::merge(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'),['other' => 'Other']),
+                ArrayHelper::merge(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'), ['other' => 'Other']),
                 [
                     'prompt' => 'Select Type',
                     'id' => 'agreement-type-dropdown'
                 ]
             ) ?>
         </div>
-        <div id="other-agreement-type" class="col-md-8">
+        <div id="other-agreement-type" class="col-md-4">
             <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true]) ?>
         </div>
-
-        <div class="col-md-12">
-            <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
-            ]) ?>
+        <div class="col-md-4">
+            <?= $form->field($model, 'transfer_to')->dropDownList(
+                ['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'],
+                [
+                    'prompt' => 'Select OSC',
+                    'id' => 'transfer-to-dropdown'
+                ]
+            ) ?>
         </div>
     </div>
-
+    <!-- Collaborator details start -->
     <div class="row">
-        <div class="col-md">
-            <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-            <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+        <h4>Collaborator Details</h4>
+        <div class="col-md-12">
+            <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-            <?= $form->field($model, 'col_email')->textInput(['type => email', 'maxlength' => true, 'placeholder' => '']) ?>
+            <?= $form->field($model, 'col_name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-md">
+            <?= $form->field($model, 'col_address')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'col_email')->textInput(['type' => 'email']) ?>
         </div>
     </div>
-    <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6]) ?>
+    <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'rows' => 6]) ?>
+
     <div class="row">
         <div class="col-md-8">
-            <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md-4">
-            <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <?= $form->field($model, 'country')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
+    <!-- Collaborator details end -->
 
-    <h4>Person In Charge Details</h4>
+
+
     <?php foreach ($modelsPoc as $index => $modelPoc):
         $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
-        //id needed but it's not included in get methode ..........sadly
         echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
     endforeach; ?>
 
+    <!-- Project information start -->
+    <h4>Project Information</h4>
     <div class="row">
         <div class="col-md-12">
             <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
         </div>
-<!--        <div class="col-md-3">-->
-<!--            <div class="col-md">--><?php //= $form->field($model, 'champion')->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'select champion']) ?><!--</div>-->
-<!--        </div>-->
-        <?= $form->field($model, 'champion')->hiddenInput(['value'=> Yii::$app->user->identity->type])->label(false) ?>
+    </div>
+    <div id="rmc-additional-info" class="row d-none">
+        <div class="col-md">
+            <?= $form->field($model, 'project_start_date')->textInput(['type' => 'date', 'id' => 'project-start-date']) ?>
+        </div>
+        <div class="col-md">
+            <?= $form->field($model, 'project_end_date')->textInput(['type' => 'date', 'id' => 'project-end-date']) ?>
+        </div>
+        <div class="col-md">
+            <p id="duration" class="mb-0 fw-bold"></p>
+        </div>
     </div>
     <div class="row">
         <div class="col-md">
-            <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
-        </div>
-
-        <div class="col-md">
-            <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
+            <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'transfer_to')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'select OSC']) ?>
+            <?= $form->field($model, 'member')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
-
     <div id="oil-additional-info" class="row d-none">
-        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
-        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true]) ?></div>
+        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true]) ?></div>
     </div>
-
-    <?= $form->field($model, 'proposal')->textarea(['rows' => 6]) ?>
-
+    <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true]) ?>
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
 
 <?php endif; ?>
@@ -169,6 +181,84 @@ foreach ($storedFiles as $file) {
 ?>
 
 <script>
+
+    $(document).ready(function() {
+        function calculateDuration() {
+            var startDate = new Date($('#project-start-date').val());
+            var endDate = new Date($('#project-end-date').val());
+
+            if (startDate && endDate && startDate <= endDate) {
+                var duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                $('#duration').text('Duration: ' + duration + ' days');
+            } else {
+                $('#duration').text('Please select valid start and end dates.');
+            }
+        }
+
+        $('#project-start-date, #project-end-date').on('change', calculateDuration);
+        calculateDuration();
+    });
+
+    $(document).ready(function() {
+        function populateRoleDropdowns() {
+            var selectedValue = $('#transfer-to-dropdown').val();
+            var $roleDropdowns = $('.role-dropdown');
+
+            $roleDropdowns.each(function() {
+                var $this = $(this);
+                var currentValue = $this.val();
+                $this.empty();
+                $this.append($('<option>', { value: '', text: 'Select Role' }));
+
+                var options = [];
+                if (selectedValue === 'IO' || selectedValue === 'OIL') {
+                    options = [
+                        { value: 'Project Leader', text: 'Project Leader' },
+                        { value: 'Member', text: 'Member' }
+                    ];
+                } else if (selectedValue === 'RMC') {
+                    options = [
+                        { value: 'Principal Researcher', text: 'Principal Researcher' },
+                        { value: 'Co Researcher', text: 'Co Researcher' }
+                    ];
+                }
+
+                $.each(options, function(index, option) {
+                    $this.append($('<option>', { value: option.value, text: option.text }));
+                });
+
+                $this.val(currentValue);
+            });
+        }
+
+        $('#transfer-to-dropdown').on('change', populateRoleDropdowns);
+        $('#transfer-to-dropdown').trigger('change');
+
+        $('#add-poc-button').on('click', function() {
+            var pocIndex = $('#poc-container .poc-row').length;
+            if (pocIndex < 5) {
+                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, $modelPoc);?>`;
+                newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
+                newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
+                newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
+                $('#poc-container').append(newRow);
+                pocIndex++;
+
+                populateRoleDropdowns();
+            } else {
+                Swal.fire({
+                    title: "Oops...!",
+                    text: "You Can't Add More than 5 Person in Charge.",
+                    icon: "error",
+                });
+            }
+        });
+
+        $(document).on('click', '.remove-poc-button', function() {
+            var index = $(this).data('index');
+            $('#poc-row-' + index).remove();
+        });
+    });
     $(document).ready(function () {
 
         const existingFilesSize = <?= $existingFilesSize ?>;
@@ -212,28 +302,37 @@ foreach ($storedFiles as $file) {
 
 <?php
 $script = <<< JS
-$('#agreement-type-dropdown').change(function(){
-     if ($(this).val() === 'other') {
+$('#agreement-type-dropdown').change(function() {
+    if ($(this).val() === 'other') {
         $('#other-agreement-type input').prop('disabled', false);
     } else {
         $('#other-agreement-type input').prop('disabled', true);
     }
 }).change();
 
-$('#transfer-to-dropdown').change(function(){
+$('#transfer-to-dropdown').change(function() {
     if ($(this).val() === 'OIL') {
         $('#oil-additional-info').removeClass('d-none');
+        $('#rmc-additional-info').addClass('d-none');
+    }else if  ($(this).val() === 'RMC'){
+        $('#rmc-additional-info').removeClass('d-none');
+        $('#oil-additional-info').addClass('d-none');
     } else {
         $('#oil-additional-info').addClass('d-none');
+        $('#rmc-additional-info').addClass('d-none');
     }
-}).change(); 
 
-$('#{$form->id}').on('beforeSubmit', function(){
+    var form = $('#{$form->id}');
+    form.yiiActiveForm('validateAttribute', 'model-member');
+    form.yiiActiveForm('validateAttribute', 'model-grant_fund');
+    form.yiiActiveForm('validateAttribute', 'model-project_title');
+}).change();
+
+$('#{$form->id}').on('beforeSubmit', function() {
     if ($('#agreement-type-dropdown').val() === 'other') {
         var otherValue = $('#{$model->formName()}-agreement_type_other').val();
         $('#{$model->formName()}-agreement_type').val(otherValue);
     }
-    return true;
 });
 
  $('input[name="Agreement[status]"]').on('change', function() {

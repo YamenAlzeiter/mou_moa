@@ -71,11 +71,17 @@ class LoginForm extends Model
      */
     protected function getUser()
     {
-        $staff = Poc::find()->where(['staff_id' => $this->staff_id])->one();
-        if($staff){
-            if ($this->_user === null) {
-                $this->_user = User::findByUsername($this->staff_id);
-            }
+//        $staff = Poc::find()->where(['staff_id' => $this->staff_id])->one();
+//        if($staff){
+//            if ($this->_user === null) {
+//                $this->_user = User::findByUsername($this->staff_id);
+//            }
+//        }
+//
+//        return $this->_user;
+
+        if ($this->_user === null) {
+            $this->_user = User::findByUsername($this->staff_id);
         }
 
         return $this->_user;
