@@ -9,6 +9,7 @@ use common\models\EmailTemplate;
 use common\models\Reminder;
 use Yii;
 use yii\console\Controller;
+use yii\db\Exception;
 
 class ReminderController extends Controller
 {
@@ -71,21 +72,43 @@ class ReminderController extends Controller
 
     private function sendEmailReminder($users, $emailTemplate)
     {
-      foreach ($users as $user){
-          if ($user->pi_email != null) {
-              echo $user->pi_email . "\n";
-              $body = str_replace('{user}', $user->pi_name, $emailTemplate->body);
-              $body = str_replace('{id}', $user->agreement_id, $body);
-              Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'],
-                  ['subject' => $emailTemplate->subject, 'body' => $body])
-                  ->setFrom(["noreply@example.com" => "My Application"])
-                  ->setTo($user->pi_email)
-                  ->setSubject($emailTemplate->subject)
-                  ->send();
-          }
-      }
+        $primaryUser = null;
+        $ccEmails = [];
+
+        foreach ($users as $user) {
+            if ($user->pi_is_primary) {
+                $primaryUser = $user;
+            } else {
+                if ($user->pi_email != null) {
+                    $ccEmails[] = $user->pi_email;
+                }
+            }
+        }
+
+        if ($primaryUser !== null) {
+            $body = str_replace('{user}', $primaryUser->pi_name, $emailTemplate->body);
+            $body = str_replace('{id}', $primaryUser->agreement_id, $body);
+
+            $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], [
+                'subject' => $emailTemplate->subject,
+                'body' => $body,
+            ])
+                ->setFrom(["noreply@example.com" => "My Application"])
+                ->setTo($primaryUser->pi_email)
+                ->setSubject($emailTemplate->subject);
+
+            if (!empty($ccEmails)) {
+                $mailer->setCc($ccEmails);
+            }
+
+            $mailer->send();
+        }
+
     }
 
+    /**
+     * @throws Exception
+     */
     public function actionSendActivityReminders()
     {
         $activityReminderEmailTemplate = EmailTemplate::findOne(10);
@@ -100,9 +123,11 @@ class ReminderController extends Controller
 
 
         foreach ($users as $user) {
+            var_dump($user->id);
             if ($user->last_reminder == null) {
-                $user->last_reminder = Carbon::now()->copy()->addDays(7)->startOfDay();
-                $user->save();
+                $user->last_reminder = Carbon::now()->copy()->addDays(7)->startOfDay()->toDateString();
+
+
             } else {
                 $currentDate = Carbon::now()->startOfDay();
                 if ($currentDate->eq($user->last_reminder)) {
@@ -110,9 +135,15 @@ class ReminderController extends Controller
 
                     $this->sendEmailReminder($pocs, $activityReminderEmailTemplate);
                     $user->last_reminder = Carbon::createFromFormat('Y-m-d', $user->last_reminder)->copy()->addMonths(3)->toDateString();
-                    $user->save();
+
                 }
 
+            }
+            if (!$user->save()) {
+                echo "Failed to save user with ID {$user->id}.\n";
+                print_r($user->errors);
+            } else {
+                echo "Successfully saved user with ID {$user->id}.\n";
             }
 
         }

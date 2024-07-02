@@ -98,7 +98,7 @@ class Agreement extends ActiveRecord
                 }",
             ],
             [
-                ['files_applicant', 'execution_date', 'project_end_date', 'project_start_date'],
+                [ 'execution_date', 'project_end_date', 'project_start_date'],
                 'required',
                 'when' => function ($model) {
                     return $model->status == 91; // Required when status is 81
