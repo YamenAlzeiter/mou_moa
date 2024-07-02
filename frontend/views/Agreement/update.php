@@ -24,9 +24,15 @@ $additionalPoc = new pocFieldMaker();
 $currentDate = Carbon::now();
 $nextTwoWeeks = $currentDate->copy()->addWeeks(2);
 $nextTwoMonth = $currentDate->copy()->addMonths(2);
+$roleData = [];
+
 
 $model->mcom_date = '';
 $additionalPoc = new agreementPocMaker();
+foreach ($modelsPoc as $index => $modelPoc) {
+    $roleData[$index] = $modelPoc->pi_role;
+}
+
 ?>
 <?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
@@ -82,12 +88,16 @@ $additionalPoc = new agreementPocMaker();
     </div>
     <!-- Collaborator details end -->
 
-
+<div id="poc-container">
 
     <?php foreach ($modelsPoc as $index => $modelPoc):
         $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
         echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
     endforeach; ?>
+</div>
+    <div class="d-grid mb-3">
+        <?= Html::button('Add person in charge', ['class' => 'btn btn-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?>
+    </div>
 
     <!-- Project information start -->
     <h4>Project Information</h4>
@@ -121,7 +131,7 @@ $additionalPoc = new agreementPocMaker();
     </div>
     <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true]) ?>
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
-
+    <?= $form->field($model,'pi_delete_ids')->hiddenInput()->label(false)?>
 <?php endif; ?>
 <?php
 if (in_array($model->status, [11, 33, 43])): ?>
@@ -200,44 +210,57 @@ foreach ($storedFiles as $file) {
     });
 
     $(document).ready(function() {
-        function populateRoleDropdowns() {
-            var selectedValue = $('#transfer-to-dropdown').val();
-            var $roleDropdowns = $('.role-dropdown');
+        var roleData = <?= json_encode($roleData); ?>;
+            function populateRoleDropdowns() {
+                var selectedValue = $('#transfer-to-dropdown').val();
+                var $roleDropdowns = $('.role-dropdown');
 
-            $roleDropdowns.each(function() {
-                var $this = $(this);
-                var currentValue = $this.val();
-                $this.empty();
-                $this.append($('<option>', { value: '', text: 'Select Role' }));
+                $roleDropdowns.each(function(index) {
+                    var $this = $(this);
+                    var currentValue = roleData[index];
+                    $this.empty();
+                    $this.append($('<option>', { value: '', text: 'Select Role' }));
 
-                var options = [];
-                if (selectedValue === 'IO' || selectedValue === 'OIL') {
-                    options = [
-                        { value: 'Project Leader', text: 'Project Leader' },
-                        { value: 'Member', text: 'Member' }
-                    ];
-                } else if (selectedValue === 'RMC') {
-                    options = [
-                        { value: 'Principal Researcher', text: 'Principal Researcher' },
-                        { value: 'Co Researcher', text: 'Co Researcher' }
-                    ];
-                }
+                    var options = [];
+                    if (selectedValue === 'IO' || selectedValue === 'OIL') {
+                        options = [
+                            { value: 'Project Leader', text: 'Project Leader'},
+                            { value: 'Member', text: 'Member' }
+                        ];
+                    } else if (selectedValue === 'RMC') {
+                        options = [
+                            { value: 'Principal Researcher', text: 'Principal Researcher' },
+                            { value: 'Co Researcher', text: 'Co Researcher' }
+                        ];
+                    }
 
-                $.each(options, function(index, option) {
-                    $this.append($('<option>', { value: option.value, text: option.text }));
+                    $.each(options, function(index, option) {
+                        $this.append($('<option>', { value: option.value, text: option.text }));
+                    });
+
+                    $this.val(currentValue);
                 });
+            }
 
-                $this.val(currentValue);
+// Call the function when the page loads to initialize the dropdowns
+            $(document).ready(function() {
+                populateRoleDropdowns();
+
+                // Attach the function to the change event of the transfer-to dropdown
+                $('#transfer-to-dropdown').change(function() {
+                    populateRoleDropdowns();
+                });
             });
-        }
 
         $('#transfer-to-dropdown').on('change', populateRoleDropdowns);
         $('#transfer-to-dropdown').trigger('change');
 
         $('#add-poc-button').on('click', function() {
+
             var pocIndex = $('#poc-container .poc-row').length;
+            console.log(pocIndex)
             if (pocIndex < 5) {
-                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, $modelPoc);?>`;
+                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, new \common\models\AgreementPoc());?>`;
                 newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
                 newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
                 newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
@@ -253,17 +276,24 @@ foreach ($storedFiles as $file) {
                 });
             }
         });
+        var deletedPocIds = [];
 
         $(document).on('click', '.remove-poc-button', function() {
             var index = $(this).data('index');
+            var pocId = $('input[name="AgreementPoc[' + index + '][id]"]').val();
+            if (pocId) {
+                deletedPocIds.push(pocId);
+            }
+
             $('#poc-row-' + index).remove();
+            $('#agreement-pi_delete_ids').val(deletedPocIds.join(','));
+
         });
     });
     $(document).ready(function () {
 
         const existingFilesSize = <?= $existingFilesSize ?>;
         const submitButton = $('#form-update-submit');
-        console.log('files size: ' + existingFilesSize);
         const sizeLimit = 10 * 1024 * 1024; // 1 MB in bytes
 
         $('input[type="file"][name="Agreement[files_applicant][]"]').on('change', function () {

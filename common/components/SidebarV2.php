@@ -22,7 +22,7 @@ class SidebarV2 extends Widget
     {
         return Html::tag('div',
             $this->renderNavBar(),
-            ['class' => 'l-navbar', 'id' => 'nav-bar']
+            ['class' => 'l-navbar shadow-lg', 'id' => 'nav-bar']
         );
     }
 
@@ -62,19 +62,67 @@ class SidebarV2 extends Widget
     /**
      * @throws InvalidConfigException
      */
+
     protected function renderNavItem($item)
     {
         $url = isset($item['url']) ? $this->baseUrl . '/' . ltrim($item['url'], '/') : '#';
-        $iconClass = isset($item['icon']) ? $item['icon'] : 'ti ti-note fs-7';
+        $iconClass = isset($item['icon']) ? $item['icon'] : 'ti ti-icons fs-7';
         $optionTitle = isset($item['optionTitle']) ? $item['optionTitle'] : '';
 
         $linkOptions = ['class' => 'nav__link text-decoration-none'];
+        $sanitizedOptionTitle = preg_replace('/[^A-Za-z0-9\-]/', '_', $optionTitle);
+
         if (self::isItemActive($url)) {
             Html::addCssClass($linkOptions, 'active');
         }
 
+        if (isset($item['items'])) {
+            $sub = '';
+            foreach ($item['items'] as $subItem) {
+                $sub .= $this->renderSubItem($subItem);
+            }
+
+            $output = Html::a(
+                Html::tag('i', '', ['class' => $iconClass]) . ' ' . $optionTitle . Html::tag('i', '', ['class' => 'ti ti-chevron-down icon fs-7']),
+                '#',
+                [
+                    'id' => 'trigger-' . $sanitizedOptionTitle,
+                    'class' => 'collapse-trigger nav__link text-decoration-none',
+                    'data-toggle' => 'collapse',
+                    'data-target' => '#' . $sanitizedOptionTitle . '-collapse',
+                ]
+            );
+
+            // Create the collapse container
+            $output .= Html::tag('div', $sub, [
+                'class' => 'collapse-container', // Ensure 'collapse' class is applied
+                'id' => $sanitizedOptionTitle.'-collapse', // Unique collapse ID based on $optionTitle
+            ]);
+
+            return $output;
+        }
+
+
+        else{
+            return Html::a(
+                Html::tag('i', '', ['class' => $iconClass]) . Html::tag('span', $optionTitle, ['class' => 'nav__name']),
+                $url,
+                $linkOptions
+            );
+        }
+
+    }
+    protected function renderSubItem($subItem){
+        $url = isset($subItem['url']) ? $this->baseUrl . '/' . ltrim($subItem['url'], '/') : '#';
+        $optionTitle = isset($subItem['optionTitle']) ? $subItem['optionTitle'] : '';
+        $linkOptions = ['class' => 'nav__link text-decoration-none'];
+
+        if (self::isItemActive($url)) {
+            Html::addCssClass($linkOptions, 'sub-active');
+        }
+
         return Html::a(
-            Html::tag('i', '', ['class' => $iconClass]) . Html::tag('span', $optionTitle, ['class' => 'nav__name']),
+            Html::tag('span', $optionTitle, ['class' => 'nav__name sub-icon']),
             $url,
             $linkOptions
         );
@@ -115,3 +163,5 @@ class SidebarV2 extends Widget
     }
 
 }
+?>
+

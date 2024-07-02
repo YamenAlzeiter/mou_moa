@@ -94,9 +94,14 @@ $model->reason = null; // init reason to null for ckeditor value
         </div>
     <?php endif;?>
     <?php if (in_array($model->status, [81])): ?>
+    <h4>Commencement Date</h4>
         <div class="row">
             <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
             <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+        </div>
+    <h4>Execution Date</h4>
+        <div class="row">
+            <div class="col-md"><?= $form->field($model, 'execution_date')->textInput(['type' => 'date']) ?></div>
         </div>
         <?= $form->field($model, 'status')->hiddenInput(['value' =>$approveMap[$model->status]])->label(false)?>
 

@@ -14,8 +14,8 @@ use Yii;
  * @property string|null $pi_phone
  * @property string|null $pi_kcdio
  * @property string|null $pi_address
- * @property string|null $role
- * @property boolean|null $is_primary
+ * @property string|null $pi_role
+ * @property boolean|null $pi_is_primary
  *
  * @property Agreement $agreement
  */
@@ -38,14 +38,16 @@ class AgreementPoc extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'role'], 'string', 'max' => 255],
-            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'role'], 'required'],
+            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'pi_role'], 'string', 'max' => 255],
+            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'pi_role'], 'required'],
+            ['pi_email', 'email'],
             [['agreement_id'], 'default', 'value' => null],
             [['agreement_id'], 'integer'],
-            [['is_primary'], 'boolean'],
+            [['pi_is_primary'], 'boolean'],
             [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],
         ];
     }
+
 
     /**
      * {@inheritdoc}
@@ -60,8 +62,8 @@ class AgreementPoc extends \yii\db\ActiveRecord
             'pi_phone' => 'Person in Charge Phone',
             'pi_kcdio' => 'Person in Charge Kcdio',
             'pi_address' => 'Person in Charge Address',
-            'role' => 'Role',
-            'is_primary' => 'prime? '
+            'pi_role' => 'Role',
+            'pi_is_primary' => 'prime? '
         ];
     }
 

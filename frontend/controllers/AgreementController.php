@@ -108,8 +108,9 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
-        $modelsPoc = AgreementPoc::find()->where(['agreement_id' => $id])->all();
+        $modelsPoc = $model->getAgreementPoc()->all();
         if (!Yii::$app->request->isAjax) {
             return throw new ForbiddenHttpException('You are not authorized  to access this page!');
         }
@@ -402,42 +403,49 @@ class AgreementController extends Controller
             ->limit(3)
             ->all();
 
-
-        $modelsPoc = AgreementPoc::find()
-            ->where(['agreement_id' => $id])
-            ->orderBy(['id' => SORT_ASC])
-            ->all();
+        $modelsPoc = $model->getAgreementPoc()->all();
 
         $oldStatus = $model->status;
         if ($this->request->isPost && $model->load($this->request->post())) {
-
             $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
             $modelsPoc = [];
 
             foreach ($modelsPocData as $data) {
-                $poc =  isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
+                $poc = isset($data['id']) ? AgreementPoc::findOne($data['id']) : new AgreementPoc();
                 $poc->load($data, '');
                 $modelsPoc[] = $poc;
             }
 
             foreach ($modelsPoc as $modelPoc) {
+                $modelPoc->agreement_id = $model->id;
                 $modelPoc->save();
             }
 
-            $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
+            $piDeleteIds = Yii::$app->request->post('Agreement')['pi_delete_ids'] ?? '';
 
-            $model->status == 91? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
+            if (!empty($piDeleteIds)) {
+                $piDeleteIds = explode(',', $piDeleteIds);
+                if (!empty($piDeleteIds)) {
+                    AgreementPoc::deleteAll(['id' => $piDeleteIds]);
+                }
+            }
+
+            $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
+            if ($model->status == 91) {
+                $model->last_reminder = Carbon::now()->addMonths(3)->toDateTimeString();
+            }
 
             $this->multiFileHandler($model, 'executedAgreement', 'applicant_doc');
             $this->multiFileHandler($model, 'files_applicant', 'applicant_doc');
 
-            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->staff_id . ") " . Yii::$app->user->identity->username;
 
             if ($model->save()) {
-                if ($model->status == 15) $this->sendEmail($model, 6);
+                if ($model->status == 15) {
+//                    $this->sendEmail($model, 6);
+                }
                 return $this->redirect(['index']);
             }
-
         }
 
         return $this->renderAjax('update', [
@@ -446,6 +454,7 @@ class AgreementController extends Controller
             'mcomDates' => $mcomDates,
         ]);
     }
+
 
     /**
      * Deletes an existing Agreement model.

@@ -356,13 +356,22 @@ class AgreementController extends Controller
             $modelsPoc = [];
 
             foreach ($modelsPocData as $data) {
-                $poc = isset($data['id']) ? AgreementPoc::findOne($data['id']) : null;
+                $poc = isset($data['id']) ? AgreementPoc::findOne($data['id']) : new AgreementPoc();
                 $poc->load($data, '');
                 $modelsPoc[] = $poc;
             }
             foreach ($modelsPoc as $modelPoc) {
+                $modelPoc->agreement_id = $model->id;
+                $modelPoc->save();
+            }
+            $piDeleteIds = Yii::$app->request->post('Agreement')['pi_delete_ids'] ?? '';
 
-                $modelPoc->save(false);
+            if (!empty($piDeleteIds)) {
+
+                $piDeleteIds = explode(',', $piDeleteIds);
+                if (!empty($piDeleteIds)) {
+                    AgreementPoc::deleteAll(['id' => $piDeleteIds]);
+                }
             }
             return $this->redirect(['index']);
 

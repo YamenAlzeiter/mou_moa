@@ -54,12 +54,8 @@ class Agreement extends ActiveRecord
     public $files_applicant;
     public $files_dp;
     public $agreement_type_other;
-    public $poc_kcdio_getter;
-    public $poc_kcdio_getter_x;
-    public $poc_kcdio_getter_xx;
-    public $poc_name_getter;
-    public $poc_name_getter_x;
-    public $poc_name_getter_xx;
+
+    public $pi_delete_ids;
 
     /**
      * {@inheritdoc}
@@ -75,9 +71,50 @@ class Agreement extends ActiveRecord
     public function rules()
     {
         return [
-            // File validation rules
-            [['files_applicant'], 'file', 'maxFiles' => 5, 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 2],
-            [['files_dp'], 'file', 'extensions' => 'docx', 'maxSize' => 1024 * 1024 * 10],
+            [
+                ['files_applicant'],
+                'file',
+                'maxFiles' => 5,
+                'maxSize' => 1024 * 1024 * 2, // 2 MB limit
+                'extensions' => ['docx'],
+                'when' => function ($model) {
+                    return $model->status != 91; // Allow 'docx' when status is not 81
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#agreement-status').val() != 91; // Client-side validation
+                }",
+            ],
+            [
+                ['files_applicant'],
+                'file',
+                'maxFiles' => 5,
+                'maxSize' => 1024 * 1024 * 2, // 2 MB limit
+                'extensions' => ['pdf'],
+                'when' => function ($model) {
+                    return $model->status == 91; // Allow 'pdf' when status is 81
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#agreement-status').val() == 91; // Client-side validation
+                }",
+            ],
+            [
+                ['files_applicant', 'execution_date', 'project_end_date', 'project_start_date'],
+                'required',
+                'when' => function ($model) {
+                    return $model->status == 91; // Required when status is 81
+                },
+                'whenClient' => "function (attribute, value) {
+                    return $('#agreement-status').val() == 91; // Client-side validation
+                }",
+            ],
+            // Rule for files_dp: single or multiple docx files with a max size of 10MB
+            [
+                ['files_dp'],
+                'file',
+                'extensions' => 'docx',
+                'maxSize' => 1024 * 1024 * 10
+            ],
+
 
             // Required fields for 'uploadCreate' scenario
             [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
@@ -209,7 +246,7 @@ class Agreement extends ActiveRecord
 
     public function getPrimaryAgreementPoc()
     {
-        return $this->hasOne(AgreementPoc::className(), ['agreement_id' => 'id'])->andWhere(['is_primary' => true]);
+        return $this->hasOne(AgreementPoc::className(), ['agreement_id' => 'id'])->andWhere(['pi_is_primary' => true]);
     }
     /**
      * Gets query for [[Logs]].

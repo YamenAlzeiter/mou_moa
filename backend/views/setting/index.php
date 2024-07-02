@@ -14,7 +14,7 @@ use yii\helpers\Url;
 /** @var yii\data\ActiveDataProvider $emailDataProvider */
 /** @var yii\data\ActiveDataProvider $reminderDataProvider */
 /** @var yii\data\ActiveDataProvider $kcdioDataProvider */
-/** @var yii\data\ActiveDataProvider $pocDataProvider */
+
 /** @var yii\data\ActiveDataProvider $agreTypeDataProvider */
 
 ?>
@@ -55,15 +55,6 @@ use yii\helpers\Url;
                         <div class="card-body">
                             <?= $this->render('reminder', ['reminderDataProvider' => $reminderDataProvider]) ?>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-12 col-lg-5 col-md-12 my-2 d-flex">
-            <div class="card  border rounded-5 flex-grow-1 ">
-                <div class="card-body">
-                    <div class="overflow-auto">
-                        <?= $this->render('poc', ['pocDataProvider' => $pocDataProvider, 'pocSearchModel' => $pocSearchModel]) ?>
                     </div>
                 </div>
             </div>

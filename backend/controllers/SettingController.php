@@ -3,16 +3,16 @@
 namespace backend\controllers;
 
 use common\models\Agreement;
-use common\models\AgreementPoc;
+
 use common\models\AgreementType;
 use common\models\EmailTemplate;
 use common\models\Kcdio;
 use common\models\Log;
 use common\models\McomDate;
-use common\models\Poc;
+
 use common\models\Reminder;
 use common\models\search\AgreementSearch;
-use common\models\search\PocSearch;
+
 use common\models\Status;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -45,9 +45,6 @@ class SettingController extends Controller
 
                             // reminders
                             'create-reminder', 'update-reminder', 'delete-reminder',
-
-                            // poc
-                            'poc', 'create-poc', 'delete-poc', 'poc-update',
 
                             // agreement type
                             'create-type', 'type-update', 'delete-type',
@@ -138,8 +135,8 @@ class SettingController extends Controller
                 'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
             ]
         ]);
-        $pocSearchModel = new PocSearch();
-        $pocDataProvider = $pocSearchModel->search($this->request->queryParams);
+
+
 
         $agreTypeDataProvider = new ActiveDataProvider([
             'query' => AgreementType::find(),
@@ -159,9 +156,7 @@ class SettingController extends Controller
             'emailDataProvider' => $emailDataProvider,
             'reminderDataProvider' => $reminderDataProvider,
             'kcdioDataProvider' => $kcdioDataProvider,
-            'pocDataProvider' => $pocDataProvider,
             'agreTypeDataProvider' => $agreTypeDataProvider,
-            'pocSearchModel' => $pocSearchModel,
         ]);
     }
     public function actionStatus(){
@@ -232,16 +227,7 @@ class SettingController extends Controller
         ]);
 
     }
-    public function actionPoc(){
-        $pocSearchModel = new PocSearch();
-        $pocDataProvider = $pocSearchModel->search($this->request->queryParams);
 
-        return $this->render('vpoc', [
-            'pocDataProvider' => $pocDataProvider,
-            'pocSearchModel' => $pocSearchModel,
-        ]);
-
-    }
     public function actionKcdio(){
         $kcdioDataProvider = new ActiveDataProvider([
             'query' => Kcdio::find(),
@@ -330,34 +316,7 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionCreatePoc()
-    {
-        $type = Yii::$app->user->identity->type;
 
-            $model = new Poc();
-
-            if ($this->request->isPost) {
-                if ($model->load($this->request->post()) && $model->save()) {
-                    return $this->redirect(['vpoc']);
-                }
-            } else {
-                $model->loadDefaultValues();
-            }
-
-            return $this->renderAjax('createPoc', ['model' => $model,]);
-
-    }
-    public function actionPocUpdate($id){
-        $model = Poc::findOne($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['vpoc']);
-        }
-
-        return $this->renderAjax('createPoc', [
-            'model' => $model,
-        ]);
-    }
     public function actionTypeUpdate($id){
         $model = AgreementType::findOne($id);
 
@@ -446,12 +405,7 @@ class SettingController extends Controller
 
         return $this->redirect(['others']);
     }
-    public function actionDeletePoc($id)
-    {
-        Poc::findOne($id)->delete();
 
-        return $this->redirect(['vpoc']);
-    }
     /**
      * Finds the Agreement model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

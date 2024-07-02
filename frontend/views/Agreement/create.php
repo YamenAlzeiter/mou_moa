@@ -187,14 +187,82 @@ $additionalPoc = new agreementPocMaker();
         $('#add-poc-button').on('click', function() {
             var pocIndex = $('#poc-container .poc-row').length;
             if (pocIndex < 5) {
-                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, $modelPoc);?>`;
+                var newRow = `<?php $additionalPoc->renderExtraPocFields( $form, $modelPoc);?>`;
                 newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
                 newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
                 newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
+                newRow = newRow.replace(/field-agreementpoc-pocindex/g, 'field-agreementpoc-' + pocIndex);
+
                 $('#poc-container').append(newRow);
-                pocIndex++;
 
                 populateRoleDropdowns();
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_kcdio',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_kcdio]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_kcdio',
+                    input: '#agreementpoc-' + pocIndex + '-pi_kcdio',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.required(value, messages, {message: "Person in Charge Cannot be Blank"});
+                    }
+                });
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_name',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_name]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_name',
+                    input: '#agreementpoc-' + pocIndex + '-pi_name',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.required(value, messages, {message: "Name cannot be blank."});
+                    }
+                });
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_email',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_email]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_email',
+                    input: '#agreementpoc-' + pocIndex + '-pi_email',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.email(value, messages, {message: "Email is not a valid email address."});
+                        yii.validation.required(value, messages, {message: "Email cannot be blank."});
+                    }
+                });
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_phone',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_phone]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_phone',
+                    input: '#agreementpoc-' + pocIndex + '-pi_phone',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.required(value, messages, {message: "Phone number cannot be blank."});
+                    }
+                });
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_address',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_address]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_address',
+                    input: '#agreementpoc-' + pocIndex + '-pi_address',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.required(value, messages, {message: "Address cannot be blank."});
+                    }
+                });
+
+                $('#create-form').yiiActiveForm('add', {
+                    id: 'agreementpoc-' + pocIndex + '-pi_role',
+                    name: 'AgreementPoc[' + pocIndex + '][pi_role]',
+                    container: '.field-agreementpoc-' + pocIndex + '-pi_role',
+                    input: '#agreementpoc-' + pocIndex + '-pi_role',
+                    error: '.invalid-feedback',
+                    validate: function (attribute, value, messages, deferred, $form) {
+                        yii.validation.required(value, messages, {message: "Role cannot be blank."});
+                    }
+                });
             } else {
                 Swal.fire({
                     title: "Oops...!",

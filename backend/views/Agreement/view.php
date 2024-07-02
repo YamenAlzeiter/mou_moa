@@ -32,15 +32,22 @@ modal::end();
     <div class="d-flex justify-content-between">
         <div class="d-flex gap-3">
             <?= $build->pillBuilder($model->status, 'mb-3') ?>
-            <?php if ($model->champion != ''): ?>
+
+            <?php if ($model->primaryAgreementPoc): ?>
                 <p class="badge  fw-bolder mw-pill rounded-2 bg-indigo-subtle text-indigo fs-5">
-                    <span class='text-gray-dark fw-bolder fs-5'><?= $model->champion ?></span>
+                    <span class='text-gray-dark fw-bolder fs-5'><?=  $model->primaryAgreementPoc->pi_kcdio  ?></span>
                 </p>
             <?php endif; ?>
+
+            <p class="badge  fw-bolder mw-pill rounded-2 bg-danger-subtle text-danger fs-5">
+                <span class='text-danger fw-bolder fs-5'><?= $model->transfer_to ?></span>
+            </p>
+
             <?php if (!Yii::$app->user->isGuest && $model->status == 21 || $model->status == 121): ?>
                 <p class="badge  fw-bolder mw-pill rounded-2 bg-dark-subtle text-light fs-5">MCOM:
                     <span><?= Yii::$app->formatter->asDate($model->mcom_date, 'dd-MM-yyyy') ?></span></p>
             <?php endif; ?>
+
             <span class='text-gray-dark fw-bolder fs-5'><?= $model->agreement_type ?></span>
 
         </div>
@@ -49,28 +56,27 @@ modal::end();
 
     <!--section collaborator details-->
     <h4>Collaborator Details</h4>
-<?php if ($model->col_name == "" || $model->col_name == null): ?>
-    <?= $view->renderer($model->col_details, 'Details') ?>
-<?php else : ?>
+
     <div class="row">
+        <div class="col-12">
+            <?= $view->renderer($model->col_organization, 'Organization') ?>
+        </div>
         <div class="col-6">
             <?= $view->renderer($model->col_name, 'Name') ?>
             <?= $view->renderer($model->col_phone_number, 'Phone Number') ?>
-            <?= $view->renderer($model->col_collaborators_name, 'Collaborators Name') ?>
+            <?= $view->renderer($model->col_email, 'Email Address', true) ?>
             <?= $view->renderer($model->col_address, 'Address') ?>
-
         </div>
         <div class="col-6">
-            <?= $view->renderer($model->col_organization, 'Organization') ?>
-            <?= $view->renderer($model->col_email, 'Email Address', true) ?>
+            <?= $view->renderer($model->col_collaborators_name, 'Collaborators Name') ?>
             <?= $view->renderer($model->col_wire_up, 'Wire Up') ?>
         </div>
     </div>
-<?php endif; ?>
+
 
     <!--section person in charge details-->
 <?php foreach ($modelsPoc as $index => $modelPoc): ?>
-    <h4><?= $index + 1 ?>. Person In Charge Details</h4>
+    <h4>Person In Charge Details <?= $modelPoc->pi_is_primary ? '(primary)':'' ?></h4>
     <div class="row">
         <div class="col-md-6">
             <?= $view->renderer($modelPoc->pi_name, 'Name') ?>
@@ -80,21 +86,37 @@ modal::end();
         <div class="col-md-6">
             <?= $view->renderer($modelPoc->pi_phone, 'Phone Number') ?>
             <?= $view->renderer($modelPoc->pi_email, 'Email Address', true) ?>
+            <?= $view->renderer($modelPoc->pi_role, 'Role') ?>
         </div>
     </div>
 <?php endforeach; ?>
 
     <!--section additional details-->
     <h4> Details</h4>
-<?= $view->renderer($model->grant_fund, 'Fund') ?>
-<?= $view->renderer($model->member, 'Number of Members') ?>
-<?= $view->renderer($model->proposal, 'Proposal') ?>
 <?= $view->renderer($model->project_title, $model->transfer_to == "OIL" ? 'Research Title' : 'Project Title') ?>
+<?= $view->renderer($model->grant_fund, 'Fund') ?>
+<?= $view->renderer($model->member, 'No. of Project Members') ?>
+<?= $view->renderer($model->proposal, 'Proposal') ?>
+
 <?= $view->renderer($model->ssm, 'SSM') ?>
 <?= $view->renderer($model->company_profile, 'Company Profile') ?>
-<?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
-<?= $view->renderer($model->sign_date, 'Sign Date') ?>
-<?= $view->renderer($model->end_date, 'Expiry Date') ?>
+    <h4>Dates</h4>
+    <div class = "row">
+        <div class = "col-6">
+            <?= $view->renderer($model->execution_date, 'Execution Date') ?>
+            <?= $view->renderer($model->sign_date, 'Sign Date') ?>
+            <?= $view->renderer($model->end_date, 'End Date') ?>
+        </div>
+        <div class = "col-6">
+            <?php if ($model->transfer_to == 'RMC'):?>
+                <?= $view->renderer($model->project_start_date, 'Start Date') ?>
+                <?= $view->renderer($model->project_end_date, 'End Date') ?>
+            <?php endif;?>
+            <?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
+        </div>
+    </div>
+
+
 
 
     <!--section files-->
