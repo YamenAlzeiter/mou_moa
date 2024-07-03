@@ -26,8 +26,8 @@ $this->title = 'Login';
 
                                 <?php $form = ActiveForm::begin(['id' => 'login-form']); ?>
 
-                                <?= $form->field($model, 'staff_id')->textInput([
-                                    'autofocus' => true, 'placeholder' => 'Enter Staff ID'
+                                <?= $form->field($model, 'email')->textInput([
+                                    'autofocus' => true, 'placeholder' => 'Enter Email'
                                 ])->label(false) ?>
 
                                 <?= $form->field($model,

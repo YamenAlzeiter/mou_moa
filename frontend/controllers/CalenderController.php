@@ -77,24 +77,22 @@ class CalenderController extends Controller
         $userType = Yii::$app->user->identity->type;
 
         $searchModel = new AgreementSearch();
-
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         $dataProvider->query->select(['agreement.mcom_date', 'agreement.id']);
         $dataProvider->query->joinWith(['agreementPoc']);
-
         $dataProvider->query->leftJoin('mcom_date', 'agreement.mcom_date = DATE(mcom_date.date_from)');
         $dataProvider->query->andWhere(['agreement_poc.pi_kcdio' => $userType]);
 
         $models = $dataProvider->getModels();
         $events = [];
+        $model = null; // Initialize $model
 
         foreach ($models as $model) {
             $model->hasMatchingMcomDate = false;
             $matchingMcomDateRecord = null;
 
             foreach ($model->agreementPoc as $agreementPoc) {
-
                 $matchingMcomDate = (new \yii\db\Query())
                     ->select('*')
                     ->from('mcom_date')
@@ -124,7 +122,7 @@ class CalenderController extends Controller
         return $this->render('index', [
             'events' => $events,
             'model' => $model,
-
         ]);
     }
+
 }
