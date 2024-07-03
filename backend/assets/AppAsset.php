@@ -18,7 +18,7 @@ class AppAsset extends AssetBundle
 
     ];
     public $js = [
-
+        'https://cdn.jsdelivr.net/npm/sweetalert2@11',
         'js/email-template.js',
         'js/main.js',
         'js/bs-init.js'
