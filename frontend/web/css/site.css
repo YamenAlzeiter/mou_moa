@@ -89,7 +89,6 @@ a {
 
 /*===== NAV =====*/
 .l-navbar {
-
     position: fixed;
     top: 0;
     left: -30%;
@@ -99,22 +98,46 @@ a {
     padding: .5rem 1rem 0 0;
     transition: .2s;
     z-index: var(--z-fixed);
-
+    overflow: auto;
+    overflow-x: hidden;
+}
+.nav__name{
+    opacity: 1;
+    visibility: visible;
+    transition: all .5s;
+}
+.collapse-sidenav .nav__link .nav__name,
+.collapse-sidenav .nav__link .icon,
+.collapse-sidenav .nav__logo .nav__logo-text {
+    opacity: 0;
+    visibility: hidden;
 }
 
 .nav {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
+    align-content: space-between;
+
 }
 
-.nav__logo, .nav__link{
+.nav__logo{
     display: grid;
     grid-template-columns: max-content 1fr max-content;
     align-items: center;
     padding: .5rem 0 .5rem 1.5rem;
+    column-gap: 1rem;
+}
+.nav__link{
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    align-items: center;
+    padding: .5rem 0 .5rem 1.5rem;
+    column-gap: 1rem;
+}
+.collapse-container .nav__link{
+    display: grid;
+    grid-template-columns: max-content 1fr max-content;
+    align-items: center;
+    padding: .5rem 0 .5rem 0;
     column-gap: 1rem;
 }
 
@@ -132,9 +155,7 @@ a {
 
 .nav__logo {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
+    text-align: center;
     margin-bottom: 1rem;
 }
 
@@ -146,10 +167,13 @@ a {
 
 .nav__logo-text {
     position: absolute;
-    top: -4px;
     left: 16px;
     width: 190px;
     z-index: 100;
+    font-size: 2rem;
+}
+.nav__logo:hover{
+
 }
 @media (max-width: 768px) {
     .nav__logo-text {
@@ -181,7 +205,7 @@ a {
 }
 
 .collapse-container.show {
-    max-height: 500px;
+    max-height: 1000px;
     transition: max-height 0.25s ease-in;
 }
 
@@ -235,7 +259,9 @@ a {
 }
 
 .icon{
-    transition: transform .3s ease;
+    opacity: 1;
+    visibility: visible;
+    transition: all .3s ease;
 }
 .chevron-rotate{
     transform: rotate(180deg);
@@ -243,13 +269,18 @@ a {
 }
 
 @media screen and (min-width: 768px) {
+    .collapse-sidenav.l-navbar {
+        left: 0;
+        padding: 1rem 0 0 0;
+    }
     .l-navbar {
         left: 0;
         padding: 1rem 1rem 0 0;
     }
 
+
     .show-sidenav {
-        width: calc(var(--nav-width) + 156px);
+        width: calc(var(--nav-width) + 180px);
     }
 
     .body-pd {

@@ -63,7 +63,6 @@ AppAsset::register($this);
         ['url' => 'agreement/index', 'icon' => 'ti ti-layout-dashboard fs-7', 'optionTitle' => 'Agreements'],
     ];
     if (Yii::$app->user->identity->is_admin) {
-
         $menuItems[] = [
             'icon' => 'ti ti-settings-2 fs-7',
             'optionTitle' => 'settings',
@@ -74,8 +73,6 @@ AppAsset::register($this);
                 ['url' => 'setting/others', 'optionTitle' => 'Others'],
             ]
         ];
-
-
     }
     echo SidebarV2::widget([
         'items' => $menuItems,
