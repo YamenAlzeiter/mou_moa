@@ -28,7 +28,8 @@
         "mpdf/mpdf": "^8.2",
         "kartik-v/yii2-widget-datetimepicker": "^1.5",
         "philippfrenzel/yii2fullcalendar": "*",
-        "bower-asset/fullcalendar": "~3.10.2"
+        "bower-asset/fullcalendar": "~3.10.2",
+        "onmotion/yii2-widget-apexcharts": "^1.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

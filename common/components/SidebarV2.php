@@ -10,12 +10,24 @@ use yii\helpers\Html;
 class SidebarV2 extends Widget
 {
     public $items = [];
+    public $logoUrl;
+    public $logoText;
+    public $logo2Url;
+    public $logo2Text;
     protected $baseUrl;
 
     public function init()
     {
         parent::init();
         $this->baseUrl = Yii::$app->request->baseUrl;
+
+        // Set default logo URLs if not provided
+        if ($this->logoUrl === null && $this->logoText === null) {
+            $this->logoUrl = Yii::getAlias('@web') . '/iiumLogo.svg';
+        }
+        if ($this->logo2Url === null && $this->logo2Text === null) {
+            $this->logo2Url = Yii::getAlias('@web') . '/iiumLogo2.svg';
+        }
     }
 
     public function run()
@@ -36,18 +48,25 @@ class SidebarV2 extends Widget
             ['class' => 'nav']
         );
     }
+
     protected function renderLogo()
     {
-        $logoUrl = Yii::getAlias('@web') . '/iiumLogo.svg';
-        $logo2Url = Yii::getAlias('@web') . '/iiumLogo2.svg';
+        $logoContent = '';
+        if ($this->logoUrl !== null) {
+            $logoContent .= Html::img($this->logoUrl, ['class' => 'ti ti-letter-t fs-7 nav__logo-icon']);
+        } elseif ($this->logoText !== null) {
+            $logoContent .= Html::tag('span', $this->logoText, ['class' => 'ti ti-letter-t fs-7 nav__logo-icon']);
+        }
 
-        return Html::a(
-            Html::img($logoUrl, ['class' => 'ti ti-letter-t fs-7 nav__logo-icon']) .
-            Html::tag('span',
-                Html::img($logo2Url, ['class' => 'nav__logo-text nav__name']) ), '/agreement/index', ['class' => 'nav__logo']);
+        $logo2Content = '';
+        if ($this->logo2Url !== null) {
+            $logo2Content .= Html::img($this->logo2Url, ['class' => 'nav__logo-text nav__name']);
+        } elseif ($this->logo2Text !== null) {
+            $logo2Content .= Html::tag('span', $this->logo2Text, ['class' => 'nav__logo-text ']);
+        }
+
+        return Html::a($logoContent . $logo2Content, '#', ['class' => 'nav__logo']);
     }
-
-
 
     protected function renderNavList()
     {
@@ -83,7 +102,7 @@ class SidebarV2 extends Widget
             }
 
             $output = Html::a(
-                Html::tag('i', '', ['class' => $iconClass]) . ' ' . $optionTitle . Html::tag('i', '', ['class' => 'ti ti-chevron-down icon fs-7']),
+                Html::tag('i', '', ['class' => $iconClass]) . ' ' .  Html::tag('span', $optionTitle, ['class' => 'nav__name']) . Html::tag('i', '', ['class' => 'ti ti-chevron-down icon fs-7']),
                 '#',
                 [
                     'id' => 'trigger-' . $sanitizedOptionTitle,
@@ -100,19 +119,17 @@ class SidebarV2 extends Widget
             ]);
 
             return $output;
-        }
-
-
-        else{
+        } else {
             return Html::a(
                 Html::tag('i', '', ['class' => $iconClass]) . Html::tag('span', $optionTitle, ['class' => 'nav__name']),
                 $url,
                 $linkOptions
             );
         }
-
     }
-    protected function renderSubItem($subItem){
+
+    protected function renderSubItem($subItem)
+    {
         $url = isset($subItem['url']) ? $this->baseUrl . '/' . ltrim($subItem['url'], '/') : '#';
         $optionTitle = isset($subItem['optionTitle']) ? $subItem['optionTitle'] : '';
         $linkOptions = ['class' => 'nav__link text-decoration-none'];
@@ -122,7 +139,7 @@ class SidebarV2 extends Widget
         }
 
         return Html::a(
-            Html::tag('span', $optionTitle, ['class' => 'nav__name sub-icon']),
+            Html::tag('i', '', ['class' => 'ti ti-point fs-7']) . Html::tag('span', $optionTitle, ['class' => 'nav__name']),
             $url,
             $linkOptions
         );
@@ -136,7 +153,7 @@ class SidebarV2 extends Widget
             ]) . Html::endForm();
 
         $logoutLink = Html::a(
-            '<i class="ti ti-logout  fs-7 nav__icon"></i><span class="nav__name">Log Out</span>',
+            '<i class="ti ti-logout fs-7 nav__icon"></i><span class="nav__name">Log Out</span>',
             '#',
             [
                 'class' => 'nav__link text-decoration-none',
@@ -144,24 +161,16 @@ class SidebarV2 extends Widget
             ]
         );
 
-        return $logoutLink . $logoutForm;
+        return Html::tag('div', $logoutLink . $logoutForm, ['class' => 'nav__logout-link']);
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
+
     /**
      * @throws InvalidConfigException
      */
     public static function isItemActive($url): bool
     {
-        $currentUrl = Yii::$app->getRequest()->getUrl();
-        $currentUrlPath = parse_url($currentUrl, PHP_URL_PATH);
-        $urlPath = parse_url($url, PHP_URL_PATH);
-
-        return $currentUrlPath === $urlPath;
+        $currentUrlPath = $_SERVER['REQUEST_URI'];
+        return $currentUrlPath === $url;
     }
-
 }
-?>
-

@@ -77,7 +77,13 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        if(!Yii::$app->user->isGuest){
+            $this->redirect('agreement/index');
+        }else{
+            $this->layout ='blank';
+            return $this->render('index');
+        }
+
     }
     /**
      * Lists all Agreement models.
@@ -87,6 +93,7 @@ class SiteController extends Controller
      */
     public function actionPublicIndex()
     {
+        $this->layout ='blank';
         $searchModel = new AgreementSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
@@ -115,6 +122,7 @@ class SiteController extends Controller
      */
     public function actionLogin()
     {
+        $this->layout ='blank';
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }

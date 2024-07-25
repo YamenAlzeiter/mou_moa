@@ -49,7 +49,7 @@ class AgreementController extends Controller
                             'index', 'update', 'view', 'downloader', 'log',
                             'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
                             'import', 'mcom', 'update-poc', 'create-poc', 'create',
-                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete'
+                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete', 'dashboard'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -977,6 +977,20 @@ class AgreementController extends Controller
         // Output the PDF
         $mpdf->Output();
         exit;
+    }
+
+    public function actionDashboard(){
+        $searchModel = new AgreementSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        // Pass the chart data
+        $chartData = Yii::$app->params['chartData'] ?? [];
+
+        return $this->render('dashboard', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'chartData' => $chartData,
+        ]);
     }
 
 
