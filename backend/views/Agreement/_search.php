@@ -55,10 +55,14 @@ use yii\widgets\ActiveForm;
             'class' => 'form-select', 'prompt' => 'Pick End Date', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
-        <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array) McomDate::find()->all(), 'date',
-            'date'), [
-            'prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
-        ])->label(false) ?>
+        <?= $form->field($model, 'mcom_date')
+            ->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date_from', function ($model) {
+                $dateFrom = new DateTime($model->date_from);
+                $dateUntil = new DateTime($model->date_until);
+                return  $dateFrom->format('y/m/d') .",  " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i');
+            }), [
+                'prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
+            ])->label(false) ?>
         <buttton class = "btn btn-dark-light btn-sm"><i class = "ti ti-search fs-7"></i></buttton>
     </div>
 

@@ -41,7 +41,7 @@ $notCompleteMap = [
 $rejectMap = [
          21 => 32, // OLA -> Applicant
          31 => 42, // OLA -> Applicant
-
+        1 => 2,
         121 => 32,
 ];
 

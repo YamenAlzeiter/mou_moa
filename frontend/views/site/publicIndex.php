@@ -49,6 +49,12 @@ modal::end();
                             return $model->primaryAgreementPoc ? $model->primaryAgreementPoc->pi_kcdio : null;
                         },
                     ],
+                    [
+                            'label' => 'PIC',
+                        'value' => function ($model) {
+                            return $model->primaryAgreementPoc ? $model->primaryAgreementPoc->pi_name : null;
+                        },
+                    ],
                     'sign_date',
                     'end_date',
                     'agreement_type',

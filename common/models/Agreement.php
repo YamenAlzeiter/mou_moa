@@ -188,7 +188,7 @@ class Agreement extends ActiveRecord
             'col_address' => 'Address',
             'col_contact_details' => 'Contact Details',
             'col_collaborators_name' => 'Collaborators Name',
-            'col_wire_up' => 'Write Up',
+            'col_wire_up' => 'Project Description',
             'col_phone_number' => 'Phone Number',
             'col_email' => 'Email',
             'champion' => 'Champion',

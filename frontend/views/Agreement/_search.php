@@ -64,8 +64,12 @@ use yii\widgets\ActiveForm;
         ])->label(false) ?>
 
         <?php if(!Yii::$app->user->isGuest) :?>
-        <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date',
-            'date'), [
+        <?= $form->field($model, 'mcom_date')
+                ->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date_from', function ($model) {
+                    $dateFrom = new DateTime($model->date_from);
+                    $dateUntil = new DateTime($model->date_until);
+                    return  $dateFrom->format('y/m/d') .",  " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i');
+                }), [
             'prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
         ])->label(false) ?>
         <?php endif;?>
