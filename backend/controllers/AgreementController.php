@@ -271,77 +271,106 @@ class AgreementController extends Controller
         if ($this->request->isPost && $model->load($this->request->post())) {
             $this->multiFileHandler($model, 'files_applicant', 'draft', 'dp_doc');
             $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+
+            // Attempt to save the model
             if ($model->save()) {
-                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81, 11])) {
-                    $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
+                // If model status requires email notification
+                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81, 11, 91])) {
+                    $this->sendEmail($model, ($model->status != 2));
                 }
                 return $this->redirect(['index']);
+            } else {
+                // If model save fails, log the error and show a user-friendly message
+                Yii::error("Error saving model: " . print_r($model->errors, true), __METHOD__);
+                Yii::$app->session->setFlash('error', 'There was an error saving your data. Please check the input and try again.');
             }
-
+        } elseif ($this->request->isPost) {
+            // If model load fails, log the error and show a user-friendly message
+            Yii::error("Error loading model: " . print_r($model->errors, true), __METHOD__);
+            Yii::$app->session->setFlash('error', 'There was an error processing your request. Please try again.');
         }
 
-
-        return $this->renderAjax('update', ['model' => $model,]);
+        return $this->renderAjax('update', ['model' => $model]);
     }
+
 
     private function sendEmail($model, $needCC)
     {
-        $mailMap = [//$model->status => emailTemplate->id//
+
+        $mailMap = [
             1   =>  5,    // new application    from OSC to OLA
             2   =>  4,    // not complete       from OSC to Applicant
             12  =>  4,    // not complete       from OLA to OSC CC Applicant
             11  =>  2,    // Pick date          from OLA
-            31  =>  13,    // MCOM Recommended   from OLA to Applicant CC OSC
-            32  =>  16,    // MCOM Reject        from OLA to Applicant CC OSC
-            33  =>  15,    // MCOM not Complete  from OLA to Applicant CC OSC
-            34  =>  14,    // MCOM Special       from OLA to Applicant CC OSC
+            31  =>  13,   // MCOM Recommended   from OLA to Applicant CC OSC
+            32  =>  16,   // MCOM Reject        from OLA to Applicant CC OSC
+            33  =>  15,   // MCOM not Complete  from OLA to Applicant CC OSC
+            34  =>  14,   // MCOM Special       from OLA to Applicant CC OSC
             41  =>  9,    // Approved UMC       from OLA to Applicant CC OSC
-            42  =>  17,    // UMC Reject         from OLA to Applicant CC OSC
-            43  =>  18,    // UMC not Complete   from OLA to Applicant CC OSC
+            42  =>  17,   // UMC Reject         from OLA to Applicant CC OSC
+            43  =>  18,   // UMC not Complete   from OLA to Applicant CC OSC
             51  =>  3,    // draft uploaded     from OLA to Applicant CC OSC
             72  =>  7,    // draft rejected     from OLA to OSC
             81  =>  8,    // final Draft uploaded from OLA to Applicant CC OSC
+            91  => 20,    // final Draft uploaded from OLA to Applicant CC OSC
             121 => 11,    // MCOM Date Updated  from OLA to Applicant cc OSC
         ];
 
         $mail = EmailTemplate::findOne($mailMap[$model->status]);
-        $pocs = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
+
+        // Get non-primary POCs
+        $pocs = $model->getAgreementPoc()->where(['or', ['pi_is_primary' => false], ['pi_is_primary' => null]])->all();
+
+        // Get the primary POC
+        $modelPoc = $model->getAgreementPoc()->where(['pi_is_primary' => true])->one();
+
+        // Fallback if no primary POC found
+        if (!$modelPoc) {
+            throw new \Exception('Primary POC not found.');
+        }
 
         $body = $mail->body;
-
-        $body = str_replace('{user}', $pocs[0]->pi_name, $body);
+        $body = str_replace('{user}', $modelPoc->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
         $body = str_replace('{id}', $model->id, $body);
+        $body = str_replace('{date}', $model->mcom_date, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
 
         // Add CCs if needed
         if ($needCC) {
-            $osc = Admin::find()->where(['type' => 'IO'])->all();
+            $osc = Admin::find()->where(['type' => $model->transfer_to])->all();
             foreach ($osc as $admin) {
                 $ccRecipients[] = $admin->email;
             }
         }
 
-        foreach ($pocs as $index => $poc) {
-            if ($index == 0) {
-                $mailer = Yii::$app->mailer
-                    ->compose(['html' => '@backend/views/email/emailTemplate.php'],
-                        ['subject' => $mail->subject,
-                            'recipientName' => $poc->pi_name,
-                            'reason' => $model->reason,
-                            'body' => $body])
-                    ->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
-                    ->setTo($poc->pi_email)
-                    ->setSubject($mail->subject);
-            } else  $ccRecipients[] = $poc->pi_email;
+        // Add POCs to CC recipients
+        foreach($pocs as $poc){
+            $ccRecipients[] = $poc->pi_email;
         }
 
-        $mailer->setCc($ccRecipients);
+        // Compose and send the email
+        $mailer = Yii::$app->mailer->compose([
+            'html' => '@backend/views/email/emailTemplate.php'
+        ], [
+            'subject' => $mail->subject,
+            'recipientName' => $modelPoc->pi_name,
+            'reason' => $model->reason,
+            'body' => $body
+        ])
+            ->setFrom(['noReply@iium.edu.my' => 'IIUM'])
+            ->setTo($modelPoc->pi_email)
+            ->setSubject($mail->subject);
+
+        if (!empty($ccRecipients)) {
+            $mailer->setCc($ccRecipients);
+        }
 
         $mailer->send();
     }
+
 
     public function actionUpdatePoc($id)
     {

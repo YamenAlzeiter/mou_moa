@@ -368,15 +368,31 @@ class AgreementController extends Controller
 
         $osc = Admin::findOne(['type' => $model->transfer_to]);
 
+
+
+        $modelPoc = $model->getAgreementPoc()->where(['pi_is_primary' => true])->one();
+
+
+
+
         if ($osc != null) {
             $body = $mail->body;
+
+            $body = str_replace('{user}', $modelPoc->pi_name, $body);
+            $body = str_replace('{reason}', $model->reason, $body);
+            $body = str_replace('{id}', $model->id, $body);
+
             $mailer = Yii::$app->mailer->compose([
                 'html' => '@backend/views/email/emailTemplate.php'
             ], [
                 'subject' => $mail->subject,
-                'recipientName' => $osc->username,
+                'recipientName' => Yii::$app->user->identity->username,
                 'body' => $body
-            ])->setFrom(['noReplay@iium.edy.my' => 'IIUM'])->setTo($osc->email)->setSubject($mail->subject);
+            ])
+                ->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
+                ->setTo($modelPoc->pi_email)
+                ->setSubject($mail->subject)
+                ->setCc($osc->email);
             $mailer->send();
         }
 
@@ -406,6 +422,7 @@ class AgreementController extends Controller
         $modelsPoc = $model->getAgreementPoc()->all();
 
         $oldStatus = $model->status;
+
         if ($this->request->isPost && $model->load($this->request->post())) {
             $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
             $modelsPoc = [];
@@ -442,7 +459,9 @@ class AgreementController extends Controller
 
             if ($model->save()) {
                 if ($model->status == 15) {
-//                    $this->sendEmail($model, 6);
+                    $this->sendEmail($model, 6);
+                }elseif ($oldStatus == 33){
+                    $this->sendEmail($model, 19);
                 }
                 return $this->redirect(['index']);
             }

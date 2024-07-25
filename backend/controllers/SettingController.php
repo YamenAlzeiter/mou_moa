@@ -175,16 +175,22 @@ class SettingController extends Controller
     public function actionEmailTemplate()
     {
         $emailDataProvider = new ActiveDataProvider([
-            'query' => EmailTemplate::find(),
+            'query' => EmailTemplate::find()->orderBy(['id' => SORT_ASC]), // You can use SORT_DESC for descending order
             'pagination' => [
-                'pageSize' => 50
+                'pageSize' => 50,
             ],
-
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC, // You can use SORT_DESC for descending order
+                ]
+            ],
         ]);
+
         return $this->render('vemailTemplate', [
             'emailDataProvider' => $emailDataProvider,
         ]);
     }
+
 
     public function actionOthers()  {
 

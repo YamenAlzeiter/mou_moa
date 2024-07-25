@@ -44,9 +44,7 @@ $rejectMap = [
 
         121 => 32,
 ];
-$conditionalMap = [
-         21 => 34
-];
+
 
 $form = ActiveForm::begin(['id' => 'actiontaken', 'validateOnBlur' => false, 'validateOnChange' => false, 'options' => ['enctype' => 'multipart/form-data'],]);
 
@@ -58,10 +56,6 @@ if (!in_array($model->status, [51, 72, 81, 41])) {
     $options = [$approveMap[$model->status] => $recommendedTag, $notCompleteMap[$model->status] => $rejectTag,];
 
     if (in_array($model->status, [21, 31, 121])) {
-        if ($model->status == 21)
-        {
-            $options += [$conditionalMap[$model->status] => 'Conditional Recommend'];
-        }
         $options += [$rejectMap[$model->status] => ' Reject'];
     }
     echo $form->field($model, 'status')->radioList($options, [
@@ -96,8 +90,8 @@ $model->reason = null; // init reason to null for ckeditor value
     <?php if (in_array($model->status, [81])): ?>
     <h4>Commencement Date</h4>
         <div class="row">
-            <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
-            <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'project_start_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'project_end_date')->textInput(['type' => 'date']) ?></div>
         </div>
     <h4>Execution Date</h4>
         <div class="row">
