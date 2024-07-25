@@ -3,6 +3,7 @@
 namespace common\models\search;
 
 use Carbon\Carbon;
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use common\models\Agreement;
@@ -45,18 +46,9 @@ class   AgreementSearch extends Agreement
     {
         $query = Agreement::find()->joinWith('agreementPoc');
 
-//        $query->leftJoin('mcom_date md1', new Expression('md1.date_from::date = agreement.mcom_date'));
-
-
-        // add conditions that should always apply here
-
-        $dataProvider = new ActiveDataProvider(['query' => $query,]);
+        $dataProvider = new ActiveDataProvider(['query' => $query]);
 
         $this->load($params);
-
-        $this->load($params);
-
-        // ... your existing code ...
 
         // Calculate target ranges
         $today = Carbon::now();
@@ -66,20 +58,17 @@ class   AgreementSearch extends Agreement
         $twoMonthsFromNow = $today->copy()->addMonths(2)->startOfMonth();
         $oneMonthFromNow = $today->copy()->addMonth()->startOfMonth();
 
-
         if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
             return $dataProvider;
         }
 
-        // grid filtering conditions
+        // Grid filtering conditions
         $query->andFilterWhere([
-
             'agreement.sign_date' => $this->sign_date,
             'agreement.end_date' => $this->end_date,
             'agreement.mcom_date' => $this->mcom_date,
-            'agreement.agreement_type' => $this->agreement_type]);
+            'agreement.agreement_type' => $this->agreement_type
+        ]);
 
         $query
             ->orFilterWhere(['ilike', 'agreement.col_organization', $this->full_info])
@@ -103,11 +92,7 @@ class   AgreementSearch extends Agreement
             ->orFilterWhere(['agreement_poc.pi_name' => $this->full_info])
             ->orFilterWhere(['agreement_poc.pi_kcdio' => $this->full_info])
             ->andFilterWhere(['ilike', 'transfer_to', $this->transfer_to])
-            ->andFilterWhere(['agreement.id' => $this->id])
-            ;
-
-
-
+            ->andFilterWhere(['agreement.id' => $this->id]);
 
         if ($this->applications === 'new_applications') {
             $query->andWhere(['not in', 'status', [100, 102, 91, 92]]);
@@ -119,23 +104,45 @@ class   AgreementSearch extends Agreement
 
         if ($this->endDate === '1 Year') {
             $query->andWhere(['>=', 'end_date', $oneYearFromNow->toDateString()])
-                    ->andWhere(['<=', 'end_date', $oneYearFromNow->addYear()->startOfYear()->toDateString()]);
+                ->andWhere(['<=', 'end_date', $oneYearFromNow->addYear()->startOfYear()->toDateString()]);
         } elseif ($this->endDate === '6 Month') {
             $query->andWhere(['>=', 'end_date', $sixMonthsFromNow->toDateString()])
-                    ->andWhere(['<=', 'end_date', $sixMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
+                ->andWhere(['<=', 'end_date', $sixMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
         } elseif ($this->endDate === '3 Month') {
             $query->andWhere(['>=', 'end_date', $threeMonthsFromNow->toDateString()])
-                    ->andWhere(['<=', 'end_date', $threeMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
+                ->andWhere(['<=', 'end_date', $threeMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
         } elseif ($this->endDate === '2 Month') {
             $query->andWhere(['>=', 'end_date', $twoMonthsFromNow->toDateString()])
-                    ->andWhere(['<=', 'end_date', $twoMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
+                ->andWhere(['<=', 'end_date', $twoMonthsFromNow->addMonth()->startOfMonth()->toDateString()]);
         } elseif ($this->endDate === '1 Month') {
             $query->andWhere(['>=', 'end_date', $oneMonthFromNow->toDateString()])
-                    ->andWhere(['<=', 'end_date', $oneMonthFromNow->addMonth()->startOfMonth()->toDateString()]);
+                ->andWhere(['<=', 'end_date', $oneMonthFromNow->addMonth()->startOfMonth()->toDateString()]);
         }
+
+        // Aggregate data to count agreement types
+        $agreementCounts = Agreement::find()
+            ->select(['agreement_type', 'COUNT(*) AS count'])
+            ->groupBy('agreement_type')
+            ->asArray()
+            ->all();
+
+        // Prepare data for the chart
+        $chartData = [
+            'categories' => [],
+            'series' => [],
+        ];
+
+        foreach ($agreementCounts as $data) {
+            $chartData['categories'][] = $data['agreement_type'];
+            $chartData['series'][] = (int) $data['count'];
+        }
+
+        // Pass the chart data to the view
+        Yii::$app->params['chartData'] = $chartData;
 
         return $dataProvider;
     }
+
 
 
 }

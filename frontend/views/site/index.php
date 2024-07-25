@@ -2,6 +2,15 @@
 
 /** @var yii\web\View $this */
 
-$this->title = 'My Yii Application';
+use yii\bootstrap5\Html;
+
+$this->title = 'IIUM Memorandum';
 ?>
-<h1>indexxxxxxxxxxx</h1>
+
+
+<section class="hero parallax" data-speed="0.5">
+    <div class="hero-content container">
+        <h1>IIUM <br> Memorandum <br> Program</h1>
+        <a href="/site/public-index" class="btn">See Agreements!</a>
+    </div>
+</section>
