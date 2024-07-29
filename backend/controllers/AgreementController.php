@@ -4,6 +4,7 @@ namespace backend\controllers;
 
 use Carbon\Carbon;
 use common\helpers\Model;
+use common\helpers\Variables;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
@@ -260,9 +261,10 @@ class AgreementController extends Controller
     /**
      * Updates an existing Agreement model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
+     * @param  int  $id  ID
      * @return string|Response
      * @throws NotFoundHttpException if the model cannot be found
+     * @throws Exception
      */
     public function actionUpdate($id)
     {
@@ -274,10 +276,9 @@ class AgreementController extends Controller
 
             // Attempt to save the model
             if ($model->save()) {
-                // If model status requires email notification
-                if (in_array($model->status, [2, 12, 31, 32, 33, 34, 41, 42, 43, 51, 72, 81, 11, 91])) {
+
                     $this->sendEmail($model, ($model->status != 2));
-                }
+
                 return $this->redirect(['index']);
             } else {
                 // If model save fails, log the error and show a user-friendly message
@@ -298,25 +299,83 @@ class AgreementController extends Controller
     {
 
         $mailMap = [
-            1   =>  5,    // new application    from OSC to OLA
-            2   =>  4,    // not complete       from OSC to Applicant
-            12  =>  4,    // not complete       from OLA to OSC CC Applicant
-            11  =>  2,    // Pick date          from OLA
-            31  =>  13,   // MCOM Recommended   from OLA to Applicant CC OSC
-            32  =>  16,   // MCOM Reject        from OLA to Applicant CC OSC
-            33  =>  15,   // MCOM not Complete  from OLA to Applicant CC OSC
-            34  =>  14,   // MCOM Special       from OLA to Applicant CC OSC
-            41  =>  9,    // Approved UMC       from OLA to Applicant CC OSC
-            42  =>  17,   // UMC Reject         from OLA to Applicant CC OSC
-            43  =>  18,   // UMC not Complete   from OLA to Applicant CC OSC
-            51  =>  3,    // draft uploaded     from OLA to Applicant CC OSC
-            72  =>  7,    // draft rejected     from OLA to OSC
-            81  =>  8,    // final Draft uploaded from OLA to Applicant CC OSC
-            91  => 20,    // final Draft uploaded from OLA to Applicant CC OSC
-            121 => 11,    // MCOM Date Updated  from OLA to Applicant cc OSC
+            Variables::agreement_init => [
+                'template' => Variables::email_agr_complete_osc,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_approved_osc => [
+                'template' => Variables::email_agr_complete_osc,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_not_complete_osc => [
+                'template' => Variables::email_agr_not_complete,
+                'cc' => ''
+            ],
+            Variables::agreement_approved_ola => [
+                'template' => Variables::email_agr_review_complete_ola,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_not_complete_ola => [
+                'template' => Variables::email_agr_review_not_complete_ola,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_MCOM_date_changed => [
+                'template' => Variables::email_agr_mcom_date_change,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_MCOM_approved => [
+                'template' => Variables::email_agr_mcom_approve,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_MCOM_reject => [
+                'template' => Variables::email_agr_mcom_reject,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_MCOM_KIV => [
+                'template' => Variables::email_agr_mcom_kiv,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_UMC_approve => [
+                'template' => Variables::email_umc_approve,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_UMC_KIV => [
+                'template' => Variables::email_umc_kiv,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_UMC_reject => [
+                'template' => Variables::email_umc_reject,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_draft_uploaded_ola => [
+                'template' => Variables::email_draft_upload_ola,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_draft_approved_ola => [
+                'template' => Variables::email_draft_approve,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_draft_rejected_ola => [
+                'template' => Variables::email_draft_not_complete,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_draft_approve_final_draft => [
+                'template' => Variables::email_draft_approve,
+                'cc' => 'OLA'
+            ],
+            Variables::agreement_executed => [
+                'template' => Variables::email_agr_executed,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_rejected => [
+                'template' => Variables::email_agr_reject,
+                'cc' => 'OSC'
+            ],
         ];
 
-        $mail = EmailTemplate::findOne($mailMap[$model->status]);
+
+        // Find the email template based on the status
+        $mail = EmailTemplate::findOne($mailMap[$model->status]['template']);
 
         // Get non-primary POCs
         $pocs = $model->getAgreementPoc()->where(['or', ['pi_is_primary' => false], ['pi_is_primary' => null]])->all();
@@ -330,24 +389,46 @@ class AgreementController extends Controller
         }
 
         $body = $mail->body;
+
         $body = str_replace('{user}', $modelPoc->pi_name, $body);
         $body = str_replace('{reason}', $model->reason, $body);
         $body = str_replace('{id}', $model->id, $body);
-        $body = str_replace('{date}', $model->mcom_date, $body);
+        $body = str_replace('{MCOM_date}', $model->mcom_date, $body);
+        $body = str_replace('{UMC_date}', $model->umc_date, $body);
+        $body = str_replace('{principle}', $model->principle, $body);
+        $body = str_replace('{advice}', $model->advice, $body);
+        $body = str_replace('{execution_date}', $model->execution_date, $body);
+        $body = str_replace('{expiry_date}', $model->end_date, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
 
-        // Add CCs if needed
-        if ($needCC) {
-            $osc = Admin::find()->where(['type' => $model->transfer_to])->all();
-            foreach ($osc as $admin) {
-                $ccRecipients[] = $admin->email;
+        // Get the CC group from the map
+        $ccGroup = $mailMap[$model->status]['cc'];
+
+        // Determine the actual CC recipients based on the CC group
+        if (!empty($ccGroup)) {
+            if ($ccGroup === 'OSC') {
+                // Determine the specific OSC type based on `directed_to`
+                $oscType = $model->transfer_to; // IO, RMC, OIL, etc.
+                $ccAdmins = Admin::find()->where(['type' => $oscType])->all();
+                foreach ($ccAdmins as $admin) {
+                    $ccRecipients[] = $admin->email;
+                }
+            } else {
+                // Handle other CC groups (e.g., OLA)
+                $ccGroups = explode(', ', $ccGroup);
+                foreach ($ccGroups as $group) {
+                    $ccAdmins = Admin::find()->where(['type' => $group])->all();
+                    foreach ($ccAdmins as $admin) {
+                        $ccRecipients[] = $admin->email;
+                    }
+                }
             }
         }
 
         // Add POCs to CC recipients
-        foreach($pocs as $poc){
+        foreach ($pocs as $poc) {
             $ccRecipients[] = $poc->pi_email;
         }
 
@@ -360,7 +441,7 @@ class AgreementController extends Controller
             'reason' => $model->reason,
             'body' => $body
         ])
-            ->setFrom(['noReply@iium.edu.my' => 'IIUM'])
+            ->setFrom(['noReply@iium.edu.my' => 'Memorandum Program '.Yii::$app->user->identity->type])
             ->setTo($modelPoc->pi_email)
             ->setSubject($mail->subject);
 
@@ -372,7 +453,7 @@ class AgreementController extends Controller
     }
 
 
-    public function actionUpdatePoc($id)
+        public function actionUpdatePoc($id)
     {
         $model = $this->findModel($id);
         $modelsPoc = AgreementPoc::find()
@@ -983,13 +1064,27 @@ class AgreementController extends Controller
         $searchModel = new AgreementSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        // Pass the chart data
-        $chartData = Yii::$app->params['chartData'] ?? [];
+        // Get data for charts
+        $agreementCountsByCountry = $searchModel->getAgreementCountsByCountry();
+        $executedAgreementsCount = $searchModel->getExecutedAgreementsCount();
+        $expiredAgreementsCount = $searchModel->getExpiredAgreementsCount();
+
+        // Prepare data for charts
+        $countryChartData = [
+            'categories' => array_column($agreementCountsByCountry, 'country'),
+            'series' => array_column($agreementCountsByCountry, 'count'),
+        ];
+
+        $pieChartData = [
+            'categories' => ['Executed', 'Expired'],
+            'series' => [$executedAgreementsCount, $expiredAgreementsCount],
+        ];
 
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'chartData' => $chartData,
+            'countryChartData' => $countryChartData,
+            'pieChartData' => $pieChartData,
         ]);
     }
 

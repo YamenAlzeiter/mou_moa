@@ -46,9 +46,6 @@ class SettingController extends Controller
                             // reminders
                             'create-reminder', 'update-reminder', 'delete-reminder',
 
-                            // agreement type
-                            'create-type', 'type-update', 'delete-type',
-
                             // mcom dates
                             'create-mcom', 'mcom-update', 'delete-mcom',
 
@@ -85,87 +82,17 @@ class SettingController extends Controller
      *
      * @return string
      */
-    public function actionIndex()
-    {
-//        $this->layout = 'blank';
-        $searchModel = new AgreementSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-        $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
-
-        $dataProvider = new ActiveDataProvider([
-            'query' => Agreement::find(),
-            'pagination' => [
-                'pageSize' => 10
-            ],
-        ]);
-
-        $statusDataProvider = new ActiveDataProvider([
-            'query' => Status::find(),
-            'pagination' => [
-                'pageSize' => 50
-            ],
-
-        ]);
-        $emailDataProvider = new ActiveDataProvider([
-            'query' => EmailTemplate::find(),
-            'pagination' => [
-                'pageSize' => 50
-            ],
-
-        ]);
-
-        $reminderDataProvider = new ActiveDataProvider([
-            'query' => Reminder::find(),
-
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [ // Add the 'sort' configuration
-                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
-            ]
-        ]);
-
-        $kcdioDataProvider = new ActiveDataProvider([
-            'query' => Kcdio::find(),
-
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [ // Add the 'sort' configuration
-                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
-            ]
-        ]);
-
-
-
-        $agreTypeDataProvider = new ActiveDataProvider([
-            'query' => AgreementType::find(),
-
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [ // Add the 'sort' configuration
-                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
-            ]
-        ]);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'statusDataProvider' => $statusDataProvider,
-            'emailDataProvider' => $emailDataProvider,
-            'reminderDataProvider' => $reminderDataProvider,
-            'kcdioDataProvider' => $kcdioDataProvider,
-            'agreTypeDataProvider' => $agreTypeDataProvider,
-        ]);
-    }
     public function actionStatus(){
         $statusDataProvider = new ActiveDataProvider([
             'query' => Status::find(),
             'pagination' => [
                 'pageSize' => 50
             ],
-
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC, // You can use SORT_DESC for descending order
+                ]
+            ],
         ]);
 
         return $this->render('vstatus', [
@@ -296,7 +223,7 @@ class SettingController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['others']);
+                return $this->redirect(['vkcdio']);
             }
         } else {
             $model->loadDefaultValues();
@@ -306,34 +233,7 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionCreateType()
-    {
-        $model = new AgreementType();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['others']);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->renderAjax('typeUpdate', [
-            'model' => $model,
-        ]);
-    }
-
-    public function actionTypeUpdate($id){
-        $model = AgreementType::findOne($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['others']);
-        }
-
-        return $this->renderAjax('typeUpdate', [
-            'model' => $model,
-        ]);
-    }
     public function actionStatusUpdate($id){
         $model = Status::findOne($id);
 
@@ -361,7 +261,7 @@ class SettingController extends Controller
         $model = EmailTemplate::findOne($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['viewEmailTemplate']);
+            return $this->redirect(['email-template']);
         }
 
         return $this->renderAjax('updateEmailTemplate', [
@@ -405,13 +305,6 @@ class SettingController extends Controller
 
         return $this->redirect(['others']);
     }
-    public function actionDeleteType($id)
-    {
-        AgreementType::findOne($id)->delete();
-
-        return $this->redirect(['others']);
-    }
-
     /**
      * Finds the Agreement model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.

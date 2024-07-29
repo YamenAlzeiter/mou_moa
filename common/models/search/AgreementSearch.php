@@ -142,7 +142,28 @@ class   AgreementSearch extends Agreement
 
         return $dataProvider;
     }
+    public function getAgreementCountsByCountry()
+    {
+        return Agreement::find()
+            ->select(['country', 'COUNT(*) AS count'])
+            ->groupBy('country')
+            ->asArray()
+            ->all();
+    }
 
+    public function getExecutedAgreementsCount()
+    {
+        return Agreement::find()
+            ->where(['status' => [91, 100]])
+            ->count();
+    }
+
+    public function getExpiredAgreementsCount()
+    {
+        return Agreement::find()
+            ->where(['status' => [92, 102]])
+            ->count();
+    }
 
 
 }

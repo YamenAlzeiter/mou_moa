@@ -55,9 +55,8 @@ use yii\widgets\ActiveForm;
             'class' => 'form-select', 'prompt' => 'Pick End Date', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
-        <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array) McomDate::find()->all(), 'date',
-            'date'), [
-            'prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
+        <?= $form->field($model, 'transfer_to', ['options' => ['mb-0']])->dropDownList(['IO' => 'IO', 'OIL' => 'OIL', 'RMC' => 'RMC'], ['class' => 'form-select', 'prompt' => 'Pick ', // Placeholder text
+            'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
         <buttton class = "btn btn-dark-light btn-sm"><i class = "ti ti-search fs-7"></i></buttton>
     </div>

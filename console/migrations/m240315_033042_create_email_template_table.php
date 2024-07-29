@@ -21,205 +21,319 @@ class m240315_033042_create_email_template_table extends Migration
         $templates = [
             [
                 'id' => 1,
-                'subject' => 'Rejected',
+                'subject' => 'Agreement Init',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>Dear {user},</p>
-                <p>Your application ID no: {id} has been reviewed. After a thorough review, we<br />
-                regret to inform you that your application is rejected due to:</p>
-                <p>{reason}</p>
+
+                <p>Dear {user}</p>
+                
+                <p>Your application ID no: {id} has been received and you will be notified on the status of submission within xx working days from the date of submission.</p>
+                
                 HTML
             ],
             [
                 'id' => 2,
-                'subject' => 'Pick MCOM DATE',
+                'subject' => 'Agreement not complete (OSC)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Your application ID no:&nbsp;{id}&nbsp;is Approved by OLA. Please choose the MCOM date.</p>
+                
+                <p>Your application ID no: {id} has been received but is not complete, please provide the missing information as follows;</p>
+                
                 HTML
             ],
             [
                 'id' => 3,
-                'subject' => 'draft uploaded',
+                'subject' => 'Agreement Rejected',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>We have reviewed the draft agreement and our response are<br />
-                as follows:</p>
-                <p>The same has been reflected in the track changes of the draft<br />
-                agreement.</p>
+                
+                <p>Your application ID no: {id} has been reviewed. After a thorough review, we regret to inform you that your application is rejected due to:</p>
+                
+                <p>{reason}</p>                
                 HTML
             ],
             [
                 'id' => 4,
-                'subject' => 'Not Complete',
+                'subject' => 'Review & Complete (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>&nbsp;</p>
-                <p>Dear &nbsp;{user}&nbsp;,</p>
-                <p>Your application ID no:&nbsp;{id}&nbsp; has been received but is not complete, please provide the missing information as follows;<br />
-                &nbsp;{reason}&nbsp;</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your application ID no: {id} is complete. Please choose the MCOM date.</p>
+                
                 HTML
             ],
             [
                 'id' => 5,
-                'subject' => 'New Application Submitted',
+                'subject' => 'Review & Reject (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>&nbsp;</p>
-                <p>Dear&nbsp;{user},</p>
-                <p>Thank you for submitting your application! Your application ID no: &nbsp;{id}&nbsp;has been received. You can expect to hear back from us regarding the status within xx working days from the date of submission. We appreciate your patience!</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your application ID no: {id} is rejected due to</p>
+                
+                <p>{reason}</p>
+                
                 HTML
             ],
             [
                 'id' => 6,
-                'subject' => 'Application re-submitted',
+                'subject' => 'MCOM Date Picked (Applicant)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>&nbsp;</p>
-                <p>Dear&nbsp;{user},</p>
-                <p>Thank you for submitting your application! Your application ID no: &nbsp;{id}&nbsp;has been received. You can expect to hear back from us regarding the status within xx working days from the date of submission. We appreciate your patience!</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your MCOM date will be on: {MCOM_date} .</p>
+
                 HTML
             ],
             [
                 'id' => 7,
-                'subject' => 'Draft Not Recommended',
+                'subject' => 'MCOM Date Changed (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Your draft agreement {id} has been<br />
-                reviewed and not recommended due to: {reason}.</p>
+                
+                <p>Please be informed that there has been a change in the date scheduled for the MCOM Meeting. Your next MCOM date will be on: {MCOM_date}.</p>
+                
                 HTML
             ],
             [
                 'id' => 8,
-                'subject' => 'Final Draft Uploaded',
+                'subject' => 'MCOM Approved (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Your draft agreement {id} has been<br />
-                reviewed and ready for execution.</p>
+                
+                <p>Congratulations. We are pleased to inform you that your application has been recommended for approval in principle by the MCOM No.x/2024 dated on {MCOM_date}.</p>
+                
+                <p>{reason}</p>
+                
+                <p>Your application will be deliberated in the UMC Meeting No.x/2024 dated on {UMC_date} for approval.</p>
+                
                 HTML
             ],
             [
                 'id' => 9,
-                'subject' => 'UMC Approve',
+                'subject' => 'MCOM KIV (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>We are pleased to inform you that your application<br />
-                has been approved in principle by the University<br />
-                Management Committee No.x/2024 dated on {reason}. We will review the draft agreement within 21 working days. .</p>
+                
+                <p>Please be informed that your application has been recommended for KIV due to: {reason} during MCOM No.x/ 2024 dated on {MCOM_date}. You are advice to</p>
+                
+                <p>{advice}</p>
+                
+                <p>Once all the action above has been completed, please resubmit to Office of Legal Adviser.</p>
+                
                 HTML
             ],
             [
                 'id' => 10,
-                'subject' => 'Reminder',
-                'body' => 'Edit This'
+                'subject' => 'MCOM Reject (OLA)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>We regret to inform you that MCOM has rejected your application ID no: {id} due to</p>
+                
+                <p>{reason}</p>
+                
+                <p>We appreciate your interest and effort.</p>
+                
+                HTML
             ],
             [
                 'id' => 11,
-                'subject' => 'MCOM date Changed',
+                'subject' => 'MCOM Resubmitted (Applicant)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Please be informed that there has been a<br />
-                change in the date scheduled for the<br />
-                MCOM Meeting. Your next MCOM date<br />
-                will be on: {date}.</p>
+                
+                <p>Please be informed that your resubmission of agreement {id} has been received.</p>
+                
                 HTML
             ],
             [
                 'id' => 12,
-                'subject' => 'Agreement Expired',
-                'body' => 'Edit This'
+                'subject' => 'UMC Approved (OLA)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>We are pleased to inform you that your application has been {principle} by the University Management Committee No.x/2024 dated on {UMC_date}.</p>
+                
+                <p>{reason}</p>
+                
+                <p>We will review the draft agreement within 21 working days. .</p>
+                
+                HTML
             ],
             [
                 'id' => 13,
-                'subject' => 'MCOM Approve',
+                'subject' => 'UMC KIV (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>Dear&nbsp;{user}&nbsp;,</p>
-                <p>Congratulations. We are pleased to inform<br />
-                you that your application {id} has been<br />
-                recommended for approval in principle by the<br />
-                MCOM No.x/2024 dated on {date}.<br />
-                Your application will be deliberated in the<br />
-                UMC Meeting No.x/2024 dated on&nbsp;{reason}&nbsp;for<br />
-                approval.</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Please be informed that your application has been KIV due to: {reason} during University Management Committee No.x/ 2024 dated on {UMC_date}. You are advice to</p>
+                
+                <p>{advice}</p>
+                
+                <p>Once all the action above has been completed, please resubmit to Office of Legal Adviser.</p>
+
                 HTML
             ],
             [
                 'id' => 14,
-                'subject' => 'MCOM Special',
-                'body' => 'Edit This'
+                'subject' => 'UMC Reject (OLA)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>We regret to inform you that your application has been rejected by the University Management Committee No. x/ 2024 dated on {UMC_date} due to</p>
+                
+                <p>{reason}</p>
+                
+                <p>We appreciate your interest and effort.</p>
+
+                HTML
             ],
             [
                 'id' => 15,
-                'subject' => 'MCOM KIV',
+                'subject' => 'Draft Uploaded (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Please be informed that your application has<br />
-                been recommended for KIV due to:&nbsp;{reason}&nbsp;<br />
-                during MCOM No.x/ 2024 dated on {date}.<br />
-                You are advice to match all requirments. Once all the<br />
-                action above has been completed, please<br />
-                resubmit to Office of Legal Adviser.</p>
+                
+                <p>We have reviewed the draft agreement and our response are as follows:</p>
+                
+                <p>The same has been reflected in the track changes of the draft agreement.</p>
+
                 HTML
             ],
             [
                 'id' => 16,
-                'subject' => 'MCOM Reject',
+                'subject' => 'Draft Uploaded (Applicant)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>Dear&nbsp;{user}&nbsp;,</p>
-                <p>We regret to inform you that MCOM has<br />
-                rejected your application ID no: {id}<br />
-                due to {reason}. We appreciate your<br />
-                interest and effort.</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your draft agreement has been received. Office of Legal Adviser will review the feedback received within 7 working days.</p>
+                
                 HTML
             ],
             [
                 'id' => 17,
-                'subject' => 'UMC Reject',
+                'subject' => 'Draft Complete (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>We regret to inform you that your application has<br />
-                been rejected by the University Management<br />
-                Committee No. due<br />
-                to {reason}. We appreciate your interest and<br />
-                effort.</p>
+                
+                <p>Your draft agreement has been reviewed and ready for execution.</p>
+
                 HTML
             ],
             [
                 'id' => 18,
-                'subject' => 'UMC KIV',
+                'subject' => 'Draft Not Complete (OLA)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
-                <p>Dear Applicant/ OSC,</p>
-                <p>Please be informed that your application has been KIV due<br />
-                to: {reason&nbsp; }during University Management Committee. You are advice to..... Once all the action above has been<br />
-                completed, please resubmit to Office of Legal Adviser.</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your draft agreement {id} has been reviewed and cannot be approved for execution due to the following reason:</p>
+                
+                <p>{reason}</p>
+                
+                <p>Please address the issue and resubmit the draft for further review.</p>
+
                 HTML
             ],
             [
                 'id' => 19,
-                'subject' => 'MCOM Resubmit – Applicant resubmit',
+                'subject' => 'Agreement Executed (OSC)',
                 'body' => <<<HTML
                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
                 <p>Dear {user},</p>
-                <p>Please be informed that your resubmission of application {id}<br />
-                has been received. and MCOM date upldated to {date}</p>
+                
+                <p>The agreement {id} has been executed on: {execution_date}. The executed agreement has been uploaded.</p>
+                
                 HTML
             ],
             [
                 'id' => 20,
-                'subject' => 'Agreement Executed',
-                'body' => 'Edit This'
+                'subject' => 'Progress Report (Reminder)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>This is a friendly reminder that the deadline for reporting progress on the MOU/MOA is approaching. Please ensure that the necessary updates are submitted promptly.</p>
+                
+                <p>Thank you for your attention to this matter.</p>
+                
+                HTML
             ],
+            [
+                'id' => 21,
+                'subject' => 'Expiry Date (Reminder)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>This is a reminder that the expiry date of the agreement {id} related to your MOA/MOU is approaching. Please ensure that any necessary actions are taken before the expiration date.</p>
+                
+                <p>Thank you for your attention to this matter.</p>
+                
+                HTML
+            ],
+            [
+                'id' => 22,
+                'subject' => 'Agreement Expired (Reminder)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>The agreement {id} has expired on {expiry_date}. Please reach out to discuss any necessary next steps on the agreement (if any).</p>
+                
+                HTML
+            ],
+            [
+                'id' => 23,
+                'subject' => 'Agreement Expired (Reminder)',
+                'body' => <<<HTML
+                <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user}</p>
+                
+                <p>
+                Your application ID no: {id} has been received by the Office of Legal Adviser and will be reviewed within 3 working days.</p>
+                
+                HTML
+            ],
+
         ];
 
         foreach ($templates as $template) {

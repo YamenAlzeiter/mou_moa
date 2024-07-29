@@ -63,12 +63,6 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
-        <?php if(!Yii::$app->user->isGuest) :?>
-        <?= $form->field($model, 'mcom_date')->dropDownList(ArrayHelper::map((array)McomDate::find()->all(), 'date',
-            'date'), [
-            'prompt' => 'Filter MCOM Date', 'class' => 'form-select', 'onchange' => '$(this).closest("form").submit();',
-        ])->label(false) ?>
-        <?php endif;?>
         <buttton class="btn btn-dark-light btn-sm"><i class="ti ti-search fs-7"></i></buttton>
     </div>
 

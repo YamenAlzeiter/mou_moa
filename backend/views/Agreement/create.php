@@ -149,8 +149,8 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
     ArrayHelper::map(
         McomDate::find()
             ->where(['<', 'counter', 10])
-            ->andWhere(['>', 'date', $nextTwoWeeks->toDateString()])
-            ->andWhere(['<', 'date', $nextTwoMonth->toDateString()])
+            ->andWhere(['>', 'date_from', $nextTwoWeeks->toDateString()])
+            ->andWhere(['<', 'date_from', $nextTwoMonth->toDateString()])
             ->limit(3) // Limit the number of results to three
             ->all(),
         'date',
