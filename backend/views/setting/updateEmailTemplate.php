@@ -30,11 +30,12 @@ use yii\widgets\ActiveForm;
                 'extraPlugins' => 'insertId', // Register the custom plugin
                 'toolbar' => [
                     ['name' => 'clipboard', 'items' => ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']],
-                    ['name' => 'insert', 'items' => ['InsertId', 'InsertUser', 'InsertReason']],
+                    ['name' => 'insert', 'items' => ['InsertId', 'InsertUser', 'InsertReason', 'InsertMCOMDate', 'InsertUMCDate', 'InsertPrinciple', 'InsertAdvice', 'InsertExecutionDate', 'InsertExpiryDate']],
                 ],
             ],
         ]
     )->label(false) ?>
+
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

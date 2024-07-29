@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use Carbon\Carbon;
+use common\helpers\Variables;
 use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
@@ -249,7 +250,7 @@ class AgreementController extends Controller
                             }
                         }
                         $this->multiFileHandler($model, 'files_applicant',  'applicant_doc');
-                        $this->sendEmail($model, 5);
+                        $this->sendEmail($model, Variables::email_init);
                         $transaction->commit();
                         return $this->redirect(['index']);
                     }
@@ -381,6 +382,7 @@ class AgreementController extends Controller
             $body = str_replace('{user}', $modelPoc->pi_name, $body);
             $body = str_replace('{reason}', $model->reason, $body);
             $body = str_replace('{id}', $model->id, $body);
+            $body = str_replace('{MCOM_date}', $model->mcom_date, $body);
 
             $mailer = Yii::$app->mailer->compose([
                 'html' => '@backend/views/email/emailTemplate.php'
@@ -389,7 +391,7 @@ class AgreementController extends Controller
                 'recipientName' => Yii::$app->user->identity->username,
                 'body' => $body
             ])
-                ->setFrom(['noReplay@iium.edy.my' => 'IIUM'])
+                ->setFrom(['noReplay@iium.edy.my' => 'IIUM Memorandum Program'])
                 ->setTo($modelPoc->pi_email)
                 ->setSubject($mail->subject)
                 ->setCc($osc->email);
@@ -447,8 +449,8 @@ class AgreementController extends Controller
                 }
             }
 
-            $model->status = $oldStatus != 110 ? $this->request->post('checked') : $model->status;
-            if ($model->status == 91) {
+            $model->status = $oldStatus != Variables::agreement_reminder_sent ? $this->request->post('checked') : $model->status;
+            if ($model->status == Variables::agreement_executed) {
                 $model->last_reminder = Carbon::now()->addMonths(3)->toDateTimeString();
             }
 
@@ -458,10 +460,12 @@ class AgreementController extends Controller
             $model->temp = "(" . Yii::$app->user->identity->staff_id . ") " . Yii::$app->user->identity->username;
 
             if ($model->save()) {
-                if ($model->status == 15) {
-                    $this->sendEmail($model, 6);
-                }elseif ($oldStatus == 33){
-                    $this->sendEmail($model, 19);
+                if ($model->status == Variables::agreement_resubmitted) {
+                    $this->sendEmail($model, Variables::email_init);
+                }elseif ($oldStatus == Variables::agreement_MCOM_KIV){
+                    $this->sendEmail($model, Variables::email_agr_mcom_resubmitted);
+                }elseif($model->status == Variables::agreement_MCOM_date_set){
+                    $this->sendEmail($model, Variables::email_agr_pick_mcom_date);
                 }
                 return $this->redirect(['index']);
             }

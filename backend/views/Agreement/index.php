@@ -24,7 +24,7 @@ if ($type == "IO" || $type == "RMC" || $type == "OIL") {
     echo '<div class="col-md-3 col-sm-12 ">
             <div class="d-flex flex-column align-items-center justify-content-center gap-2">'
                     . $build->createButton(['import'], 'ti-table', 'Import Records', 'Bulk Import', ['class' => 'btn btn-lg btn-primary w-100']) .
-                    $build->createButton(['create-poc'], 'ti-plus', 'Add Person In Charge', 'Create Person in Charge', ['class' => 'btn btn-lg btn-outline-primary w-100']) .
+
             '</div>
            </div>';
 }

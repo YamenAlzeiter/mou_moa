@@ -21,26 +21,51 @@ landing::register($this);
 </head>
 <body>
 <?php $this->beginBody() ?>
-<header>
-    <!--        <a href="" class="logo"><img src="https://shenliktech.com/shen/assets/img/logo.png" alt=""> <span>Shenlik Tech.</span></a>-->
-    <?= Html::a(Html::img(Yii::getAlias('@web') . '/iiumLogo.svg', ['class' => 'logo']), 'index', ['class' => 'logo']) ?>
 
-    <ul class="navbarr">
-        <li><a href="#home" class="active">Home</a></li>
-        <li><a href="/site/public-index"">Agreements</a></li>
-        <li><a href="#about">About Us</a></li>
-        <li><a href="#contact">Contact</a></li>
-    </ul>
-
-    <div class="mainn">
-        <a href="/site/login" class="signin-btn">Sign In</a>
-        <bi class='ti ti-list' id="menu-icon"></bi>
+<nav>
+    <div class="logo">
+        <?= Html::a(Html::img(Yii::getAlias('@web') . '/iiumLogo.svg', ['class' => 'logoface']), 'index', ['class' => 'logo']) ?>
+        <a href="http://applicant.iium/" target="_blank"><h2 class="sitename">Memorandum Program</h2></a>
     </div>
-</header>
+
+    <div class="menu">
+        <a href="#home" class="menu-item active">Home</a>
+        <a href="/site/public-index" class="menu-item">Agreements</a>
+        <a href="#about" class="menu-item">Templates</a>
+        <a href="#about" class="menu-item">FAQ</a>
+        <a href="#contact" class="menu-item">Contact</a>
+        <a href="/site/login" class="primary-button">Sign In</a>
+    </div>
+</nav>
+
 
     <?= $content ?>
 
 
+<div class="footer" id="footer">
+    <div class="logo">
+        <?= Html::a(Html::img(Yii::getAlias('@web') . '/iiumLogo.svg', ['class' => 'logoface']), 'index', ['class' => 'logo']) ?>
+        <a href="http://applicant.iium/" target="_blank"><h2 class="sitename reversed">Memorandum Program</h2></a>
+    </div>
+    <div class="footer-cols">
+
+
+        <div class="footer-col">
+         <h4 class="fw-bolder">
+             Contact Us:
+         </h4>
+            <p>
+                <span class="fw-bolder">OFFICE FOR STRATEGY AND INSTITUTIONAL CHANGE (OSIC)</span><br>
+                <span>Level 3, Muhammad Abdul-rauf Building,</span><br>
+                P.O. Box 10,<br>
+                50728 Kuala Lumpur <br>
+                <span class="fw-bolder">Phone:</span> +6 03 6421 5851 <br>
+                <span class="fw-bolder">Email:</span> qaiium@iium.edu.my
+            </p>
+        </div>
+    </div>
+
+</div>
 
 
 <script>

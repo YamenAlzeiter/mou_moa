@@ -16,7 +16,7 @@ class m240320_043149_create_activities_table extends Migration
             'id'            => $this->primaryKey(),
             'agreement_id'  => $this->integer   (),
             'name'          => $this->string(522),
-            'staff_number'  => $this->string(7),
+            'staff_number'  => $this->string(522),
             'kcdio'         => $this->string(522),
             'mou_moa'       => $this->string(522),
             'activity_type' => $this->string(522),

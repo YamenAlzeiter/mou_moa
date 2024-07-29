@@ -29,6 +29,7 @@ class McomDate extends \yii\db\ActiveRecord
     {
         return [
             [['date_from', 'date_until'], 'safe'],
+            
             [['counter'], 'default', 'value' => null],
             [['counter'], 'integer'],
         ];

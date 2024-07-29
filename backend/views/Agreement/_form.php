@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\Variables;
 use Itstructure\CKEditor\CKEditor;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
@@ -10,63 +11,77 @@ use yii\helpers\Html;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 $approveMap = [
-         10 => 1,  // init -> accept OSC
-         1  => 11,  // OSC -> OLA approve OLA
-         15 => 1,  // OSC -> OLA approve OLA
-         21 => 31, // OLA -> / approve OLA
-         31 => 41, // OLA -> / approve OLA
-
-         46 => 51,
-        121 => 31,
-         61 => 81,
-
-         41 => 51,
-         51 => 61,
-         72 => 61,
-         81 => 91,
-
+        Variables::agreement_init => Variables::agreement_approved_osc,
+        Variables::agreement_approved_osc  => Variables::agreement_approved_ola,
+        Variables::agreement_resubmitted => Variables::agreement_approved_osc,
+        Variables::agreement_MCOM_date_set => Variables::agreement_MCOM_approved,
+        Variables::agreement_MCOM_approved => Variables::agreement_UMC_approve,
+        Variables::agreement_conditional_upload => Variables::agreement_draft_uploaded_ola,
+        Variables::agreement_MCOM_date_changed => Variables::agreement_MCOM_approved,
+        Variables::agreement_draft_uploaded_ola => Variables::agreement_draft_upload_applicant,
+        Variables::agreement_draft_upload_applicant => Variables::agreement_draft_approve_final_draft,
+        Variables::agreement_UMC_approve => Variables::agreement_draft_uploaded_ola,
+        Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant,
+        Variables::agreement_draft_approve_final_draft => Variables::agreement_executed,
 ];
 $notCompleteMap = [
-         10 => 2,  // OSC -> Applicant
-          1 => 12, // OLA -> Applicant
-         15 => 2,  // OSC -> OLA approve OLA
-         21 => 33, // OLA -> Applicant
-         31 => 43, // OLA -> Applicant
-         61 => 72, // OLA -> OSC
+        Variables::agreement_init => Variables::agreement_not_complete_osc,
+        Variables::agreement_resubmitted => Variables::agreement_not_complete_osc,
+        Variables::agreement_approved_osc => Variables::agreement_not_complete_ola,
+        Variables::agreement_MCOM_date_set => Variables::agreement_MCOM_KIV,
+        Variables::agreement_MCOM_approved => Variables::agreement_UMC_KIV,
+        Variables::agreement_draft_upload_applicant => Variables::agreement_draft_rejected_ola,
+        Variables::agreement_conditional_upload => Variables::agreement_conditional_upload_not_complete,
+        Variables::agreement_MCOM_date_changed => Variables::agreement_MCOM_KIV,
+    86 => 87,
 
-         46 => 47,
-         86 => 87,
-        121 => 33,
 ];
 $rejectMap = [
-         21 => 32, // OLA -> Applicant
-         31 => 42, // OLA -> Applicant
-        1 => 2,
-        121 => 32,
+        Variables::agreement_MCOM_date_set => Variables::agreement_MCOM_reject,
+        Variables::agreement_MCOM_approved => Variables::agreement_UMC_reject,
+        Variables::agreement_MCOM_date_changed => Variables::agreement_MCOM_reject,
 ];
 
 
 $form = ActiveForm::begin(['id' => 'actiontaken', 'validateOnBlur' => false, 'validateOnChange' => false, 'options' => ['enctype' => 'multipart/form-data'],]);
 
-if (!in_array($model->status, [51, 72, 81, 41])) {
+if (!in_array($model->status,
+    [
+        Variables::agreement_draft_uploaded_ola,
+        Variables::agreement_draft_rejected_ola,
+        Variables::agreement_draft_approve_final_draft,
+        Variables::agreement_UMC_approve
+    ])) {
 
-    $rejectTag = (in_array($model->status, [21, 31])) ? 'KIV' : 'Not Complete';
-    $recommendedTag = !(in_array($model->status, [31])) ? 'Recommended' : 'Approve';
+    $notCompleteTag = (in_array($model->status, [Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) ? 'KIV' : 'Not Complete';
+    $recommendedTag = !($model->status == Variables::agreement_MCOM_approved) ? 'Recommended' : 'Approve';
 
-    $options = [$approveMap[$model->status] => $recommendedTag, $notCompleteMap[$model->status] => $rejectTag,];
+    $options = [$approveMap[$model->status] => $recommendedTag, $notCompleteMap[$model->status] => $notCompleteTag,];
 
-    if (in_array($model->status, [21, 31, 121])) {
+    if (in_array($model->status, [Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) {
         $options += [$rejectMap[$model->status] => ' Reject'];
     }
-    echo $form->field($model, 'status')->radioList($options, [
-            'class' => 'gap-2 row',
-            'item' => function ($index, $label, $name, $checked, $value) {
-                        return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">'
-                            . Html::radio($name, $checked, ['id' => "is" . $value,
-                                                            'value' => $value,
-                                                            'class' => 'mx-2']) . $label .
-                                '</label>';
-            }])->label(false);
+    echo $form->field($model, 'status')->radioList(
+        $options,
+        [
+            'item' => function($index, $label, $name, $checked, $value) {
+                return '
+            <label class="plan ' . strtolower($value) . '-plan" for="is' . $value . '">
+            
+                <input type="radio" id="is' . $value . '" name="' . $name . '" value="' . $value . '" ' . ($checked ? 'checked' : '') . ' />
+                <div class="plan-content">
+                    <div class="plan-details">
+                        <span>' . $label . '</span>
+                    </div>
+                </div>
+                <p class="invalid-feedback mb-0"></p>
+            </label>
+            ';
+            },
+            'class' => 'plans',
+            'errorOptions' => ['class' => 'invalid-feedback'],
+        ]
+    )->label(false);
 }
 
 $currentDate = date('Y-m-d'); // Get the current date in the format 'YYYY-MM-DD'
@@ -76,18 +91,17 @@ $model->reason = null; // init reason to null for ckeditor value
 ?>
 
 <div class="agreement-form">
-
-    <?php if (in_array($model->status, [72, 41])): ?>
+    <?php if (in_array($model->status, [Variables::agreement_draft_rejected_ola, Variables::agreement_UMC_approve])): ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => $approveMap[$model->status]])->label(false) ?>
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
     <?php endif;?>
 
-    <?php if(in_array($model->status, [46, 61])):?>
+    <?php if(in_array($model->status, [Variables::agreement_conditional_upload, Variables::agreement_draft_upload_applicant])):?>
         <div class="doc-approved mb-4 d-none">
             <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
         </div>
     <?php endif;?>
-    <?php if (in_array($model->status, [81])): ?>
+    <?php if ($model->status == Variables::agreement_draft_approve_final_draft): ?>
     <h4>Commencement Date</h4>
         <div class="row">
             <div class="col-md"><?= $form->field($model, 'project_start_date')->textInput(['type' => 'date']) ?></div>
@@ -102,13 +116,28 @@ $model->reason = null; // init reason to null for ckeditor value
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
     <?php endif; ?>
 
-        <div class="not-complete mb-4 d-none">
-            <?= $form->field($model, 'reason')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
+    <div class="row">
+        <div class="col umc_date d-none">
+            <?= $form->field($model, 'umc_date')->textInput(['type' => 'date', 'id' => 'umc_date'])->label('UMC Date') ?>
         </div>
+
+        <div class="col principle d-none">
+            <?= $form->field($model, 'principle')->dropDownList(['in principle' => 'in principle'], ['prompt' => 'Select One', 'id' => 'principle'])->label('Principle') ?>
+        </div>
+        <div class="col-12 advice d-none">
+            <?= $form->field($model, 'advice')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
+        </div>
+    </div>
+
+    <div class="not-complete mb-4 d-none">
+        <?= $form->field($model, 'reason')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
+    </div>
+
+
 
 
     <div class="d-flex flex-row gap-2 mb-2 justify-content-end">
-        <?= Html::submitButton('Submit', ['class' => 'btn btn-success']) ?>
+        <?= Html::submitButton('Submit', ['class' => 'btn-submit mb-4']) ?>
     </div>
 
 
@@ -116,42 +145,71 @@ $model->reason = null; // init reason to null for ckeditor value
 
 
     <script>
-        $("#is2, #is12, #is42, #is43, #is31, #is32, #is34, #is33, #is41, #is47, #is72, #is87, #is52").on("change", function () {
 
-            if (this.checked) {
-                $(".not-complete").removeClass('d-none');
-            }
-        });
-        $("#is1, #is11, #is51, #is81, #is91").on("change", function () {
+        $(document).ready(function() {
+            // Call updateVisibility once on page load to ensure correct initial state
+            updateVisibility();
+            updateNotCompleteVisibility();
+            updateDocApprovedVisibility();
+            updateCKEditorVisibility();
 
-            if (this.checked) {
-                $(".not-complete").addClass('d-none');
-            }
-        });
-        $(" #is72").on("change", function () {
+            // Bind the change event to all radio buttons within the form container
+            $('input[type="radio"]').on('change', function() {
+                updateVisibility();
+                updateNotCompleteVisibility();
+                updateDocApprovedVisibility();
+            });
 
-            if (this.checked) {
-                $(".doc-approved").addClass('d-none');
-            }
-        });
-        $(" #is81").on("change", function () {
-                console.log('quit ')
-            if (this.checked) {
-                $(".doc-approved").removeClass('d-none');
-            }
-        });
-        $(" #is51").on("change", function () {
+            // Bind the change event to the principle dropdown
+            $('#principle').on('change', function() {
+                updateCKEditorVisibility();
+            });
 
-            if (this.checked) {
-                $(".doc-approved").removeClass('d-none');
-            }
-        });
-        $(" #is47, #is52").on("change", function () {
+            function updateVisibility() {
+                $('.umc_date, .advice, .principle').addClass('d-none');
 
-            if (this.checked) {
-                $(".doc-approved").addClass('d-none');
+                if ($('#is31').is(':checked') || $('#is43').is(':checked') || $('#is42').is(':checked') || $('#is41').is(':checked'))  {
+                    $('.umc_date').removeClass('d-none');
+                }
+
+                if ($('#is33').is(':checked') || $('#is43').is(':checked')) {
+                    $('.advice').removeClass('d-none');
+                }
+
+                if ($('#is41').is(':checked') || $('#is31').is(':checked')) {
+                    $('.principle').removeClass('d-none');
+                }
+            }
+
+            function updateNotCompleteVisibility() {
+                const notCompleteSelectors = "#is2, #is12, #is42, #is43, #is31, #is32, #is34, #is33, #is47, #is72, #is87, #is52";
+                const completeSelectors = "#is1, #is11, #is51, #is81, #is91";
+
+                if ($(notCompleteSelectors).is(':checked')) {
+                    $(".not-complete").removeClass('d-none');
+                } else if ($(completeSelectors).is(':checked')) {
+                    $(".not-complete").addClass('d-none');
+                }
+            }
+
+            function updateDocApprovedVisibility() {
+                if ($('#is72').is(':checked') || $('#is47').is(':checked') || $('#is52').is(':checked')) {
+                    $(".doc-approved").addClass('d-none');
+                } else if ($('#is81').is(':checked') || $('#is51').is(':checked')) {
+                    $(".doc-approved").removeClass('d-none');
+                }
+            }
+
+            function updateCKEditorVisibility() {
+                if ($('#principle').val() === 'in principle') {
+                    $(".not-complete").removeClass('d-none');
+                } else {
+                    $(".not-complete").addClass('d-none');
+                }
             }
         });
+
+
     </script>
 
 

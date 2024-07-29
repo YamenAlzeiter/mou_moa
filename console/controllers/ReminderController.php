@@ -3,6 +3,7 @@
 namespace console\controllers;
 
 use Carbon\Carbon;
+use common\helpers\Variables;
 use common\models\Agreement;
 use common\models\AgreementPoc;
 use common\models\EmailTemplate;
@@ -16,8 +17,8 @@ class ReminderController extends Controller
 
     public function actionSendEmailReminders()
     {
-        $remindEmailTemplate = EmailTemplate::findOne(10);
-        $expiredEmailTemplate = EmailTemplate::findOne(12);
+        $remindEmailTemplate = EmailTemplate::findOne(Variables::email_expiry_date_reminder);
+        $expiredEmailTemplate = EmailTemplate::findOne(Variables::email_agr_expired);
 
         if (!$remindEmailTemplate || !$expiredEmailTemplate) {
             echo "Email template not found.\n";
@@ -40,28 +41,28 @@ class ReminderController extends Controller
 
 //                var_dump('record is : ' . $model->id . " " . $model->end_date . " " . $remindDate);
 
-                if ($currentDate->eq($remindDate) && ($model->status == 91 || $model->status == 100)) {
+                if ($currentDate->eq($remindDate) && ($model->status == Variables::agreement_executed || $model->status == Variables::imported_agreement_executed)) {
                     $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
                     // Send email reminder
-                    $this->sendEmailReminder($users, $remindEmailTemplate);
+                    $this->sendEmailReminder($users, $remindEmailTemplate, $model);
                     $model->isReminded += 1;
-                    $model->status = 110;
+                    $model->status = Variables::agreement_reminder_sent;
                     $model->save();
-                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == 91 || $model->status == 100) && !($currentDate > $model->end_date)) {
+                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == Variables::agreement_executed || $model->status == Variables::imported_agreement_executed) && !($currentDate > $model->end_date)) {
 
                     if ($model->isReminded == $index) {
                         $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
-                        $this->sendEmailReminder($users, $remindEmailTemplate);
+                        $this->sendEmailReminder($users, $remindEmailTemplate, $model);
                         $model->isReminded += 1;
-                        $model->status = 110;
+                        $model->status = Variables::agreement_reminder_sent;
                         $model->save();
                     }
                 }
 
-                if ($currentDate > $model->end_date && ($model->status == 91 || $model->status == 110 || $model->status == 100)) {
+                if ($currentDate > $model->end_date && ($model->status == Variables::agreement_executed || $model->status == Variables::agreement_reminder_sent || $model->status == Variables::imported_agreement_executed)) {
                     $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
-                    $this->sendEmailReminder($users, $remindEmailTemplate);
-                    $model->status = 92;
+                    $this->sendEmailReminder($users, $remindEmailTemplate, $model);
+                    $model->status = Variables::agreement_expired;
                     $model->save();
                 }
             }
@@ -70,7 +71,7 @@ class ReminderController extends Controller
         echo "Reminders sent successfully.\n";
     }
 
-    private function sendEmailReminder($users, $emailTemplate)
+    private function sendEmailReminder($users, $emailTemplate, $model)
     {
         $primaryUser = null;
         $ccEmails = [];
@@ -88,12 +89,13 @@ class ReminderController extends Controller
         if ($primaryUser !== null) {
             $body = str_replace('{user}', $primaryUser->pi_name, $emailTemplate->body);
             $body = str_replace('{id}', $primaryUser->agreement_id, $body);
+            $body = str_replace('{expiry_date}', $model->end_date, $body);
 
             $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], [
                 'subject' => $emailTemplate->subject,
                 'body' => $body,
             ])
-                ->setFrom(["noreply@example.com" => "My Application"])
+                ->setFrom(["noreply@example.com" => "IIUM Memorandum Reminder"])
                 ->setTo($primaryUser->pi_email)
                 ->setSubject($emailTemplate->subject);
 
@@ -111,7 +113,7 @@ class ReminderController extends Controller
      */
     public function actionSendActivityReminders()
     {
-        $activityReminderEmailTemplate = EmailTemplate::findOne(10);
+        $activityReminderEmailTemplate = EmailTemplate::findOne(Variables::email_progress_reminder);
 
         if (!$activityReminderEmailTemplate) {
             echo "Email template not found.\n";
@@ -119,7 +121,7 @@ class ReminderController extends Controller
         }
 
 
-        $users = Agreement::find()->andWhere(['not', ['sign_date' => null]])->andWhere(['status' => [100, 91]])->all();
+        $users = Agreement::find()->andWhere(['not', ['sign_date' => null]])->andWhere(['status' => [Variables::imported_agreement_executed, Variables::agreement_executed]])->all();
 
 
         foreach ($users as $user) {

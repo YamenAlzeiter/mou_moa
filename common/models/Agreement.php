@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use common\helpers\Variables;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -54,9 +55,11 @@ class Agreement extends ActiveRecord
     public $files_applicant;
     public $files_dp;
     public $agreement_type_other;
-
     public $pi_delete_ids;
 
+    public $advice;
+    public $principle;
+    public $umc_date;
     /**
      * {@inheritdoc}
      */
@@ -130,6 +133,12 @@ class Agreement extends ActiveRecord
                 'files_applicant', 'champion'], 'required', 'on' => 'createSpecial'],
 
             // Conditional required rules
+            [['files_applicant'], 'required', 'when' => function ($model) {
+                return $model->status == Variables::agreement_draft_uploaded_ola;
+            }, 'whenClient' => "function (attribute, value) {
+            return $('#agreement-status').val() == 51 ;
+        }"],
+
             [['agreement_type_other'], 'required', 'when' => function ($model) {
                 return $model->agreement_type == 'other';
             }, 'whenClient' => "function (attribute, value) {
@@ -158,13 +167,13 @@ class Agreement extends ActiveRecord
             [['project_title', 'proposal', 'reason', 'temp'], 'string'],
             [['col_organization', 'col_name', 'col_address', 'col_contact_details',
                 'col_collaborators_name', 'col_wire_up', 'champion',
-                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country'], 'string', 'max' => 522],
+                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country', 'principle', 'advice'], 'string', 'max' => 522],
             [['col_phone_number', 'col_email'], 'string', 'max' => 512],
             [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
             [['member'], 'string', 'max' => 2],
 
             // Safe fields
-            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder'], 'safe'],
+            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder', 'umc_date', ], 'safe'],
 
             // Default and integer rules
             [['status'], 'default', 'value' => null],
