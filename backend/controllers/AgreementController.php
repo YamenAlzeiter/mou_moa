@@ -6,16 +6,17 @@ use Carbon\Carbon;
 use common\helpers\Model;
 use common\helpers\Variables;
 use common\models\Activities;
-use common\models\admin;
 use common\models\Agreement;
 use common\models\AgreementPoc;
+use common\models\Collaboration;
 use common\models\EmailTemplate;
 use common\models\Import;
-use common\models\Kcdio;
 use common\models\Log;
+use common\models\LookupCdKcdiom;
 use common\models\McomDate;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
+use common\models\User;
 use Exception;
 use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
@@ -39,30 +40,69 @@ class AgreementController extends Controller
     /**
      * @inheritDoc
      */
+//    public function behaviors()
+//    {
+//        return [
+//            'access' => [
+//                'class' => AccessControl::class,
+//                'rules' => [
+//                    ['actions' =>
+//                        [
+//                            'index', 'update', 'view', 'downloader', 'log',
+//                            'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
+//                            'import', 'mcom', 'update-poc', 'create-poc', 'create',
+//                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete', 'dashboard'
+//                        ],
+//                        'allow' => !Yii::$app->user->isGuest,
+//                        'roles' => ['@'],
+//                    ],
+//                ],
+//            ],
+//            'verbs' => [
+//                'class' => VerbFilter::class,
+//                'actions' => ['logout' => ['post'],
+//                ],
+//            ],
+//        ];
+//    }
     public function behaviors()
     {
-        return [
-            'access' => [
-                'class' => AccessControl::class,
-                'rules' => [
-                    ['actions' =>
+        return array_merge(
+            parent::behaviors(),
+            [
+                'access' => [
+                    'class' => AccessControl::className(),
+                    'rules' => [
                         [
-                            'index', 'update', 'view', 'downloader', 'log',
-                            'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
-                            'import', 'mcom', 'update-poc', 'create-poc', 'create',
-                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete', 'dashboard'
+                            'allow' => true,
+                            'roles' => ['OSIC'], // Admins can access all actions
                         ],
-                        'allow' => !Yii::$app->user->isGuest,
-                        'roles' => ['@'],
+                        [
+                            'allow' => true,
+                            'roles' => ['OLA'],
+                        ],
+                        [
+                            'allow' => false,
+                            'roles' => ['OLA'],
+                            'actions' => [
+                                 'import-excel', 'import-excel-activity', 'update-poc', 'bulk-delete', 'dashboard'],
+                        ],
+                        [
+                            'allow' => true,
+                            'roles' => ['IO' , 'OIL', 'RMC'],
+                        ],
+                        [
+                            'allow' => false,
+                            'roles' => ['IO' , 'OIL', 'RMC'],
+                            'actions' => ['mcom', 'create-poc', 'create', 'get-poc-info', 'get-kcdio-poc', 'bulk-delete'],
+                        ],
+                        [
+                            'allow' => false,
+                        ],
                     ],
                 ],
-            ],
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => ['logout' => ['post'],
-                ],
-            ],
-        ];
+            ]
+        );
     }
 
     /**
@@ -75,14 +115,15 @@ class AgreementController extends Controller
         $searchModel = new AgreementSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
-        $type = Yii::$app->user->identity->type;
-
+        $type = array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name;
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
         // Define the statuses to be always on top
-        $type != "OLA" ? $topStatuses = [10, 15, 81] : $topStatuses = [1, 21, 31, 41, 61, 121];
+        !Yii::$app->user->can('OLA') ? $topStatuses = [10, 15, 81] : $topStatuses = [1, 21, 31, 41, 61, 121];
 
-        if ($type != 'OLA' && $type != 'admin') {
+        if (!Yii::$app->user->can('OLA') &&
+            !Yii::$app->user->can('OSIC'))
+        {
             $dataProvider->query->andWhere(['transfer_to' => $type]);
         }
 
@@ -107,12 +148,15 @@ class AgreementController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
         $modelsPoc = AgreementPoc::find()->where(['agreement_id' => $id])->all();
+        $modelCol = Collaboration::findone(['id' =>$model->col_id]);
         if (!Yii::$app->user->isGuest) {
 
             return $this->renderAjax('view', [
-                'model' => $this->findModel($id),
+                'model' => $model,
+                'modelCol' => $modelCol,
                 'haveActivity' => $haveActivity,
                 'modelsPoc' => $modelsPoc,]);
         } else {
@@ -146,32 +190,35 @@ class AgreementController extends Controller
 
     public function actionCreate()
     {
-        if (Yii::$app->user->identity->type == 'OLA') {
-            $model = new Agreement();
-            $modelsPoc = [new AgreementPoc()];
-            $model->scenario = 'createSpecial';
-            if ($this->request->isPost) {
-                $model->load($this->request->post());
-                $modelsPoc = [];
+        $model = new Agreement();
+        $colModel = new Collaboration();
+        $modelsPoc = [new AgreementPoc()];
+        $model->scenario = 'createSpecial';
+        if ($this->request->isPost) {
+            $model->load($this->request->post());
+            $colModel->load($this->request->post());
+            $modelsPoc = [];
 
-                $pocData = Yii::$app->request->post('AgreementPoc', []);
-                foreach ($pocData as $index => $data) {
-                    $modelPoc = new AgreementPoc();
-                    $modelPoc->load($data, '');
-                    $modelsPoc[] = $modelPoc;
+            $pocData = Yii::$app->request->post('AgreementPoc', []);
+            foreach ($pocData as $index => $data) {
+                $modelPoc = new AgreementPoc();
+                $modelPoc->load($data, '');
+                $modelsPoc[] = $modelPoc;
 
-                }
+            }
 
-                $status = $this->request->post('checked');
-                $model->status = $status;
-                $model->status == 91 ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
-                $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+            $status = $this->request->post('checked');
+            $model->status = $status;
+            $model->status == Variables::agreement_executed ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
+            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
 
-                $valid = Model::validateMultiple($modelsPoc);
+            $valid = Model::validateMultiple($modelsPoc);
 
-                if ($valid) {
-                    $transaction = Yii::$app->db->beginTransaction();
-                    try {
+            if ($valid) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    if($colModel->save()){
+                        $model->col_id = $colModel->id;
                         if ($model->save(false)) {
                             foreach ($modelsPoc as $modelPoc) {
                                 $modelPoc->agreement_id = $model->id;
@@ -181,24 +228,23 @@ class AgreementController extends Controller
                                 }
                             }
                             $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
-
                             $transaction->commit();
                             return $this->redirect(['index']);
                         }
-                    } catch (Exception $e) {
-                        $transaction->rollBack();
                     }
+                } catch (Exception $e) {
+                    $transaction->rollBack();
                 }
-
-            } else {
-                $model->loadDefaultValues();
             }
 
-            return $this->renderAjax('create', [
-                'model' => $model,
-                'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
-            ]);
-        } else throw new forbiddenHttpException("You are not authorized to be in this page");
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        return $this->renderAjax('create', [
+            'model' => $model,
+            'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
+        ]);
     }
 
     function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
@@ -226,36 +272,23 @@ class AgreementController extends Controller
 
     public function actionCreatePoc()
     {
-        $type = Yii::$app->user->identity->type;
+        $model = new Poc();
 
-        if ($type == "IO" || $type == 'OIL' || $type == 'RMC') {
-            $model = new Poc();
-
-            if ($this->request->isPost) {
-                if ($model->load($this->request->post()) && $model->save()) {
-                    return $this->redirect(['index']);
-                }
-            } else {
-                $model->loadDefaultValues();
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['index']);
             }
+        } else {
+            $model->loadDefaultValues();
+        }
 
-            return $this->renderAjax('createPoc', ['model' => $model,]);
-        } else throw new ForbiddenHttpException("you can't access this page");
-
+        return $this->renderAjax('createPoc', ['model' => $model,]);
     }
 
     public function actionViewActivities($id)
     {
-
-
         $model = Activities::find()->where(['agreement_id' => $id])->all();
-        if (!Yii::$app->user->isGuest) {
-
-            return $this->renderAjax('viewActivities', ['model' => $model,]);
-        } else {
-            return throw new ForbiddenHttpException("You need to login in order to have access to this page");
-        }
-
+        return $this->renderAjax('viewActivities', ['model' => $model,]);
     }
 
     /**
@@ -270,15 +303,13 @@ class AgreementController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post())) {
+        if ($this->request->isPost && $model->load($this->request->post())){
             $this->multiFileHandler($model, 'files_applicant', 'draft', 'dp_doc');
-            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+            $model->temp = "(" . array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name . ") "  . Yii::$app->user->identity->username;
 
             // Attempt to save the model
-            if ($model->save()) {
-
-                    $this->sendEmail($model, ($model->status != 2));
-
+            if ( $model->save()) {
+                    $this->sendEmail($model, ($model->status != Variables::agreement_not_complete_osc));
                 return $this->redirect(['index']);
             } else {
                 // If model save fails, log the error and show a user-friendly message
@@ -297,7 +328,6 @@ class AgreementController extends Controller
 
     private function sendEmail($model, $needCC)
     {
-
         $mailMap = [
             Variables::agreement_init => [
                 'template' => Variables::email_agr_complete_osc,
@@ -398,7 +428,7 @@ class AgreementController extends Controller
         $body = str_replace('{principle}', $model->principle, $body);
         $body = str_replace('{advice}', $model->advice, $body);
         $body = str_replace('{execution_date}', $model->execution_date, $body);
-        $body = str_replace('{expiry_date}', $model->end_date, $body);
+        $body = str_replace('{expiry_date}', $model->agreement_expiration_date, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
@@ -411,17 +441,23 @@ class AgreementController extends Controller
             if ($ccGroup === 'OSC') {
                 // Determine the specific OSC type based on `directed_to`
                 $oscType = $model->transfer_to; // IO, RMC, OIL, etc.
-                $ccAdmins = Admin::find()->where(['type' => $oscType])->all();
+                $ccAdmins = Yii::$app->authManager->getUserIdsByRole($oscType);
                 foreach ($ccAdmins as $admin) {
-                    $ccRecipients[] = $admin->email;
+                    $user = User::findOne($admin);
+                    if($user != null){
+                        $ccRecipients[] = $user->email;
+                    }
                 }
             } else {
                 // Handle other CC groups (e.g., OLA)
                 $ccGroups = explode(', ', $ccGroup);
                 foreach ($ccGroups as $group) {
-                    $ccAdmins = Admin::find()->where(['type' => $group])->all();
+                    $ccAdmins = Yii::$app->authManager->getUserIdsByRole($group);
                     foreach ($ccAdmins as $admin) {
-                        $ccRecipients[] = $admin->email;
+                        $user = User::findOne($admin);
+                        if($user != null){
+                            $ccRecipients[] = $user->email;
+                        }
                     }
                 }
             }
@@ -441,7 +477,7 @@ class AgreementController extends Controller
             'reason' => $model->reason,
             'body' => $body
         ])
-            ->setFrom(['noReply@iium.edu.my' => 'Memorandum Program '.Yii::$app->user->identity->type])
+            ->setFrom(['noReply@iium.edu.my' => 'Memorandum Program | '. array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name ])
             ->setTo($modelPoc->pi_email)
             ->setSubject($mail->subject);
 
@@ -511,7 +547,7 @@ class AgreementController extends Controller
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $model->status = 121;
-            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+            $model->temp = "(" . array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name . ") "  . Yii::$app->user->identity->username;
             if ($model->save()) {
 
                 $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
@@ -726,7 +762,7 @@ class AgreementController extends Controller
 
             foreach ($sheetData as $row) {
                 if (!empty($row['A'])) {
-                    $kcdioName = Kcdio::findOne(['kcdio' => $row['E']])->tag ?? 'Error';
+                    $kcdioName = LookupCdKcdiom::findOne(['kcdiom_desc' => $row['E']])->abb_code ?? 'Error';
                     $pi_details = $this->applyExcelFormula($row['K']);
 
                     $parts = explode('|', $row['K']);
@@ -779,70 +815,89 @@ class AgreementController extends Controller
         return $insertedRowIds;
     }
 
-    public function importExcel($filePath, $model){
-        // to import an excel file to the system, the excel file need to be in this format
-
-        //#1 columns should follow the order in the for loop
-        //#2 details of person in charge should be in this order name, kcdio, address, phone, email between each one |
-        $to = $model->import_from;
-        $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+    public function importExcel($filePath, $model)
+    {
+        $to = array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name;
+        $temp = "(" . $to . ") " . "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
         $insertedRowIds = []; // Array to store inserted row IDs
+
+        $transaction = Yii::$app->db->beginTransaction();
         try {
             $spreadsheet = IOFactory::load($filePath);
             $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-            unset($sheetData[1]);
+            unset($sheetData[1]); // Remove header row
 
             foreach ($sheetData as $row) {
                 if (!empty($row['A'])) {
-                    $kcdioName = Kcdio::findOne(['kcdio' => $row['D']])->tag ?? 'Error';
+
+                    // Lookup for kcdioName and handle possible null
+                    $kcdioName = LookupCdKcdiom::find()
+                        ->where(['kcdiom_desc' => $row['D']])
+                        ->orWhere(['abb_code' => $row['D']])
+                        ->one();
+
 
                     $status = $row['S'] == "Active" ? 100 : 102;
+                    $col_agreement = new Collaboration();
 
-                    $agreement = new Agreement();
-                    $agreement->agreement_type = $row['A'];
-                    $agreement->col_organization = $row['B'];
-                    $agreement->country = $row['C'];
-                    $agreement->champion = $row['D'];
-                    $agreement->project_title = $row['E'];
-                    $agreement->grant_fund = $row['F'];
-                    $agreement->member = $row['G'];
-                    $agreement->col_name = $row['L'];
-                    $agreement->col_email = $row['M'];
-                    $agreement->col_address = $row['N'];
-                    $agreement->col_collaborators_name = $row['O'];
-                    $agreement->col_wire_up = $row['P'];
-                    $agreement->sign_date = $row['Q'];
-                    $agreement->end_date = $row['R'];
+                    $col_agreement->col_organization = $row['B'];
+                    $col_agreement->country = $row['C'];
+                    $col_agreement->col_name = $row['L'];
+                    $col_agreement->col_email = $row['M'];
+                    $col_agreement->col_address = $row['N'];
+                    $col_agreement->col_collaborators_name = $row['O'];
+                    $col_agreement->col_wire_up = $row['P'];
 
-                    $agreement->status = $status;
-                    $agreement->transfer_to = $to;
-                    $agreement->temp = $temp;
+                    if ($col_agreement->save(false)) {
 
-                    // Save the agreement
-                    if ($agreement->save()) {
-                        $agreementPoc = new AgreementPoc();
-                        $agreementPoc->agreement_id = $agreement->id;
-                        $agreementPoc->pi_name = $row['H'];
-                        $agreementPoc->pi_email = $row['I'];
-                        $agreementPoc->pi_address = $row['J'];
-                        $agreementPoc->pi_phone = $row['K'];
-                        $agreementPoc->pi_kcdio = $row['D'];
-                        $agreementPoc->save();
+                        $agreement = new Agreement();
+                        $agreement->col_id = $col_agreement->id;
+                        $agreement->agreement_type = $row['A'];
+
+                        $agreement->project_title = $row['E'];
+                        $agreement->grant_fund = $row['F'];
+                        $agreement->member = $row['G'];
+                        $agreement->agreement_sign_date = $row['Q'];
+                        $agreement->agreement_expiration_date = $row['R'];
+                        $agreement->status = $status;
+                        $agreement->transfer_to = $to;
+                        $agreement->temp = $temp;
+
+                        if ($agreement->save()) {
+
+                            $agreementPoc = new AgreementPoc();
+                            $agreementPoc->agreement_id = $agreement->id;
+                            $agreementPoc->pi_name = $row['H'];
+                            $agreementPoc->pi_email = $row['I'];
+                            $agreementPoc->pi_address = $row['J'];
+                            $agreementPoc->pi_phone = $row['K'];
+                            $agreementPoc->pi_kcdio = $row['D'];;
+                            $agreementPoc->save(false);
+
+
+                        } else {
+                            Yii::error('Failed to save Agreement: ' . print_r($agreement->errors, true));
+                            $transaction->rollBack(); // Rollback transaction on error
+                            return $insertedRowIds; // Return IDs of successfully inserted rows
+                        }
                     } else {
-                        Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));
+                        Yii::error('Failed to save Collaboration: ' . print_r($col_agreement->errors, true));
                     }
                 }
             }
 
+            $transaction->commit();
             Yii::$app->session->setFlash('success', 'Data imported successfully.');
 
         } catch (Exception $e) {
-            var_dump($e);
-            die();
+            $transaction->rollBack(); // Rollback transaction on exception
+            Yii::error('Exception during import: ' . $e->getMessage());
+            Yii::$app->session->setFlash('error', 'Error importing data.');
         }
 
         return $insertedRowIds;
     }
+
 
 
     private function applyExcelFormula($value)

@@ -1,10 +1,6 @@
 <?php
-
-use common\models\Kcdio;
-use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
 use yii\bootstrap5\Html;
-use yii\helpers\ArrayHelper;
 
 /** @var yii\web\View $this */
 /** @var common\models\AgreementPoc $modelsPoc */
@@ -41,22 +37,7 @@ endforeach; ?>
 
 
 <script>
-    $(document).ready(function() {
-        function calculateDuration() {
-            var startDate = new Date($('#project-start-date').val());
-            var endDate = new Date($('#project-end-date').val());
 
-            if (startDate && endDate && startDate <= endDate) {
-                var duration = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-                $('#duration').text('Duration: ' + duration + ' days');
-            } else {
-                $('#duration').text('Please select valid start and end dates.');
-            }
-        }
-
-        $('#project-start-date, #project-end-date').on('change', calculateDuration);
-        calculateDuration();
-    });
 
     $(document).ready(function() {
         var roleData = <?= json_encode($roleData); ?>;

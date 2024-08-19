@@ -8,11 +8,13 @@ use common\models\Activities;
 use common\models\admin;
 use common\models\Agreement;
 use common\models\AgreementPoc;
+use common\models\Collaboration;
 use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\McomDate;
 use common\models\Poc;
 use common\models\search\AgreementSearch;
+use common\models\User;
 use Exception;
 use Yii;
 //use yii\base\Model;
@@ -46,7 +48,7 @@ class AgreementController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file','delete-activity'
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file','delete-activity',
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -85,7 +87,6 @@ class AgreementController extends Controller
         ]);
         $dataProvider->sort->defaultOrder = ['updated_at' => SORT_DESC];
 
-        $dataProvider->query->joinWith(['agreementPoc']);
         $dataProvider->query->andWhere(['agreement_poc.pi_kcdio' => $type]);
 
         $dataProvider->pagination = [
@@ -110,14 +111,14 @@ class AgreementController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
+        $modelCol = Collaboration::findOne(['id' => $model->col_id]);
         $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
         $modelsPoc = $model->getAgreementPoc()->all();
-        if (!Yii::$app->request->isAjax) {
-            return throw new ForbiddenHttpException('You are not authorized  to access this page!');
-        }
+
         return $this->renderAjax('view', [
             'model' => $this->findModel($id),
             'modelsPoc' => $modelsPoc,
+            'modelCol' => $modelCol,
             'haveActivity' => $haveActivity
         ]);
 
@@ -212,12 +213,14 @@ class AgreementController extends Controller
     public function actionCreate()
     {
         $model = new Agreement();
+        $colModel = new Collaboration();
         $modelsPoc = [new AgreementPoc()];
         $model->scenario = 'uploadCreate';
 
 
         if ($this->request->isPost) {
             $model->load($this->request->post());
+            $colModel->load($this->request->post());
             $modelsPoc = [];
 
             $pocData = Yii::$app->request->post('AgreementPoc', []);
@@ -231,7 +234,7 @@ class AgreementController extends Controller
 
             $status = $this->request->post('checked');
             $model->status = $status;
-            $model->temp = "(" . Yii::$app->user->identity->staff_id .") ".Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->email .") ".Yii::$app->user->identity->username;
             if ($model->agreement_type == 'other') {
                 $model->agreement_type = $model->agreement_type_other;
             }
@@ -241,19 +244,23 @@ class AgreementController extends Controller
             if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    if ($model->save(false)) {
-                        foreach ($modelsPoc as $modelPoc) {
-                            $modelPoc->agreement_id = $model->id;
-                            if (!($modelPoc->save(false))) {
-                                $transaction->rollBack();
-                                break;
+                    if( $colModel->save()){
+                        $model->col_id = $colModel->id;
+                        if ($model->save(false)) {
+                            foreach ($modelsPoc as $modelPoc) {
+                                $modelPoc->agreement_id = $model->id;
+                                if (!($modelPoc->save(false))) {
+                                    $transaction->rollBack();
+                                    break;
+                                }
                             }
+                            $this->multiFileHandler($model, 'files_applicant',  'applicant_doc');
+                            $this->sendEmail($model, Variables::email_init);
+                            $transaction->commit();
+                            return $this->redirect(['index']);
                         }
-                        $this->multiFileHandler($model, 'files_applicant',  'applicant_doc');
-                        $this->sendEmail($model, Variables::email_init);
-                        $transaction->commit();
-                        return $this->redirect(['index']);
                     }
+
                 } catch (Exception $e) {
                     $transaction->rollBack();
                 }
@@ -264,6 +271,7 @@ class AgreementController extends Controller
 
         return $this->renderAjax('create', [
             'model' => $model,
+            'colModel' => $colModel,
             'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
         ]);
     }
@@ -365,40 +373,62 @@ class AgreementController extends Controller
 
     private function sendEmail($model, $template)
     {
+        // Find the email template
         $mail = EmailTemplate::findOne($template);
 
-        $osc = Admin::findOne(['type' => $model->transfer_to]);
-
-
-
-        $modelPoc = $model->getAgreementPoc()->where(['pi_is_primary' => true])->one();
-
-
-
-
-        if ($osc != null) {
-            $body = $mail->body;
-
-            $body = str_replace('{user}', $modelPoc->pi_name, $body);
-            $body = str_replace('{reason}', $model->reason, $body);
-            $body = str_replace('{id}', $model->id, $body);
-            $body = str_replace('{MCOM_date}', $model->mcom_date, $body);
-
-            $mailer = Yii::$app->mailer->compose([
-                'html' => '@backend/views/email/emailTemplate.php'
-            ], [
-                'subject' => $mail->subject,
-                'recipientName' => Yii::$app->user->identity->username,
-                'body' => $body
-            ])
-                ->setFrom(['noReplay@iium.edy.my' => 'IIUM Memorandum Program'])
-                ->setTo($modelPoc->pi_email)
-                ->setSubject($mail->subject)
-                ->setCc($osc->email);
-            $mailer->send();
+        // Ensure that the template exists
+        if ($mail === null) {
+            throw new \Exception("Email template not found.");
         }
 
+        // Get user IDs by role
+        $osc = Yii::$app->authManager->getUserIdsByRole($model->transfer_to);
+
+        // Get the primary POC
+        $modelPoc = $model->getAgreementPoc()->where(['pi_is_primary' => true])->one();
+
+        // Check if there's a primary POC
+        if ($modelPoc === null) {
+            throw new \Exception("Primary POC not found.");
+        }
+
+        // Build the email body by replacing placeholders
+        $body = $mail->body;
+        $body = str_replace('{user}', $modelPoc->pi_name, $body);
+        $body = str_replace('{reason}', $model->reason, $body);
+        $body = str_replace('{id}', $model->id, $body);
+        $body = str_replace('{MCOM_date}', $model->mcom_date, $body);
+
+        // Compose the email
+        $mailer = Yii::$app->mailer->compose([
+            'html' => '@backend/views/email/emailTemplate.php'
+        ], [
+            'subject' => $mail->subject,
+            'recipientName' => Yii::$app->user->identity->username,
+            'body' => $body
+        ])
+            ->setFrom(['noReplay@iium.edy.my' => 'IIUM Memorandum Program'])
+            ->setTo($modelPoc->pi_email)
+            ->setSubject($mail->subject);
+
+        // Add CC emails from $osc (user IDs)
+        $ccRecipients = [];
+        foreach ($osc as $admin) {
+            $user = User::findOne($admin);
+            if ($user != null) {
+                $ccRecipients[] = $user->email;
+            }
+        }
+
+        // Set CC recipients if there are any
+        if (!empty($ccRecipients)) {
+            $mailer->setCc($ccRecipients);
+        }
+
+        // Send the email
+        return $mailer->send();
     }
+
 
     /**
      * Updates an existing Agreement model.
@@ -410,6 +440,7 @@ class AgreementController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $colModel = Collaboration::findOne($model->col_id);
 
         $nextTwoWeeks = Carbon::now()->addWeeks(2)->toDateTimeString();
         $nextTwoMonths = Carbon::now()->addMonths(2)->toDateTimeString();
@@ -421,12 +452,15 @@ class AgreementController extends Controller
             ->limit(3)
             ->all();
 
+
         $modelsPoc = $model->getAgreementPoc()->all();
+
 
         $oldStatus = $model->status;
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
+            $colModel->load($this->request->post());
             $modelsPoc = [];
 
             foreach ($modelsPocData as $data) {
@@ -439,6 +473,7 @@ class AgreementController extends Controller
                 $modelPoc->agreement_id = $model->id;
                 $modelPoc->save();
             }
+
 
             $piDeleteIds = Yii::$app->request->post('Agreement')['pi_delete_ids'] ?? '';
 
@@ -457,22 +492,53 @@ class AgreementController extends Controller
             $this->multiFileHandler($model, 'executedAgreement', 'applicant_doc');
             $this->multiFileHandler($model, 'files_applicant', 'applicant_doc');
 
-            $model->temp = "(" . Yii::$app->user->identity->staff_id . ") " . Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
 
-            if ($model->save()) {
-                if ($model->status == Variables::agreement_resubmitted) {
-                    $this->sendEmail($model, Variables::email_init);
-                }elseif ($oldStatus == Variables::agreement_MCOM_KIV){
-                    $this->sendEmail($model, Variables::email_agr_mcom_resubmitted);
-                }elseif($model->status == Variables::agreement_MCOM_date_set){
-                    $this->sendEmail($model, Variables::email_agr_pick_mcom_date);
+            if($model->status == Variables::agreement_extended){
+                $newAgreement = new Agreement();
+                $newAgreement->attributes = $model->attributes;
+                $newAgreement->status = Variables::agreement_executed;
+                $newAgreement->col_id = $model->col_id;
+
+                if ($newAgreement->save()) {
+                    $modelsPoc = $model->getAgreementPoc()->all();
+
+                    foreach ($modelsPoc as $modelPoc) {
+                        $newPoc = new AgreementPoc();
+                        $newPoc->attributes = $modelPoc->attributes;
+                        $newPoc->agreement_id = $newAgreement->id;
+                        $newPoc->save();
+                    }
+
+                    $oldFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$model->id}";
+                    $newFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$newAgreement->id}";
+
+                    $this->copyDirectory($oldFolder, $newFolder);
+
+                    $newAgreement->applicant_doc = $newFolder.'/applicant/';
+                    $newAgreement->dp_doc = $newFolder.'/higher/';
+                    $newAgreement->save();
                 }
-                return $this->redirect(['index']);
+
             }
+
+              if ($model->save()) {
+                  $colModel->save();
+                  if ($model->status == Variables::agreement_resubmitted) {
+                      $this->sendEmail($model, Variables::email_init);
+                  }elseif ($oldStatus == Variables::agreement_MCOM_KIV){
+                      $this->sendEmail($model, Variables::email_agr_mcom_resubmitted);
+                  }elseif($model->status == Variables::agreement_MCOM_date_set){
+                      $this->sendEmail($model, Variables::email_agr_pick_mcom_date);
+                  }
+                  return $this->redirect(['index']);
+              }
+
         }
 
         return $this->renderAjax('update', [
             'model' => $model,
+            'colModel' => $colModel,
             'modelsPoc' => $modelsPoc,
             'mcomDates' => $mcomDates,
         ]);
@@ -496,5 +562,34 @@ class AgreementController extends Controller
     public function actionDownloader($filePath)
     {
         Yii::$app->response->sendFile($filePath);
+    }
+    /**
+     * Recursively copy files and directories from one location to another.
+     *
+     * @param string $src Source directory
+     * @param string $dst Destination directory
+     */
+    private function copyDirectory($src, $dst)
+    {
+        if (is_dir($src)) {
+            @mkdir($dst, 0777, true);
+
+            $files = scandir($src);
+
+            foreach ($files as $file) {
+                if ($file !== '.' && $file !== '..') {
+                    $srcPath = "$src/$file";
+                    $dstPath = "$dst/$file";
+
+                    if (is_dir($srcPath)) {
+                        $this->copyDirectory($srcPath, $dstPath);
+                    } else {
+                        copy($srcPath, $dstPath);
+                    }
+                }
+            }
+        } elseif (file_exists($src)) {
+            copy($src, $dst);
+        }
     }
 }

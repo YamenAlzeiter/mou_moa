@@ -26,10 +26,10 @@ class ReminderController extends Controller
         }
 
         $reminders = Reminder::find()->all();
-        $models = Agreement::find()->where(['not', ['end_date' => null]])->all();
+        $models = Agreement::find()->where(['not', ['agreement_expiration_date' => null]])->all();
 
         foreach ($models as $model) {
-            $endDate = Carbon::createFromFormat('Y-m-d', $model->end_date);
+            $endDate = Carbon::createFromFormat('Y-m-d', $model->agreement_expiration_date);
             foreach ($reminders as $index => $reminder) {
                 if ($reminder->type === 'MONTH') {
                     $remindDate = $endDate->copy()->subMonths($reminder->reminder_before)->startOfDay();
@@ -48,7 +48,7 @@ class ReminderController extends Controller
                     $model->isReminded += 1;
                     $model->status = Variables::agreement_reminder_sent;
                     $model->save();
-                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == Variables::agreement_executed || $model->status == Variables::imported_agreement_executed) && !($currentDate > $model->end_date)) {
+                } elseif ($currentDate->greaterThan($remindDate) && ($model->status == Variables::agreement_executed || $model->status == Variables::imported_agreement_executed) && !($currentDate > $model->agreement_expiration_date)) {
 
                     if ($model->isReminded == $index) {
                         $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
@@ -59,7 +59,7 @@ class ReminderController extends Controller
                     }
                 }
 
-                if ($currentDate > $model->end_date && ($model->status == Variables::agreement_executed || $model->status == Variables::agreement_reminder_sent || $model->status == Variables::imported_agreement_executed)) {
+                if ($currentDate > $model->agreement_expiration_date && ($model->status == Variables::agreement_executed || $model->status == Variables::agreement_reminder_sent || $model->status == Variables::imported_agreement_executed)) {
                     $users = AgreementPoc::find()->where(['agreement_id' => $model->id])->all();
                     $this->sendEmailReminder($users, $remindEmailTemplate, $model);
                     $model->status = Variables::agreement_expired;
@@ -89,7 +89,7 @@ class ReminderController extends Controller
         if ($primaryUser !== null) {
             $body = str_replace('{user}', $primaryUser->pi_name, $emailTemplate->body);
             $body = str_replace('{id}', $primaryUser->agreement_id, $body);
-            $body = str_replace('{expiry_date}', $model->end_date, $body);
+            $body = str_replace('{expiry_date}', $model->agreement_expiration_date, $body);
 
             $mailer = Yii::$app->mailer->compose(['html' => '@backend/views/email/emailTemplate.php'], [
                 'subject' => $emailTemplate->subject,
@@ -121,7 +121,7 @@ class ReminderController extends Controller
         }
 
 
-        $users = Agreement::find()->andWhere(['not', ['sign_date' => null]])->andWhere(['status' => [Variables::imported_agreement_executed, Variables::agreement_executed]])->all();
+        $users = Agreement::find()->andWhere(['not', ['execution_date' => null]])->andWhere(['status' => [Variables::imported_agreement_executed, Variables::agreement_executed]])->all();
 
 
         foreach ($users as $user) {

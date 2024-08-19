@@ -3,6 +3,7 @@
 namespace common\helpers;
 
 use common\models\Kcdio;
+use common\models\LookupCdKcdiom;
 use common\models\Poc;
 use Yii;
 use yii\bootstrap5\Html;
@@ -20,7 +21,16 @@ class agreementPocMaker
                 <div class="row poc-row">
 
                     <div class="col-12 col-md-6">
-                        <?= $form->field($model, "[pocIndex]pi_kcdio")->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO']) ?>
+                        <?= $form->field($model, "[pocIndex]pi_kcdio")
+                            ->dropDownList(
+                                ArrayHelper::map(
+                                    LookupCdKcdiom::find()->where(['not', ['abb_code' => null]])->all(),
+                                    'abb_code',
+                                    'kcdiom_desc'
+                                ),
+                                ['prompt' => 'Select KCDIO']
+                            )
+                        ?>
                     </div>
                     <div class="col-12 col-md-6">
                         <?= $form->field($model, "[pocIndex]pi_name")->textInput(['maxlength' => true, 'placeholder' => '']) ?>
@@ -42,13 +52,22 @@ class agreementPocMaker
             </div>
         <?php }
 
-        function renderInitPocFields($form, $model, $index, $defaultPoc)
+        function renderInitPocFields($form, $model, $index)
         {
             ?>
             <h4>Details of Person in Charge IIUM </h4>
             <div class="row poc-row">
                 <div class="col-12 col-md-6">
-                    <?= $form->field($model, "[$index]pi_kcdio")->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select K/C/D/I/O']) ?>
+                    <?= $form->field($model, "[$index]pi_kcdio")
+                        ->dropDownList(
+                            ArrayHelper::map(
+                                LookupCdKcdiom::find()->where(['not', ['abb_code' => null]])->all(),
+                                'abb_code',
+                                'kcdiom_desc'
+                            ),
+                            ['prompt' => 'Select KCDIO']
+                        )
+                    ?>
                 </div>
                 <div class="col-12 col-md-6">
                     <?= $form->field($model, "[$index]pi_name")->textInput(['maxlength' => true, 'placeholder' => ''])?>
@@ -83,7 +102,16 @@ class agreementPocMaker
             <div class="row poc-row">
                 <div class="col-12 col-md-6">
                     <?= $form->field($model, "[$index]pi_kcdio")
-                        ->dropDownList(ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO']) ?>
+                        ->dropDownList(
+                            ArrayHelper::map(
+                                LookupCdKcdiom::find()->where(['not', ['abb_code' => null]])->all(),
+                                'abb_code',
+                                'kcdiom_desc'
+                            ),
+                            ['prompt' => 'Select KCDIO']
+                        )
+                    ?>
+
                 </div>
                 <div class="col-12 col-md-6">
                     <?= $form->field($model, "[$index]pi_name")->textInput(['maxlength' => true, 'placeholder' => ''])?>

@@ -104,8 +104,8 @@ $model->reason = null; // init reason to null for ckeditor value
     <?php if ($model->status == Variables::agreement_draft_approve_final_draft): ?>
     <h4>Commencement Date</h4>
         <div class="row">
-            <div class="col-md"><?= $form->field($model, 'project_start_date')->textInput(['type' => 'date']) ?></div>
-            <div class="col-md"><?= $form->field($model, 'project_end_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'agreement_sign_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'agreement_expiration_date')->textInput(['type' => 'date']) ?></div>
         </div>
     <h4>Execution Date</h4>
         <div class="row">

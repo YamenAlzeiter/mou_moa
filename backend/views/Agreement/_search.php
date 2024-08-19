@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Agreement;
 use common\models\AgreementType;
 use common\models\McomDate;
 use yii\helpers\ArrayHelper;
@@ -42,11 +43,22 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
-        <?= $form->field($model, 'agreement_type',
-            ['options' => ['mb-0']])->dropDownList(ArrayHelper::map(Agreementtype::find()->all(), 'type', 'type'), [
-            'class' => 'form-select', 'prompt' => 'Pick Type', // Placeholder text
-            'onchange' => '$(this).closest("form").submit();', // Submit form on change
-        ])->label(false) ?>
+        <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])
+            ->dropDownList(
+                \yii\helpers\ArrayHelper::map(Agreement::find()
+                    ->select(['agreement_type'])
+                    ->groupBy('agreement_type')
+                    ->orderBy('agreement_type')
+                    ->asArray()
+                    ->all(), 'agreement_type', 'agreement_type'),
+                [
+                    'class' => 'form-select',
+                    'prompt' => 'Pick Type',
+                    'onchange' => '$(this).closest("form").submit();'
+                ]
+            )->label(false)
+        ?>
+
 
         <?= $form->field($model, 'endDate', ['options' => ['mb-0']])->dropDownList([
             '1 Year' => '1 Year', '6 Month' => '6 Month', '3 Month' => '3 Month', '2 Month' => '2 Month',

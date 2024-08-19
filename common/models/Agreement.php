@@ -11,42 +11,35 @@ use yii\db\Expression;
  * This is the model class for table "agreement".
  *
  * @property int $id
- * @property string|null $col_organization
- * @property string|null $col_name
- * @property string|null $col_address
- * @property string|null $col_contact_details
- * @property string|null $col_collaborators_name
- * @property string|null $col_wire_up
- * @property string|null $col_phone_number
- * @property string|null $col_email
+ * @property int|null $status
+ * @property int|null $col_id
  * @property string|null $champion
- * @property string|null $updated_at
- * @property string|null $created_at
- * @property string|null $country
- *
  * @property string|null $project_title
  * @property string|null $grant_fund
- * @property string|null $sign_date
- * @property string|null $last_reminder
- * @property string|null $end_date
  * @property string|null $member
+ * @property string|null $agreement_type
+ * @property string|null $transfer_to
  * @property string|null $proposal
- * @property int|null $status
+ * @property string|null $rmc_start_date
+ * @property string|null $rmc_end_date
  * @property string|null $ssm
  * @property string|null $company_profile
- * @property string|null $mcom_date
- * @property string|null $meeting_link
- * @property string|null $agreement_type
+ * @property string|null $agreement_sign_date
+ * @property string|null $agreement_expiration_date
  * @property string|null $execution_date
- * @property string|null $project_start_date
- * @property string|null $project_end_date
- * @property string|null $dp_doc
+ * @property string|null $mcom_date
+ * @property string|null $last_reminder
+ * @property string|null $updated_at
+ * @property string|null $created_at
  * @property string|null $applicant_doc
+ * @property string|null $dp_doc
  * @property string|null $reason
- * @property string|null $transfer_to
+ * @property string|null $collaboration_area
+ * @property int|null $isReminded
  * @property string|null $temp
- * @property integer|null $isReminded
+ *
  * @property Activities[] $activities
+ * @property AgreementPoc[] $agreementPocs
  * @property Log[] $logs
  */
 class Agreement extends ActiveRecord
@@ -81,7 +74,7 @@ class Agreement extends ActiveRecord
                 'maxSize' => 1024 * 1024 * 2, // 2 MB limit
                 'extensions' => ['docx'],
                 'when' => function ($model) {
-                    return $model->status != 91; // Allow 'docx' when status is not 81
+                    return $model->status != Variables::agreement_executed; // Allow 'docx' when status is not 81
                 },
                 'whenClient' => "function (attribute, value) {
                     return $('#agreement-status').val() != 91; // Client-side validation
@@ -94,17 +87,17 @@ class Agreement extends ActiveRecord
                 'maxSize' => 1024 * 1024 * 2, // 2 MB limit
                 'extensions' => ['pdf'],
                 'when' => function ($model) {
-                    return $model->status == 91; // Allow 'pdf' when status is 81
+                    return $model->status == Variables::agreement_executed; // Allow 'pdf' when status is 81
                 },
                 'whenClient' => "function (attribute, value) {
                     return $('#agreement-status').val() == 91; // Client-side validation
                 }",
             ],
             [
-                [ 'execution_date', 'project_end_date', 'project_start_date'],
+                [ 'execution_date', 'agreement_expiration_date', 'agreement_sign_date'],
                 'required',
                 'when' => function ($model) {
-                    return $model->status == 91; // Required when status is 81
+                    return $model->status == Variables::agreement_executed; // Required when status is 81
                 },
                 'whenClient' => "function (attribute, value) {
                     return $('#agreement-status').val() == 91; // Client-side validation
@@ -120,17 +113,10 @@ class Agreement extends ActiveRecord
 
 
             // Required fields for 'uploadCreate' scenario
-            [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up',  'proposal', 'col_phone_number',
-                'col_email', 'transfer_to', 'agreement_type', 'country',
-                'files_applicant', 'champion'], 'required', 'on' => 'uploadCreate'],
+            [['transfer_to', 'agreement_type', 'files_applicant', 'champion'], 'required', 'on' => 'uploadCreate'],
 
             // Required fields for 'createSpecial' scenario
-            [['col_organization', 'col_name', 'col_address', 'col_collaborators_name',
-                'col_wire_up', 'proposal', 'col_phone_number',
-                'col_email', 'transfer_to',
-                'agreement_type', 'country', 'sign_date', 'end_date', 'mcom_date',
-                'files_applicant', 'champion'], 'required', 'on' => 'createSpecial'],
+            [['transfer_to', 'agreement_type', 'agreement_sign_date', 'agreement_expiration_date', 'mcom_date', 'files_applicant', 'champion'], 'required', 'on' => 'createSpecial'],
 
             // Conditional required rules
             [['files_applicant'], 'required', 'when' => function ($model) {
@@ -154,33 +140,25 @@ class Agreement extends ActiveRecord
             }, 'whenClient' => "function (attribute, value) {
             return $('#transfer-to-dropdown').val() !== 'RMC';
         }"],
-            [['project_start_date', 'project_end_date'], 'required', 'when' => function ($model) {
+            [['rmc_start_date', 'rmc_end_date'], 'required', 'when' => function ($model) {
                 return $model->transfer_to == 'RMC';
             }, 'whenClient' => "function (attribute, value) {
             return $('#transfer-to-dropdown').val() == 'RMC';
         }"],
 
-            // Email validation rule
-            [['col_email'], 'email'],
+
 
             // String type rules
-            [['project_title', 'proposal', 'reason', 'temp'], 'string'],
-            [['col_organization', 'col_name', 'col_address', 'col_contact_details',
-                'col_collaborators_name', 'col_wire_up', 'champion',
-                'ssm', 'dp_doc', 'applicant_doc', 'transfer_to', 'agreement_type', 'country', 'principle', 'advice'], 'string', 'max' => 522],
-            [['col_phone_number', 'col_email'], 'string', 'max' => 512],
-            [['grant_fund', 'company_profile', 'meeting_link'], 'string', 'max' => 255],
+            [['status', 'col_id', 'isReminded'], 'default', 'value' => null],
+            [['status', 'col_id', 'isReminded'], 'integer'],
+            [['rmc_start_date', 'rmc_end_date', 'agreement_sign_date', 'agreement_expiration_date', 'execution_date', 'mcom_date', 'last_reminder', 'updated_at', 'created_at'], 'safe'],
+            [['applicant_doc', 'dp_doc', 'reason', 'collaboration_area', 'temp'], 'string'],
+            [['champion'], 'string', 'max' => 522],
+            [['project_title', 'proposal', 'company_profile'], 'string', 'max' => 255],
+            [['grant_fund', 'transfer_to'], 'string', 'max' => 10],
             [['member'], 'string', 'max' => 2],
-
-            // Safe fields
-            [['sign_date', 'end_date', 'mcom_date', 'created_at', 'updated_at', 'last_reminder', 'umc_date', ], 'safe'],
-
-            // Default and integer rules
-            [['status'], 'default', 'value' => null],
-            [['status'], 'integer'],
-
-            // Default value rules
-            [['reason'], 'default', 'value' => null],
+            [['agreement_type'], 'string', 'max' => 50],
+            [['ssm'], 'string', 'max' => 25],
         ];
     }
 
@@ -192,43 +170,40 @@ class Agreement extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'col_organization' => 'Organization',
-            'col_name' => 'Name',
-            'col_address' => 'Address',
-            'col_contact_details' => 'Contact Details',
-            'col_collaborators_name' => 'Collaborators Name',
-            'col_wire_up' => 'Project Description',
-            'col_phone_number' => 'Phone Number',
-            'col_email' => 'Email',
-            'champion' => 'Champion',
 
-            'project_end_date' => 'End Date',
-            'project_start_date' => 'Start Date',
-            'execution_date' => 'Execution Date',
+            'agreement_expiration_date' => 'Agreement Expiration Date',
+            'agreement_sign_date' => 'Agreement Sign Date',
+            'execution_date' => 'Agreement Execution Date',
+            'rmc_start_date' => 'Project Start Date',
+            'rmc_end_date' => 'Project End Date',
+
             'project_title' => 'Project Title / Research Title',
             'grant_fund' => 'Grant Fund',
-            'sign_date' => 'Sign Date',
-            'end_date' => 'End Date',
+
             'member' => 'No. of Project Members',
             'proposal' => 'proposal',
             'status' => 'Status',
+
             'ssm' => 'SSM',
             'company_profile' => 'Company Profile',
-            'mcom_date' => 'MCOM Date',
-            'meeting_link' => 'Meeting Link',
 
-            'dp_doc' => 'by department',
-            'applicant_doc' => 'by applicant',
+            'mcom_date' => 'MCOM Date',
+
+            'dp_doc' => 'Upload Files',
+            'applicant_doc' => 'Upload Files',
 
             'reason' => 'Reason',
             'transfer_to' => 'OSC',
             'agreement_type' => 'Type',
+
             'created_at' => 'Created At',
             'updated_at' => 'Updated At',
-            'country' => 'Country',
+
             'isReminded' => 'Reminder Step',
+
             'temp_attribute_poc' => 'KCDIO',
             'temp_attribute' => 'person in charge name',
+
             'agreement_type_other' => 'Other'
         ];
     }
@@ -246,6 +221,9 @@ class Agreement extends ActiveRecord
     public function getAgreementPoc()
     {
         return $this->hasMany(AgreementPoc::class, ['agreement_id' => 'id']);
+    }
+    public function getcollaboration(){
+        return $this->hasOne(Collaboration::class, ['id' => 'col_id']);
     }
 
     public function getMcomDate()
@@ -281,7 +259,8 @@ class Agreement extends ActiveRecord
 
         //delete draft files when status become 91 AKA ACTV
 //        if($this->status == 91) $this->deleteDrafts();
-        if ($this->status == 21 || $this->status == 121) $this->increaseMCOMDate();
+
+        if (in_array($this->status,[Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_date_changed])) $this->increaseMCOMDate();
     }
 
     protected function increaseMCOMDate()

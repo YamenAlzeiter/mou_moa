@@ -46,7 +46,8 @@ class m240315_033031_create_status_table extends Migration
         $this->insert('{{%status}}', ['status' => 100, 'tag' => 'I-AGR-EXC', 'description' => 'Excuted Agreement']);
         $this->insert('{{%status}}', ['status' => 102, 'tag' => 'I-AGR-EXP', 'description' => 'Expired Agreement']);
         $this->insert('{{%status}}', ['status' => 110, 'tag' => 'REMINDER', 'description' => 'Reminder for agreement update']);
-        $this->insert('{{%status}}', ['status' => 121, 'tag' => 'MCOM-C', 'description' => 'MCOM Date Changed']);
+        $this->insert('{{%status}}', ['status' => 111, 'tag' => 'REMINDER', 'description' => 'Reminder for agreement update']);
+        $this->insert('{{%status}}', ['status' => 121, 'tag' => 'AGR_EXT', 'description' => 'Agreement Extended']);
 
 
     }

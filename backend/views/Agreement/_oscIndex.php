@@ -1,7 +1,6 @@
 <?php
 
 use common\helpers\builders;
-use yii\bootstrap5\Html;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
@@ -22,10 +21,10 @@ echo GridView::widget([
         'id',
 
         [
-            'attribute' => 'col_organization',
+            'attribute' => 'collaboration.col_organization',
             'contentOptions' => ['class' => 'truncate'],
         ],
-        'country',
+        'collaboration.country',
         [
             'label' => 'Champion',
             'value' => function ($model) {

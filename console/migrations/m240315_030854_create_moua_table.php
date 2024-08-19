@@ -16,41 +16,32 @@ class m240315_030854_create_moua_table extends Migration
             'id' => $this->primaryKey(),
             //status
             'status' => $this->integer(),
-            //Collaborator Details
-            'col_organization' => $this->string(522),
-            'col_name' => $this->string(522),
-            'col_address' => $this->string(522),
-            'col_contact_details' => $this->string(522),
-            'col_collaborators_name' => $this->string(522),
-            'col_wire_up' => $this->string(522),
-            'col_phone_number' => $this->string(512),
-            'col_email' => $this->string(512),
-            'country' => $this->string(522),
+            'col_id' => $this->integer(),
             //primary person in charge
             'champion' => $this->string(522),
             //research/ project
-            'project_title' => $this->text(),
-            'grant_fund' => $this->string(),
+            'project_title' => $this->string(255),
+            'grant_fund' => $this->string(10),
             'member' => $this->string(2),
-            'progress' => $this->text(),
 
-            'agreement_type' => $this->string(),
-            'transfer_to' => $this->string(),
-            'proposal' => $this->string(),
+            'agreement_type' => $this->string(50),
+            'transfer_to' => $this->string(10),
+            'proposal' => $this->string(255),
 
             //rmc additional requirement
-            'project_start_date' => $this->date(),
-            'project_end_date' => $this->date(),
+            'rmc_start_date' => $this->date(),
+            'rmc_end_date' => $this->date(),
 
             //oil additional requirement
-            'ssm' => $this->string(522),
+            'ssm' => $this->string(25),
             'company_profile' => $this->string(),
 
             // dates
-            'sign_date' => $this->date(),
-            'end_date' => $this->date(),
+            'agreement_sign_date' => $this->date(),
+            'agreement_expiration_date' => $this->date(),
             'execution_date' => $this->date(),
-            'last_reminder' => $this->date(), //activity
+            'mcom_date' => $this->date(),
+            'last_reminder' => $this->date(),
 
             'updated_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
@@ -73,16 +64,15 @@ class m240315_030854_create_moua_table extends Migration
 
         ]);
 
-        //in case need foreign key
-//        $this->addForeignKey(
-//            'fk-agreement-user-id', // name of the foreign key constraint
-//            '{{%agreement}}', // child table (agreement table)
-//            'user_id', // name of the column in the child table
-//            '{{%user}}', // parent table (user table)
-//            'id', // name of the column in the parent table
-//            'CASCADE', // on delete
-//            'CASCADE' // on update
-//        );
+        $this->addForeignKey(
+            'fk-col-id',
+            '{{%agreement}}',
+            'col_id',
+            '{{%collaboration}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
 
         $this->execute("
             CREATE OR REPLACE FUNCTION before_insert_agreement() 
@@ -105,33 +95,11 @@ class m240315_030854_create_moua_table extends Migration
             EXECUTE FUNCTION before_insert_agreement();
         ");
 
-//        $this->execute("
-//            CREATE OR REPLACE FUNCTION clear_draft_fields()
-//            RETURNS TRIGGER AS $$
-//            BEGIN
-//                IF NEW.status = 81 THEN
-//                    NEW.doc_applicant := '';
-//                    NEW.doc_draft := '';
-//                    NEW.doc_newer_draft := '';
-//                END IF;
-//                RETURN NEW;
-//            END;
-//            $$ LANGUAGE plpgsql;
-//        ");
 
-        // Create the trigger
-//        $this->execute("
-//            CREATE TRIGGER clear_files_on_status_81
-//            BEFORE UPDATE ON agreement
-//            FOR EACH ROW
-//            WHEN (NEW.status = 81 AND OLD.status <> 81) -- Trigger only on change TO 81
-//            EXECUTE FUNCTION clear_draft_fields();
-//        ");
         $this->execute("
 CREATE OR REPLACE FUNCTION create_status_log()
 RETURNS trigger AS $$ 
 BEGIN
-   -- Access changed attributes using special variables
    IF (TG_OP = 'INSERT' AND NEW.status = 10) OR 
       (TG_OP = 'INSERT' AND NEW.status = 91) OR
       (TG_OP = 'INSERT' AND NEW.status = 100) OR
@@ -142,34 +110,34 @@ BEGIN
            old_status INTEGER := CASE WHEN TG_OP = 'UPDATE' THEN OLD.status ELSE 0 END;
            new_status INTEGER := NEW.status;
            reason TEXT := NEW.reason;
-           creator TEXT := NEW.temp;
            log_message TEXT;
            resubmitted BOOLEAN;
            imported BOOLEAN;
            inserted BOOLEAN;
            special BOOLEAN;
+           creator TEXT := NEW.temp;
 
        BEGIN 
            -- Determine boolean flags based on conditions
-           IF (OLD.status = 2 AND NEW.status = 15) THEN 
+           IF OLD.status = 2 AND NEW.status = 15 THEN 
                resubmitted := TRUE;
            ELSE 
                resubmitted := FALSE;
            END IF;
 
-           IF (TG_OP = 'INSERT' AND (NEW.status = 100 OR NEW.status = 102)) THEN 
+           IF TG_OP = 'INSERT' AND (NEW.status = 100 OR NEW.status = 102) THEN 
                imported := TRUE;
            ELSE 
                imported := FALSE;
            END IF;
 
-           IF (TG_OP = 'INSERT' AND NEW.status = 10) THEN 
+           IF TG_OP = 'INSERT' AND NEW.status = 10 THEN 
                inserted := TRUE;
            ELSE 
                inserted := FALSE;
            END IF;
 
-           IF (TG_OP = 'INSERT' AND NEW.status = 91) THEN 
+           IF TG_OP = 'INSERT' AND NEW.status = 91 THEN 
                special := TRUE;
            ELSE 
                special := FALSE;
@@ -198,13 +166,15 @@ BEGIN
    RETURN NEW; 
 END;
 $$ LANGUAGE plpgsql;
-        ");
+");
+
         $this->execute("
-             CREATE TRIGGER log
-            AFTER INSERT OR UPDATE ON agreement -- Replace 'your_agreement_table' 
-            FOR EACH ROW 
-            EXECUTE PROCEDURE create_status_log();
-        ");
+    CREATE TRIGGER log
+    AFTER INSERT OR UPDATE ON agreement
+    FOR EACH ROW 
+    EXECUTE PROCEDURE create_status_log();
+");
+
 
     }
 
@@ -216,68 +186,3 @@ $$ LANGUAGE plpgsql;
         $this->dropTable('{{%agreement}}');
     }
 }
-
-//
-//BEGIN
-//-- Access changed attributes using special variables
-//IF (TG_OP = 'INSERT' AND NEW.status = 10) OR (TG_OP = 'INSERT' AND NEW.status = 91) OR
-//(TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) OR
-//(TG_OP = 'UPDATE' AND OLD.status != NEW.status)
-//   THEN
-//       DECLARE
-//       old_status INTEGER := (CASE WHEN TG_OP = 'UPDATE' THEN OLD.status ELSE 0 END);
-//           new_status INTEGER := NEW.status;
-//           reason TEXT := NEW.reason;
-//           log_message TEXT;
-//         resubmitted bool;
-//         imported bool;
-//         inserted bool;
-//		 specail bool;
-//		 creator TEXT = NEW.temp;
-//
-//       BEGIN
-//
-//       IF (OLD.status = 2 AND NEW.status = 15) THEN resubmitted = TRUE;
-//                                        ELSE resubmitted = FALSE;
-//       END IF;
-//       IF (TG_OP = 'INSERT' AND NEW.status = 100 OR TG_OP = 'INSERT' AND NEW.status = 102) THEN imported = TRUE;
-//                                        ELSE imported = FALSE;
-//       END IF;
-//       IF (TG_OP = 'INSERT' AND NEW.status = 10) THEN inserted = TRUE;
-//                                        ELSE inserted = FALSE;
-//       END IF;
-//	   IF(TG_OP = 'INSERT' AND NEW.status = 91)THEN specail = TRUE;
-//	   									ELSE specail = FALSE;
-//		END IF;
-//       --what status need reason message
-//         IF ( resubmitted = TRUE
-//             OR imported = TRUE
-//             OR TG_OP = 'INSERT'
-//             OR NEW.status = 2 -- Not Recommended from OSC
-//           OR NEW.status = 12 -- Not Recommended from OLA
-//           OR NEW.status = 31 -- Approved After MCOM
-//           OR new.status = 32 -- Rejected After MCOM
-//           OR new.status = 33 -- KIV After MCOM
-//           OR new.status = 34 -- Conditional Approve After Mcom
-//           OR new.status = 41 -- Approved After UMC
-//           OR NEW.status = 42 -- Rejected After UMC
-//           OR NEW.status = 43 -- KIV After UMC
-//           OR NEW.status = 82 -- Newer Draft Not Recommended
-//         ) THEN
-//           -- Build the log message
-//           log_message := CASE
-//                            WHEN inserted = TRUE THEN 'New Application Submitted'
-//                     WHEN resubmitted = TRUE THEN 'Application Resubmitted'
-//                     WHEN imported = TRUE THEN 'Application Imported'
-//					 WHEN specail = TRUE THEN 'Applicatoin has been created by OLA skipping all normal process.'
-//                            ELSE reason
-//                          END;
-//       END IF;
-//           -- Insert into log table
-//           INSERT INTO log (agreement_id, old_status, new_status, message, created_by)
-//           VALUES (NEW.id, old_status, new_status, log_message, creator);
-//       END;
-//   END IF;
-//
-//   RETURN NEW;
-//END;

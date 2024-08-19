@@ -64,13 +64,12 @@ AppAsset::register($this);
     $menuItems = [
         ['url' => 'agreement/index', 'icon' => 'ti ti-layout-dashboard fs-7', 'optionTitle' => 'Agreements'],
     ];
-    if (Yii::$app->user->identity->is_admin) {
+    if (Yii::$app->user->can('OSIC')) {
         $menuItems[] = [
             'icon' => 'ti ti-settings-2 fs-7',
             'optionTitle' => 'settings',
             'items' => [
                 ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
-                ['url' => 'setting/kcdio', 'optionTitle' => 'K/C/D/I/O'],
                 ['url' => 'setting/status', 'optionTitle' => 'Status'],
                 ['url' => 'setting/others', 'optionTitle' => 'Others'],
             ]

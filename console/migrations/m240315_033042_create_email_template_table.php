@@ -322,15 +322,13 @@ class m240315_033042_create_email_template_table extends Migration
             ],
             [
                 'id' => 23,
-                'subject' => 'Agreement Expired (Reminder)',
+                'subject' => 'Agreement Approved',
                 'body' => <<<HTML
-                <p>السلام عليكم ورحمة الله وبركاته</p>
+                  <p>السلام عليكم ورحمة الله وبركاته</p>
 
-                <p>Dear {user}</p>
-                
-                <p>
-                Your application ID no: {id} has been received by the Office of Legal Adviser and will be reviewed within 3 working days.</p>
-                
+                  <p>Dear {user}</p>
+
+                  <p>Your application ID no: {id} has been received by the Office of Legal Adviser and will be reviewed within 3 working days.</p>
                 HTML
             ],
 

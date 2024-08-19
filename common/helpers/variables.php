@@ -29,7 +29,9 @@ class Variables
     const imported_agreement_executed = 100;
     const imported_agreement_expired = 102;
     const agreement_reminder_sent = 110;
+    const agreement_extended = 111;
     const agreement_MCOM_date_changed = 121;
+
 
 
     //email templates

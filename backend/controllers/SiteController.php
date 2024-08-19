@@ -2,10 +2,8 @@
 
 namespace backend\controllers;
 
-use common\models\AdminLoginForm;
-use common\models\LoginCas;
-use GuzzleHttp\Client;
-use GuzzleHttp\Cookie\CookieJar;
+use common\models\User;
+use phpCAS;
 use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
@@ -27,7 +25,7 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['login', 'error'],
+                        'actions' => ['cas-login', 'error'],
                         'allow' => true,
                     ],
                     [
@@ -73,86 +71,83 @@ class SiteController extends Controller
      *
      * @return string|Response
      */
-//    public function actionLogin()
+
+//    public function actionCasLogin()
 //    {
-//        if (!\Yii::$app->user->isGuest) {
+//        if (!Yii::$app->user->isGuest) {
 //            return $this->goHome();
 //        }
+//        $casParams = Yii::$app->params['cas'];
+//        phpCAS::setLogger();
+//        phpCAS::setVerbose(true);
+//        phpCAS::client(SAML_VERSION_1_1, $casParams['host'], $casParams['port'], $casParams['casContext'], $casParams['clientServiceName']);
+//        if (!empty($casParams['casServerSslCert']))
+//            phpCAS::setCasServerCACert($casParams['casServerSslCert']);
+//        else
+//            phpCAS::setNoCasServerValidation();
 //
-//        $model = new LoginCas();
-//        if ($model->login()) {
-//
-//            $jar = new CookieJar;
-//
-//            $client = new Client(array(
-//                'cookies' => $jar,
-//                'verify' => false
-//            ));
-//
-//            $params = Yii::$app->params['mstr'];
-//            $url = $params['loginUrl'];
-//
-//
-//            $client->request('POST', $url, [
-//                'timeout' => 30,
-//                'form_params' => [
-//                    'username' => 'view',
-//                    'password' => '',
-//                    'loginMode' => 1,
-//                ],
-//                // 'debug' => fopen('php://stderr', 'w')
-//            ]);
-//
-//
-//            $jarArray = $jar->toArray();
-//
-//            if (isset($_COOKIE['iSession'])) {
-//                unset($_COOKIE['iSession']);
-//                setcookie('iSession', null, -1, '/');
-//                // return true;
-//                // print_r($_COOKIE['iSession']);
-//                // exit;
-//            }
-//
-//            if (isset($_COOKIE['JSESSIONID'])) {
-//                unset($_COOKIE['JSESSIONID']);
-//                setcookie('JSESSIONID', null, -1, '/');
-//            }
-//
-//            if(isset($jarArray[0])) {
-//                setcookie($jarArray[0]['Name'], $jarArray[0]['Value'], time() + (86400 * 30), $jarArray[0]['Path'], $jarArray[0]['Domain'], 0);
-//            }
-//            if(isset($jarArray[1])) {
-//                setcookie($jarArray[1]['Name'], $jarArray[1]['Value'], time() + (86400 * 30), $jarArray[1]['Path'], $jarArray[1]['Domain'], 0);
-//            }
-//
-//            return $this->goBack();
+//        phpCAS::handleLogoutRequests(true, $casParams['casRealHost']);
+//        phpCAS::forceAuthentication();
+//        $findUser = User::findByUsername(phpCAS::getUser());
+//        if ($findUser === null) {
+//            $newUser = new User();
+//            $newUser->username = phpCAS::getUser();
+//            $newUser->status = User::STATUS_ACTIVE;
+//            $newUser->auth_key = Yii::$app->security->generateRandomString();
+//            $newUser->email = isset(phpCAS::getAttributes()['mail']) ? phpCAS::getAttributes()['mail'] : '';
+//            $newUser->save();
+//            Yii::$app->user->login($newUser, 3600 * 24 * 30);
 //        } else {
-//            return $this->render('login', [
-//                'model' => $model,
-//            ]);
+//            Yii::$app->user->login($findUser, 3600 * 24 * 30);
 //        }
+//
+//        return $this->goBack();
 //    }
-    public function actionLogin()
+
+    public function actionCasLogin()
     {
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $this->layout = 'blank';
-
-        $model = new AdminLoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->goBack();
+        $casParams = Yii::$app->params['cas'];
+        phpCAS::setLogger();
+        phpCAS::setVerbose(true);
+        phpCAS::client(SAML_VERSION_1_1, $casParams['host'], $casParams['port'], $casParams['casContext'], $casParams['clientServiceName']);
+        if (!empty($casParams['casServerSslCert'])) {
+            phpCAS::setCasServerCACert($casParams['casServerSslCert']);
+        } else {
+            phpCAS::setNoCasServerValidation();
         }
 
-        $model->password = '';
+        phpCAS::handleLogoutRequests(true, $casParams['casRealHost']);
+        phpCAS::forceAuthentication();
 
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        $username = phpCAS::getUser();
+        $email = isset(phpCAS::getAttributes()['mail']) ? phpCAS::getAttributes()['mail'] : '';
+        $userType = isset(phpCas::getAttributes()['defaultgroup']) ? phpCas::getAttributes()['defaultgroup'] : '';
+//        var_dump(phpCAS::getAttributes());
+//        die();
+//        if ($userType === 'STUDENT:UI:') {
+//            throw new ForbiddenHttpException('You do not have permission to access this page.');
+//        }
+        $findUser = User::findOne(['email' => $email]);
+
+        if ($findUser === null) {
+            $newUser = new User();
+            $newUser->username = $username;
+            $newUser->status = User::STATUS_ACTIVE;
+            $newUser->auth_key = Yii::$app->security->generateRandomString();
+            $newUser->email = $email;
+            $newUser->type = isset(phpCAS::getAttributes()['kcdi']) ? phpCAS::getAttributes()['kcdi'] : '';
+            $newUser->save();
+            Yii::$app->user->login($newUser, 3600 * 24 * 30);
+        } else {
+            Yii::$app->user->login($findUser, 3600 * 24 * 30);
+        }
+
+        return $this->goBack();
     }
-
 
     /**
      * Logout action.

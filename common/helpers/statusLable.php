@@ -54,6 +54,7 @@ class statusLable
             102 => ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
 
             110 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
+            111 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
         ];
 
         $default = ['badge' => 'bg-danger-subtle text-danger', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];

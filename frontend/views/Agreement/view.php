@@ -13,6 +13,7 @@ use yii\web\YiiAsset;
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
 /** @var common\models\AgreementPoc $modelsPoc */
+/** @var common\models\Collaboration $modelCol */
 /** @var common\models\Activities $haveActivity */
 
 
@@ -58,17 +59,17 @@ modal::end();
 
     <div class="row">
         <div class="col-12">
-            <?= $view->renderer($model->col_organization, 'Organization') ?>
+            <?= $view->renderer($modelCol->col_organization, 'Organization') ?>
         </div>
         <div class="col-6">
-            <?= $view->renderer($model->col_name, 'Name') ?>
-            <?= $view->renderer($model->col_phone_number, 'Phone Number') ?>
-            <?= $view->renderer($model->col_email, 'Email Address', true) ?>
-            <?= $view->renderer($model->col_address, 'Address') ?>
+            <?= $view->renderer($modelCol->col_name, 'Name') ?>
+            <?= $view->renderer($modelCol->col_phone_number, 'Phone Number') ?>
+            <?= $view->renderer($modelCol->col_email, 'Email Address', true) ?>
+            <?= $view->renderer($modelCol->col_address, 'Address') ?>
         </div>
         <div class="col-6">
-            <?= $view->renderer($model->col_collaborators_name, 'Collaborators Name') ?>
-            <?= $view->renderer($model->col_wire_up, 'Wire Up') ?>
+            <?= $view->renderer($modelCol->col_collaborators_name, 'Collaborators Name') ?>
+            <?= $view->renderer($modelCol->col_wire_up, 'Wire Up') ?>
         </div>
     </div>
 
@@ -103,14 +104,14 @@ modal::end();
     <div class = "row">
         <div class = "col-6">
             <?= $view->renderer($model->execution_date, 'Execution Date') ?>
-            <?= $view->renderer($model->sign_date, 'Sign Date') ?>
-            <?= $view->renderer($model->end_date, 'End Date') ?>
+            <?= $view->renderer($model->agreement_sign_date, 'Agreement Sign Date') ?>
+            <?= $view->renderer($model->agreement_expiration_date, 'Agreement Expiration Date') ?>
         </div>
         <div class = "col-6">
-            <?php if ($model->transfer_to == 'RMC'):?>
-                <?= $view->renderer($model->project_start_date, 'Start Date') ?>
-                <?= $view->renderer($model->project_end_date, 'End Date') ?>
-            <?php endif;?>
+
+                <?= $view->renderer($model->rmc_start_date, 'Project Start Date') ?>
+                <?= $view->renderer($model->rmc_end_date, 'Project End Date') ?>
+
             <?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
         </div>
     </div>

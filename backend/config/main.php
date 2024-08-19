@@ -17,9 +17,10 @@ return [
             'csrfParam' => '_csrf-backend',
         ],
         'user' => [
-            'identityClass' => 'common\models\Admin',
+            'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-backend', 'httpOnly' => true],
+            'loginUrl' => ['/site/cas-login'],
         ],
         'session' => [
             'name' => 'advanced-backend',
@@ -49,6 +50,6 @@ return [
         ],
 
     ],
-    'defaultRoute' => 'agreement/index', // Setting the default route here
+    'defaultRoute' => 'agreement/index',
     'params' => $params,
 ];

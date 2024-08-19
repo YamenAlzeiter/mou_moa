@@ -1,5 +1,6 @@
 <?php
 
+use common\models\Agreement;
 use common\models\AgreementType;
 use common\models\McomDate;
 use yii\helpers\ArrayHelper;
@@ -55,9 +56,22 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
-        <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])->dropDownList(ArrayHelper::map(Agreementtype::find()->all(), 'type', 'type'), ['class' => 'form-select', 'prompt' => 'Pick Type', // Placeholder text
-            'onchange' => '$(this).closest("form").submit();', // Submit form on change
-        ])->label(false) ?>
+        <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])
+            ->dropDownList(
+                \yii\helpers\ArrayHelper::map(Agreement::find()
+                    ->select(['agreement_type'])
+                    ->groupBy('agreement_type')
+                    ->orderBy('agreement_type')
+                    ->asArray()
+                    ->all(), 'agreement_type', 'agreement_type'),
+                [
+                    'class' => 'form-select',
+                    'prompt' => 'Pick Type',
+                    'onchange' => '$(this).closest("form").submit();'
+                ]
+            )->label(false)
+        ?>
+
 
         <?= $form->field($model, 'transfer_to', ['options' => ['mb-0']])->dropDownList(['IO' => 'IO', 'OIL' => 'OIL', 'RMC' => 'RMC'], ['class' => 'form-select', 'prompt' => 'Pick ', // Placeholder text
             'onchange' => '$(this).closest("form").submit();', // Submit form on change

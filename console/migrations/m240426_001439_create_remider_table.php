@@ -14,7 +14,7 @@ class m240426_001439_create_remider_table extends Migration
     {
         $this->createTable('{{%reminder}}', [
             'id' => $this->primaryKey(),
-            'type' => $this->string(),
+            'type' => $this->string(10),
             'reminder_before' => $this->integer(2),
         ]);
         $this->insert('{{%reminder}}', ['type' => 'MONTH', 'reminder_before' => 6]);

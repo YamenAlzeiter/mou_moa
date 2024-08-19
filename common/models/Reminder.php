@@ -27,9 +27,10 @@ class Reminder extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [['reminder_before', 'reminder_after', 'type'], 'required'],
             [['reminder_before'], 'default', 'value' => null],
             [['reminder_before'], 'integer'],
-            [['type'], 'string', 'max' => 255],
+            [['type'], 'string', 'max' => 10],
         ];
     }
 

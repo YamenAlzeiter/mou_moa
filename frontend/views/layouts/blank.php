@@ -34,7 +34,7 @@ landing::register($this);
         <a href="#about" class="menu-item">Templates</a>
         <a href="#about" class="menu-item">FAQ</a>
         <a href="#contact" class="menu-item">Contact</a>
-        <a href="/site/login" class="primary-button">Sign In</a>
+        <a href="/site/cas-login" class="primary-button">Sign In</a>
     </div>
 </nav>
 

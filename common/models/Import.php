@@ -29,8 +29,11 @@ class Import extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
+            [[ 'type'], 'required'],
             [['importedFile'], 'file', 'extensions' => 'xlsx'],
-            [['type', 'import_from', 'directory'], 'string', 'max' => 255],
+            [['directory'], 'string'],
+            [['type'], 'string', 'max' => 50],
+            [['import_from'], 'string', 'max' => 10],
         ];
     }
 

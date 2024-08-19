@@ -1,5 +1,3 @@
-
-
 <?php
 
 use common\helpers\builders;
@@ -21,14 +19,14 @@ echo GridView::widget([
     'columns' => [
         'id',
         [
-            'attribute' => 'col_organization',
+            'attribute' => 'collaboration.col_organization',
             'contentOptions' => ['class' => 'truncate'],
         ],
         [
             'attribute' => 'created_at', 'label' => 'Date', 'format' => ['date', 'php:d/m/y'],
             'enableSorting' => false,
         ],
-        'country',
+        'collaboration.country',
         [
             'label' => 'Champion',
             'value' => function ($model) {

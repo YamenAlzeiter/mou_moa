@@ -3,7 +3,6 @@
 /** @var common\models\Agreement $model */
 
 use common\helpers\builders;
-use yii\bootstrap5\Html;
 use yii\grid\GridView;
 
 ?>

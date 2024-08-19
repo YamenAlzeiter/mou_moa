@@ -3,9 +3,11 @@
 namespace frontend\controllers;
 
 use common\models\search\AgreementSearch;
+use common\models\User;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\SignupForm;
 use frontend\models\VerifyEmailForm;
+use phpCAS;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\web\BadRequestHttpException;
@@ -16,6 +18,7 @@ use common\models\LoginForm;
 use frontend\models\PasswordResetRequestForm;
 use frontend\models\ResetPasswordForm;
 use frontend\models\ContactForm;
+use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
 /**
@@ -31,12 +34,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::class,
-                'only' => ['logout', 'signup'],
                 'rules' => [
                     [
-                        'actions' => ['signup'],
+                        'actions' => ['cas-login','error', 'index'],
                         'allow' => true,
-                        'roles' => ['?'],
                     ],
                     [
                         'actions' => ['logout'],
@@ -120,23 +121,49 @@ class SiteController extends Controller
      *
      * @return mixed
      */
-    public function actionLogin()
+    public function actionCasLogin()
     {
-        $this->layout ='blank';
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            return $this->redirect(['agreement/index']);
+        $casParams = Yii::$app->params['cas'];
+        phpCAS::setLogger();
+        phpCAS::setVerbose(true);
+        phpCAS::client(SAML_VERSION_1_1, $casParams['host'], $casParams['port'], $casParams['casContext'], $casParams['clientServiceNameForApplicant']);
+        if (!empty($casParams['casServerSslCert'])) {
+            phpCAS::setCasServerCACert($casParams['casServerSslCert']);
+        } else {
+            phpCAS::setNoCasServerValidation();
         }
 
-        $model->password = '';
+        phpCAS::handleLogoutRequests(true, $casParams['casRealHost']);
+        phpCAS::forceAuthentication();
 
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+        $username = phpCAS::getUser();
+        $email = isset(phpCAS::getAttributes()['mail']) ? phpCAS::getAttributes()['mail'] : '';
+        $defaultGroup = isset(phpCAS::getAttributes()['defaultgroup']) ? phpCAS::getAttributes()['defaultgroup'] : '';
+//        var_dump(phpCAS::getAttributes());
+//        die();
+//        if (strpos($defaultGroup, 'stud') !== false) {
+//            throw new ForbiddenHttpException('You do not have permission to access this page.');
+//        }
+        $findUser = User::findOne(['email' => $email]);
+
+        if ($findUser === null) {
+            $newUser = new User();
+            $newUser->username = $username;
+            $newUser->status = User::STATUS_ACTIVE;
+            $newUser->auth_key = Yii::$app->security->generateRandomString();
+            $newUser->email = $email;
+            $newUser->type = isset(phpCAS::getAttributes()['kcdi']) ? phpCAS::getAttributes()['kcdi'] : '';
+            $newUser->save();
+            Yii::$app->user->login($newUser, 3600 * 24 * 30);
+        } else {
+            Yii::$app->user->login($findUser, 3600 * 24 * 30);
+        }
+
+        return $this->goBack();
     }
 
     /**

@@ -38,12 +38,15 @@ class AgreementPoc extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'pi_role'], 'string', 'max' => 255],
             [['pi_name', 'pi_email', 'pi_phone', 'pi_kcdio', 'pi_address', 'pi_role'], 'required'],
-            ['pi_email', 'email'],
-            [['agreement_id'], 'default', 'value' => null],
             [['agreement_id'], 'integer'],
             [['pi_is_primary'], 'boolean'],
+            [['pi_name'], 'string', 'max' => 100],
+            [['pi_email'], 'string', 'max' => 50],
+            [['pi_phone'], 'string', 'max' => 15],
+            [['pi_kcdio'], 'string', 'max' => 7],
+            [['pi_address'], 'string', 'max' => 255],
+            [['pi_role'], 'string', 'max' => 30],
             [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],
         ];
     }

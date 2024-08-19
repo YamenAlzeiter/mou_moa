@@ -4,6 +4,7 @@ use Carbon\Carbon;
 use common\helpers\agreementPocMaker;
 use common\models\AgreementType;
 use common\models\Kcdio;
+use common\models\LookupCdKcdiom;
 use common\models\McomDate;
 use common\models\Poc;
 use yii\bootstrap5\ActiveForm;
@@ -12,6 +13,7 @@ use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
+/** @var common\models\Collaboration $colModel */
 
 $additionalPoc = new agreementPocMaker();
 
@@ -41,7 +43,7 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
     </div>
 
     <div class="col-md-12">
-        <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
+        <?= $form->field($colModel, 'col_organization')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Kansai University' // Set your default value here
         ]) ?>
     </div>
 </div>
@@ -49,27 +51,27 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 
 <div class="row">
     <div class="col-md">
-        <?= $form->field($model, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Dr. Prof. Keiko IKEDA']) ?>
-        <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '81663681174 
+        <?= $form->field($colModel, 'col_name')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Dr. Prof. Keiko IKEDA']) ?>
+        <?= $form->field($colModel, 'col_phone_number')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => '81663681174 
 ']) ?>
     </div>
     <div class="col-md">
-        <?= $form->field($model, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Center for International Education, Division of International Affairs']) ?>
-        <?= $form->field($model, 'col_email')->textInput(['type' => 'email', // Correct syntax for setting the input type
+        <?= $form->field($colModel, 'col_address')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Center for International Education, Division of International Affairs']) ?>
+        <?= $form->field($colModel, 'col_email')->textInput(['type' => 'email', // Correct syntax for setting the input type
             'maxlength' => true, 'placeholder' => 'mi-room@ml.kandai.jp', 'value' => 'mi-room@ml.kandai.jp' // Set your default email value here
         ]) ?>
 
     </div>
 </div>
-<?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6, 'value' => 'names......']) ?>
+<?= $form->field($colModel, 'col_collaborators_name')->textarea(['maxlength' => true, 'placeholder' => '', 'rows' => 6, 'value' => 'names......']) ?>
 
 
 <div class="row">
     <div class="col-md-8">
-        <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'wire up .....']) ?>
+        <?= $form->field($colModel, 'col_wire_up')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'wire up .....']) ?>
     </div>
     <div class="col-md-4">
-        <?= $form->field($model, 'country')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Japan']) ?>
+        <?= $form->field($colModel, 'country')->textInput(['maxlength' => true, 'placeholder' => '', 'value' => 'Japan']) ?>
     </div>
 </div>
 <h4>Person In Charge Details</h4>
@@ -81,7 +83,11 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
             <div class="col-12 col-md-6">
                 <?= $form->field($modelPoc, "[$index]pi_kcdio")
                     ->dropDownList(
-                        ArrayHelper::map(Kcdio::find()->all(), 'tag', 'kcdio'), ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, function (data) {
+                        ArrayHelper::map(
+                            LookupCdKcdiom::find()->where(['not', ['abb_code' => null]])->all(),
+                            'abb_code',
+                            'kcdiom_desc'
+                        ),  ['prompt' => 'Select KCDIO', 'onchange' => '$.get("' . Yii::$app->urlManager->createUrl('agreement/get-kcdio-poc') . '", { id: $(this).val() }, function (data) {
             $("select#agreement-poc_name_getter-' . $index . '").html(data);
             $("select#agreement-poc_name_getter-' . $index . '").trigger("change");
         })']) ?>
@@ -162,8 +168,8 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
 ) ?>
 
 <div class="row">
-    <div class="col-md"><?= $form->field($model, 'sign_date')->textInput(['type' => 'date']) ?></div>
-    <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+    <div class="col-md"><?= $form->field($model, 'agreement_sign_date')->textInput(['type' => 'date']) ?></div>
+    <div class="col-md"><?= $form->field($model, 'agreement_expiration_date')->textInput(['type' => 'date']) ?></div>
 </div>
 
 

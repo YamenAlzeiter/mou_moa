@@ -40,9 +40,6 @@ class SettingController extends Controller
                         'actions' => [
                             'index',
 
-                            // kcdio
-                            'kcdio', 'create-kcdio', 'update-kcdio',
-
                             // reminders
                             'create-reminder', 'update-reminder', 'delete-reminder',
 
@@ -60,11 +57,7 @@ class SettingController extends Controller
 
 
                         'allow' => true,
-                        'roles' => ['@'],
-                        'matchCallback' => function ($rule, $action) {
-
-                            return !Yii::$app->user->isGuest && Yii::$app->user->identity->is_admin;
-                        }
+                        'roles' => ['OSIC'],
                     ],
                 ],
             ],
@@ -132,16 +125,7 @@ class SettingController extends Controller
             ]
         ]);
 
-        $agreTypeDataProvider = new ActiveDataProvider([
-            'query' => AgreementType::find(),
 
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [ // Add the 'sort' configuration
-                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
-            ]
-        ]);
 
         $mcomDataProvider = new ActiveDataProvider([
             'query' => McomDate::find(),
@@ -154,28 +138,14 @@ class SettingController extends Controller
             ]
         ]);
         return $this->render('vother', [
-            'agreTypeDataProvider' => $agreTypeDataProvider,
+
             'reminderDataProvider' => $reminderDataProvider,
             'mcomDataProvider' => $mcomDataProvider,
         ]);
 
     }
 
-    public function actionKcdio(){
-        $kcdioDataProvider = new ActiveDataProvider([
-            'query' => Kcdio::find(),
 
-            'pagination' => [
-                'pageSize' => 50
-            ],
-            'sort' => [ // Add the 'sort' configuration
-                'defaultOrder' => ['id' => SORT_ASC] // Order by 'id' ascending
-            ]
-        ]);
-        return $this->render('vkcdio', [
-            'kcdioDataProvider' => $kcdioDataProvider,
-        ]);
-    }
 
     public function actionViewEmailTemplate($id)
     {
@@ -217,22 +187,7 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionCreateKcdio()
-    {
-        $model = new Kcdio();
 
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['vkcdio']);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->renderAjax('updateKcdio', [
-            'model' => $model,
-        ]);
-    }
 
     public function actionStatusUpdate($id){
         $model = Status::findOne($id);
@@ -245,17 +200,7 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
-    public function actionUpdateKcdio($id){
-        $model = Kcdio::findOne($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['vkcdio']);
-        }
-
-        return $this->renderAjax('updateKcdio', [
-            'model' => $model,
-        ]);
-    }
     public function actionUpdateEmailTemplate($id)
     {
         $model = EmailTemplate::findOne($id);

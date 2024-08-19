@@ -3,15 +3,14 @@
 use Carbon\Carbon;
 use common\helpers\agreementPocMaker;
 use common\helpers\pocFieldMaker;
-use common\models\AgreementType;
-use common\models\Kcdio;
-use common\models\McomDate;
+use common\models\Agreement;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
+/** @var common\models\Collaboration $colModel */
 
 $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
@@ -33,6 +32,25 @@ foreach ($modelsPoc as $index => $modelPoc) {
     $roleData[$index] = $modelPoc->pi_role;
 }
 
+$existingTypes = (array) $model->agreement_type;
+
+// Predefined types
+$predefinedTypes = [
+    'MOU (Academic)',
+    'MOU (Non-Academic)',
+    'MOA (Academic)',
+    'MOA (Non-Academic)',
+    'RCA',
+    'other'
+];
+$filteredExistingTypes = array_filter($existingTypes, function($type) use ($predefinedTypes) {
+    return !in_array($type, $predefinedTypes);
+});
+
+$options = ArrayHelper::merge(
+    array_combine($filteredExistingTypes, $filteredExistingTypes),
+    array_combine($predefinedTypes, $predefinedTypes)
+);
 ?>
 <?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
@@ -40,13 +58,14 @@ foreach ($modelsPoc as $index => $modelPoc) {
 <?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
     <div class="row">
         <div class="col-md-4">
-            <?= $form->field($model, 'agreement_type')->dropDownList(
-                ArrayHelper::merge(ArrayHelper::map(AgreementType::find()->all(), 'type', 'type'), ['other' => 'Other']),
+            <?=$form->field($model, 'agreement_type')->dropDownList(
+                $options,
                 [
                     'prompt' => 'Select Type',
                     'id' => 'agreement-type-dropdown'
                 ]
-            ) ?>
+            );
+            ?>
         </div>
         <div id="other-agreement-type" class="col-md-4">
             <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true]) ?>
@@ -65,25 +84,25 @@ foreach ($modelsPoc as $index => $modelPoc) {
     <div class="row">
         <h4>Collaborator Details</h4>
         <div class="col-md-12">
-            <?= $form->field($model, 'col_organization')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_organization')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'col_name')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'col_phone_number')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_phone_number')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'col_address')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($model, 'col_email')->textInput(['type' => 'email']) ?>
+            <?= $form->field($colModel, 'col_address')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_email')->textInput(['type' => 'email']) ?>
         </div>
     </div>
-    <?= $form->field($model, 'col_collaborators_name')->textarea(['maxlength' => true, 'rows' => 6]) ?>
+    <?= $form->field($colModel, 'col_collaborators_name')->textarea(['maxlength' => true, 'rows' => 6]) ?>
 
     <div class="row">
         <div class="col-md-8">
-            <?= $form->field($model, 'col_wire_up')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_wire_up')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-md-4">
-            <?= $form->field($model, 'country')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'country')->textInput(['maxlength' => true]) ?>
         </div>
     </div>
     <!-- Collaborator details end -->
@@ -108,10 +127,10 @@ foreach ($modelsPoc as $index => $modelPoc) {
     </div>
     <div id="rmc-additional-info" class="row d-none">
         <div class="col-md">
-            <?= $form->field($model, 'project_start_date')->textInput(['type' => 'date', 'id' => 'project-start-date']) ?>
+            <?= $form->field($model, 'rmc_start_date')->textInput(['type' => 'date', 'id' => 'project-start-date']) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'project_end_date')->textInput(['type' => 'date', 'id' => 'project-end-date']) ?>
+            <?= $form->field($model, 'rmc_end_date')->textInput(['type' => 'date', 'id' => 'project-end-date']) ?>
         </div>
         <div class="col-md">
             <p id="duration" class="mb-0 fw-bold"></p>
@@ -155,12 +174,12 @@ elseif (in_array($model->status, [51, 72])): ?>
 elseif ($model->status == 110): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['91' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
+        <?= $form->field($model, 'status')->radioList(['111' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
             'item' => function ($index, $label, $name, $checked, $value) {
                 return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
             }])->label(false); ?>
         <div class="end_date d-none">
-            <div class="col-md"><?= $form->field($model, 'end_date')->textInput(['type' => 'date']) ?></div>
+            <div class="col-md"><?= $form->field($model, 'agreement_expiration_date')->textInput(['type' => 'date']) ?></div>
         </div>
     </div>
 <?php
@@ -168,12 +187,12 @@ endif; ?>
 
 <?php if ($model->status == 110): ?>
     <div class="modal-footer p-0">
-        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn btn-success', 'name' => 'checked']) ?>
+        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn-submit', 'name' => 'checked']) ?>
         <?php ActiveForm::end(); ?>
     </div>
 <?php else: ?>
     <div class="modal-footer p-0">
-        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn btn-success', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
+        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn-submit', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
         <?php ActiveForm::end(); ?>
     </div>
 <?php endif; ?>
@@ -366,7 +385,7 @@ $('#{$form->id}').on('beforeSubmit', function() {
 });
 
  $('input[name="Agreement[status]"]').on('change', function() {
-        if ($('#is91').is(':checked')) {
+        if ($('#is111').is(':checked')) {
             $('.end_date').removeClass('d-none');
         } else {
             $('.end_date').addClass('d-none');

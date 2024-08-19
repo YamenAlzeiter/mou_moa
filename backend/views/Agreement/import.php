@@ -32,12 +32,30 @@ $templateFileInput = '<div class="col align-items-center">
 </ul>
 <div class="row">
     <div class="col-md">
-        <?= $form->field($model, 'type')->dropDownList(['Activity' => 'Activity', 'Agreement' => 'Agreement'], ['prompt' => 'Select an Option'])?>
+        <?= $form->field($model, 'type')->radioList(
+            ['Activity' => 'Activity', 'Agreement' => 'Agreement'], // Comma added here
+            [
+                'item' => function($index, $label, $name, $checked, $value) {
+                    return '
+            <label class="plan ' . strtolower($value) . '-plan" for="is' . $value . '">
+                <input type="radio" id="is' . $value . '" name="' . $name . '" value="' . $value . '" ' . ($checked ? 'checked' : '') . ' />
+                <div class="plan-content">
+                    <div class="plan-details">
+                        <span>' . $label . '</span>
+                    </div>
+                </div>
+                <p class="invalid-feedback mb-0"></p>
+            </label>
+            ';
+                },
+                'class' => 'plans',
+                'errorOptions' => ['class' => 'invalid-feedback'],
+            ]
+        )->label(false); ?>
 
-        </div>
+    </div>
     <div class="col-md">
         <?= $form->field($model, 'import_from')->hiddenInput(['value' => Yii::$app->user->identity->type])->label(false)?>
-<!--        --><?php //= $form->field($model,'import_from')->dropDownList(['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'], ['prompt' => 'Select an Option'])?>
     </div>
     </div>
 <?= $form->field($model, 'importedFile', ['template' => $templateFileInput])->fileInput()->label('Document')->label(false) ?>

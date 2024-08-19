@@ -69,7 +69,7 @@ modal::end();
         'columns' => [
             'id',
             [
-                'attribute' => 'col_organization',
+                'attribute' => 'collaboration.col_organization',
                 'contentOptions' => ['class' => 'truncate'],
             ],
             [
@@ -83,7 +83,7 @@ modal::end();
                 'label' => 'Date',
                 'format' => ['date', 'php:d/m/y'],
                 'enableSorting' => false,
-            ], 'country',
+                ], 'collaboration.country',
             'agreement_type', [
                 'label' => 'Status',
                 'attribute' => 'Status',

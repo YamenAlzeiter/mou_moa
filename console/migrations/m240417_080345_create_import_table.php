@@ -14,9 +14,9 @@ class m240417_080345_create_import_table extends Migration
     {
         $this->createTable('{{%import}}', [
             'id' => $this->primaryKey(),
-            'type' => $this->string(),
-            'import_from' => $this->string(),
-            'directory' => $this->string(),
+            'type' => $this->string(50),
+            'import_from' => $this->string(10),
+            'directory' => $this->text(),
         ]);
     }
 
