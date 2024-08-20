@@ -23,7 +23,11 @@ const showNavbar = (toggleId, navId, bodyId, headerId) => {
             bodypd.classList.toggle('body-pd');
             headerpd.classList.toggle('body-pd');
 
-            handelSubMenu();
+            if(nav.classList.contains('show-sidenav')){
+                handelSubMenu(false);
+            }else{
+                handelSubMenu(true);
+            }
 
             const isExpanded = nav.classList.contains('show-sidenav');
             localStorage.setItem('sidebarState', isExpanded ? 'expanded' : 'collapsed');
@@ -55,41 +59,50 @@ subMenus.forEach(function(submenu) {
     });
 });
 
-function handelSubMenu() {
+function handelSubMenu(forceAllCollapse) {
+    if(forceAllCollapse === true){
+        subs.forEach(sub => {
 
-    subs.forEach(sub => {
-        const subUrl = sub.querySelector('.sub-active');
-        const nav = document.querySelector('.l-navbar');
-        if (nav.classList.contains('collapse-sidenav')) {
-            if (subUrl) {
-                const parent = subUrl.parentNode;
-                const submenu = document.querySelector(`[data-target="#${parent.getAttribute('id')}"]`);
-                console.log('l')
-                if (submenu) {
-                    const chevronIcon = submenu.querySelector('.ti-chevron-down');
-                    submenu.classList.toggle('mb-1');
-                    parent.classList.toggle('show');
-                    if (chevronIcon) {
-                        chevronIcon.classList.toggle('chevron-rotate');
+            console.log(sub.classList)
+            sub.classList.remove('show');
+        });
+    }
+
+    else{
+
+        subs.forEach(sub => {
+            const subUrl = sub.querySelector('.sub-active');
+            const nav = document.querySelector('.l-navbar');
+            if (nav.classList.contains('collapse-sidenav')) {
+                if (subUrl) {
+                    const parent = subUrl.parentNode;
+                    const submenu = document.querySelector(`[data-target="#${parent.getAttribute('id')}"]`);
+                    if (submenu) {
+                        const chevronIcon = submenu.querySelector('.ti-chevron-down');
+                        submenu.classList.toggle('mb-1');
+                        parent.classList.toggle('show');
+                        if (chevronIcon) {
+                            chevronIcon.classList.toggle('chevron-rotate');
+                        }
+                    }
+                }
+            }else{
+                if (subUrl) {
+                    const parent = subUrl.parentNode;
+                    const submenu = document.querySelector(`[data-target="#${parent.getAttribute('id')}"]`);
+
+                    if (submenu) {
+                        const chevronIcon = submenu.querySelector('.ti-chevron-down');
+                        submenu.classList.toggle('mb-1');
+                        parent.classList.toggle('show');
+                        if (chevronIcon) {
+                            chevronIcon.classList.toggle('chevron-rotate');
+                        }
                     }
                 }
             }
-        }else{
-            if (subUrl) {
-                const parent = subUrl.parentNode;
-                const submenu = document.querySelector(`[data-target="#${parent.getAttribute('id')}"]`);
-
-                if (submenu) {
-                    const chevronIcon = submenu.querySelector('.ti-chevron-down');
-                    submenu.classList.toggle('mb-1');
-                    parent.classList.toggle('show');
-                    if (chevronIcon) {
-                        chevronIcon.classList.toggle('chevron-rotate');
-                    }
-                }
-            }
-        }
-    });
+        });
+    }
 }
 
 function loader() {
@@ -132,7 +145,7 @@ function loadSideNavSaved() {
         headerpd.classList.add('body-pd');
         nav.classList.add('show-sidenav');
         nav.classList.remove('collapse-sidenav');
-        handelSubMenu();
+        handelSubMenu(false);
     } else if (sidebarState === 'collapsed') {
         nav.classList.remove('show-sidenav');
         bodypd.classList.remove('body-pd');

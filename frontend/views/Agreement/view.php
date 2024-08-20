@@ -51,7 +51,7 @@ modal::end();
             <span class='text-gray-dark fw-bolder fs-5'><?= $model->agreement_type ?></span>
 
         </div>
-        <?php $view->renderActionButton("Activities: $model->id", 'View Activities', Url::to(['view-activities', 'id' => $model->id]), $haveActivity); ?>
+        <?php $view->renderActionButton("Activities: $model->col_id", 'View Activities', Url::to(['view-activities', 'id' => $model->col_id]), $haveActivity); ?>
     </div>
 
     <!--section collaborator details-->

@@ -28,7 +28,10 @@ use yii\db\Expression;
  * @property string|null $agreement_expiration_date
  * @property string|null $execution_date
  * @property string|null $mcom_date
+ * @property string|null $umc_date
  * @property string|null $last_reminder
+ * @property string|null $umc_series
+ * @property string|null $mcom_series
  * @property string|null $updated_at
  * @property string|null $created_at
  * @property string|null $applicant_doc
@@ -83,7 +86,7 @@ class Agreement extends ActiveRecord
             [
                 ['files_applicant'],
                 'file',
-                'maxFiles' => 5,
+                'maxFiles' => 1,
                 'maxSize' => 1024 * 1024 * 2, // 2 MB limit
                 'extensions' => ['pdf'],
                 'when' => function ($model) {
@@ -146,12 +149,9 @@ class Agreement extends ActiveRecord
             return $('#transfer-to-dropdown').val() == 'RMC';
         }"],
 
-
-
-            // String type rules
             [['status', 'col_id', 'isReminded'], 'default', 'value' => null],
             [['status', 'col_id', 'isReminded'], 'integer'],
-            [['rmc_start_date', 'rmc_end_date', 'agreement_sign_date', 'agreement_expiration_date', 'execution_date', 'mcom_date', 'last_reminder', 'updated_at', 'created_at'], 'safe'],
+            [['rmc_start_date', 'rmc_end_date', 'agreement_sign_date', 'agreement_expiration_date', 'execution_date', 'mcom_date', 'umc_date', 'last_reminder', 'updated_at', 'created_at'], 'safe'],
             [['applicant_doc', 'dp_doc', 'reason', 'collaboration_area', 'temp'], 'string'],
             [['champion'], 'string', 'max' => 522],
             [['project_title', 'proposal', 'company_profile'], 'string', 'max' => 255],
@@ -159,6 +159,8 @@ class Agreement extends ActiveRecord
             [['member'], 'string', 'max' => 2],
             [['agreement_type'], 'string', 'max' => 50],
             [['ssm'], 'string', 'max' => 25],
+            [['umc_series', 'mcom_series'], 'string', 'max' => 100],
+            [['col_id'], 'exist', 'skipOnError' => true, 'targetClass' => Collaboration::class, 'targetAttribute' => ['col_id' => 'id']],
         ];
     }
 
@@ -188,6 +190,10 @@ class Agreement extends ActiveRecord
             'company_profile' => 'Company Profile',
 
             'mcom_date' => 'MCOM Date',
+            'mcom_series' => 'MCOM Series',
+
+            'umc_date' => 'UMC Date',
+            'umc_series' => 'UMC Series',
 
             'dp_doc' => 'Upload Files',
             'applicant_doc' => 'Upload Files',

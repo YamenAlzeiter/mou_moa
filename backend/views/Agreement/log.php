@@ -3,7 +3,7 @@
 /** @var common\models\Log $model */
 
 use common\helpers\builders;
-use common\helpers\statusLable;
+use common\helpers\statusLabel;
 use yii\grid\GridView;
 use yii\web\JqueryAsset;
 use yii\widgets\Pjax;
@@ -41,12 +41,12 @@ use yii\widgets\Pjax;
                 ],
                 [
                     'attribute' => 'From', 'value' => function ($model) {
-                    $statusHelper = new statusLable();
+                    $statusHelper = new statusLabel();
                     return $statusHelper->getStatusFrom($model->new_status);
                 },
                 ], [
                     'attribute' => 'To', 'value' => function ($model) {
-                        $statusHelper = new statusLable();
+                        $statusHelper = new statusLabel();
                         return $statusHelper->getStatusTo($model->new_status);
                     },
                 ],

@@ -1,28 +1,31 @@
 <?php
 
+use common\components\ActivityWidget;
 use common\helpers\builders;
 use yii\helpers\Html;
 use yii\web\JqueryAsset;
 use yii\web\YiiAsset;
 use yii\widgets\DetailView;
 use common\models\Activities;
+use yii\widgets\Pjax;
 
 /** @var yii\web\View $this */
 /** @var common\models\Activities $model */
 
 YiiAsset::register($this);
-
+Pjax::begin(['id' => 'pjax-container']);
 
 foreach ($model as $activity) {
 
-    $title = "<p>Created By: " .$activity->name. " </p> <p> email: " . $activity->staff_number . "</p>";
+    $title = "<p>Created By: " .$activity->name. " </p> <p> email: " . $activity->staff_email . "</p>";
     // Check an activity type and render content accordingly
     if ($activity->activity_type === 'Student Mobility for Credited') {
 
-        echo '<div class="d-flex gap-3"> <h4>Student Mobility for Credited</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
-
-
-        // Render author name only
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -41,7 +44,11 @@ foreach ($model as $activity) {
 
 
     } elseif ($activity->activity_type === 'Student Mobility Non-Credited') {
-        echo '<div class="d-flex gap-3"> <h4>Student Mobility for Non-Credited</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -56,20 +63,27 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Staff Mobility (Inbound)') {
-        echo '<div class="d-flex gap-3"> <h4>Staff Mobility (Inbound)</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
                     'label' => 'Number of Staff', 'value' => $activity->in_number_of_staff,
                 ], [
                     'label' => 'Staff Name', 'value' => $activity->in_staffs_name,
-                ], [
-                    'label' => 'Department Office', 'value' => $activity->in_department_office,
                 ],
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Staff Mobility (Outbound)') {
-        echo '<div class="d-flex gap-3"> <h4>Staff Mobility (Outbound)</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
+
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -81,7 +95,11 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Seminar/Conference/Workshop/Training') {
-        echo '<div class="d-flex gap-3"> <h4>Seminar/Conference/Workshop/Training</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -98,7 +116,11 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Research') {
-        echo '<div class="d-flex gap-3"> <h4>Research</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -107,7 +129,11 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Publication') {
-        echo '<div class="d-flex gap-3"> <h4>Publication</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -119,7 +145,11 @@ foreach ($model as $activity) {
         ]);
         echo '</div>';
     } elseif ($activity->activity_type === 'Consultancy') {
-        echo '<div class="d-flex gap-3"> <h4>Consultancy</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -130,7 +160,11 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'Any other of Cooperation, Please specify') {
-        echo '<div class="d-flex gap-3"> <h4>Others</h4> <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i></div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -141,20 +175,11 @@ foreach ($model as $activity) {
             ], 'template' => "<tr'><th class='col-3'>{label}</th><td class='col-9 text-break'>{value}</td></tr>"
         ]);
     } elseif ($activity->activity_type === 'No Activity, Please specify') {
-        echo '
-            <div class="d-flex justify-content-between align-items-center">
-             <div class="d-flex gap-3">
-             <h4>No Activities</h4>
-              <i class="ti ti-info-circle fs-7 text-dark" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-html="true" title="'.htmlspecialchars($title).'"></i>
-</div>
-                <div>
-                ' . Html::button('<i class="ti ti-trash fs-5"></i>', [
-                'class' => 'btn  mb-2',
-                'id' => 'delete-button',
-                'data-id' => $activity->id,
-            ]) . '
-</div>
-</div>';
+        echo ActivityWidget::widget([
+            'title' => $title,
+            'headerText' => $activity->activity_type,
+            'activity' => $activity,
+        ]);
         echo DetailView::widget([
             'model' => $activity, 'attributes' => [
                 [
@@ -166,7 +191,9 @@ foreach ($model as $activity) {
 
 
 }
+Pjax::end();
 ?>
+
 <?php
 $this->registerJsFile('https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
     ['depends' => [JqueryAsset::class]]);
@@ -179,10 +206,10 @@ JS
 );
 ?>
 
-
 <script>
+
     $(document).ready(function() {
-        $('#delete-button').on('click', function() {
+        $('.delete-button').on('click', function() {
             var activityId = $(this).data('id');
 
             Swal.fire({
@@ -195,23 +222,29 @@ JS
                 confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Send AJAX request
                     $.ajax({
-                        url: '/agreement/delete-activity', // Adjust the URL to your controller action
+                        url: '/agreement/delete-activity',
                         type: 'POST',
                         dataType: 'json',
                         data: {
                             id: activityId,
-                            _csrf: '<?= Yii::$app->request->csrfToken ?>', // Ensure CSRF token is included
+                            _csrf: '<?= Yii::$app->request->csrfToken ?>',
                         },
                         success: function(data) {
+                            console.log('Success:', data);
                             if (data.success) {
                                 Swal.fire(
                                     'Deleted!',
                                     'The activity has been deleted.',
                                     'success'
                                 ).then(() => {
-                                    location.reload(); // Refresh page or redirect
+                                    $.pjax.reload({container: '#pjax-container'})
+                                        .done(function() {
+                                            console.log('PJAX reload successful');
+                                        })
+                                        .fail(function() {
+                                            console.log('PJAX reload failed');
+                                        });
                                 });
                             } else {
                                 Swal.fire(
@@ -221,7 +254,8 @@ JS
                                 );
                             }
                         },
-                        error: function() {
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.log('AJAX error:', textStatus, errorThrown); // Debugging line
                             Swal.fire(
                                 'Error!',
                                 'Failed to delete the activity. Please try again later.',

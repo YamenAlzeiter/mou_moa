@@ -5,22 +5,17 @@ namespace frontend\controllers;
 use Carbon\Carbon;
 use common\helpers\Variables;
 use common\models\Activities;
-use common\models\admin;
 use common\models\Agreement;
 use common\models\AgreementPoc;
 use common\models\Collaboration;
 use common\models\EmailTemplate;
 use common\models\Log;
 use common\models\McomDate;
-use common\models\Poc;
 use common\models\search\AgreementSearch;
 use common\models\User;
 use Exception;
 use Yii;
-//use yii\base\Model;
 use common\helpers\Model;
-use yii\bootstrap5\ActiveForm;
-use yii\bootstrap5\Html;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\filters\AccessControl;
@@ -48,7 +43,7 @@ class AgreementController extends Controller
                 'rules' => [
                     [
                         'actions' => [
-                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file','delete-activity',
+                            'index', 'update', 'create', 'downloader', 'log', 'add-activity', 'get-poc-info', 'get-kcdio-poc', 'delete-file','delete-activity', 'check-organization'
                         ],
                         'allow' => !Yii::$app->user->isGuest,
                         'roles' => ['@'],
@@ -112,7 +107,7 @@ class AgreementController extends Controller
     {
         $model = $this->findModel($id);
         $modelCol = Collaboration::findOne(['id' => $model->col_id]);
-        $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
+        $haveActivity = Activities::findOne(['col_id' => $model->col_id]) !== null;
         $modelsPoc = $model->getAgreementPoc()->all();
 
         return $this->renderAjax('view', [
@@ -166,7 +161,7 @@ class AgreementController extends Controller
     {
         $agreement = $this->findModel($id);
         $model = new Activities();
-        $model->agreement_id = $id;
+        $model->col_id = $agreement->col_id;
 
         if ($this->request->isPost && $model->load($this->request->post())) {
             if ($model->save()) {
@@ -183,7 +178,7 @@ class AgreementController extends Controller
     public function actionViewActivities($id)
     {
         $model = Activities::find()
-            ->where(['agreement_id' => $id])
+            ->where(['col_id' => $id])
             ->orderBy(['id' => SORT_DESC])
             ->all();
 
@@ -217,7 +212,6 @@ class AgreementController extends Controller
         $modelsPoc = [new AgreementPoc()];
         $model->scenario = 'uploadCreate';
 
-
         if ($this->request->isPost) {
             $model->load($this->request->post());
             $colModel->load($this->request->post());
@@ -228,39 +222,50 @@ class AgreementController extends Controller
                 $modelPoc = new AgreementPoc();
                 $modelPoc->load($data, '');
                 $modelsPoc[] = $modelPoc;
-
             }
-
 
             $status = $this->request->post('checked');
             $model->status = $status;
-            $model->temp = "(" . Yii::$app->user->identity->email .") ".Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
             if ($model->agreement_type == 'other') {
                 $model->agreement_type = $model->agreement_type_other;
             }
 
+            // Check if the collaboration already exists
+            $existingColModel = Collaboration::findOne(['col_organization' => $colModel->col_organization]);
+            if ($existingColModel) {
+                // Use the existing collaboration
+                $model->col_id = $existingColModel->id;
+            } else {
+                // Create a new collaboration
+                if ($colModel->save()) {
+                    $model->col_id = $colModel->id;
+                } else {
+                    // Handle the error if the collaboration fails to save
+                    Yii::$app->session->setFlash('error', 'Failed to save collaboration');
+                    return $this->redirect(['create']);
+                }
+            }
+
+            // Validate all models
             $valid = Model::validateMultiple($modelsPoc);
 
             if ($valid) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    if( $colModel->save()){
-                        $model->col_id = $colModel->id;
-                        if ($model->save(false)) {
-                            foreach ($modelsPoc as $modelPoc) {
-                                $modelPoc->agreement_id = $model->id;
-                                if (!($modelPoc->save(false))) {
-                                    $transaction->rollBack();
-                                    break;
-                                }
+                    if ($model->save(false)) {
+                        foreach ($modelsPoc as $modelPoc) {
+                            $modelPoc->agreement_id = $model->id;
+                            if (!($modelPoc->save(false))) {
+                                $transaction->rollBack();
+                                break;
                             }
-                            $this->multiFileHandler($model, 'files_applicant',  'applicant_doc');
-                            $this->sendEmail($model, Variables::email_init);
-                            $transaction->commit();
-                            return $this->redirect(['index']);
                         }
+                        $this->multiFileHandler($model, 'files_applicant', 'applicant_doc');
+                        $this->sendEmail($model, Variables::email_init);
+                        $transaction->commit();
+                        return $this->redirect(['index']);
                     }
-
                 } catch (Exception $e) {
                     $transaction->rollBack();
                 }
@@ -275,38 +280,37 @@ class AgreementController extends Controller
             'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
         ]);
     }
-    public function actionGetKcdioPoc($id)
+
+
+    public function actionCheckOrganization()
     {
-        $poc = Poc::find()->where(['kcdio' => $id])->all();
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $organization = Yii::$app->request->post('col_organization');
 
+        // Using ILIKE for case-insensitive search
+        $collaboration = Collaboration::find()
+            ->where(['ILIKE', 'col_organization', $organization])
+            ->one();
 
-        if ($poc) {
-            $options = "<option>Select POC</option>";
-            foreach ($poc as $apoc) {
-                $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
-            }
-        }
-
-        echo $options;
-    }
-
-    public function actionGetPocInfo($id)
-    {
-        $poc = Poc::findOne($id);
-
-        if ($poc) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+        if ($collaboration) {
             return [
-                'name' => $poc->name,
-                'address' => $poc->address,
-                'email' => $poc->email,
-                'phone_number' => $poc->phone_number,
+                'exists' => true,
+                'data' => [
+                    'col_name' => $collaboration->col_name,
+                    'col_phone_number' => $collaboration->col_phone_number,
+                    'col_address' => $collaboration->col_address,
+                    'col_email' => $collaboration->col_email,
+                    'col_collaborators_name' => $collaboration->col_collaborators_name,
+                    'col_wire_up' => $collaboration->col_wire_up,
+                    'country' => $collaboration->country,
+                ]
             ];
         } else {
-            // Handle the case where no POC is found with the given ID
-            return ['error' => 'POC not found'];
+            return ['exists' => false];
         }
     }
+
+
 
 
     function fileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
@@ -342,7 +346,7 @@ class AgreementController extends Controller
             $path = $baseUploadPath. '/' . $model->id . '/applicant/';
 
             foreach ($files as $file) {
-                $fileName = $file->baseName . '.'. $file->extension;
+                $fileName = $file->baseName . '_'. date('Ymdhis') . '.' . $file->extension;
 
                 $filePath = $path . $fileName;
                 if (!file_exists(dirname($filePath))) {

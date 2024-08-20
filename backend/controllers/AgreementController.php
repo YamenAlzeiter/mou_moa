@@ -40,31 +40,6 @@ class AgreementController extends Controller
     /**
      * @inheritDoc
      */
-//    public function behaviors()
-//    {
-//        return [
-//            'access' => [
-//                'class' => AccessControl::class,
-//                'rules' => [
-//                    ['actions' =>
-//                        [
-//                            'index', 'update', 'view', 'downloader', 'log',
-//                            'get-organization', 'import-excel', 'import-excel-activity', 'view-activities',
-//                            'import', 'mcom', 'update-poc', 'create-poc', 'create',
-//                            'get-poc-info', 'get-kcdio-poc', 'delete-file', 'generate-pdf','bulk-delete', 'dashboard'
-//                        ],
-//                        'allow' => !Yii::$app->user->isGuest,
-//                        'roles' => ['@'],
-//                    ],
-//                ],
-//            ],
-//            'verbs' => [
-//                'class' => VerbFilter::class,
-//                'actions' => ['logout' => ['post'],
-//                ],
-//            ],
-//        ];
-//    }
     public function behaviors()
     {
         return array_merge(
@@ -149,7 +124,7 @@ class AgreementController extends Controller
     public function actionView($id)
     {
         $model = $this->findModel($id);
-        $haveActivity = Activities::findOne(['agreement_id' => $id]) !== null;
+        $haveActivity = Activities::findOne(['col_id' => $model->col_id]) !== null;
         $modelsPoc = AgreementPoc::find()->where(['agreement_id' => $id])->all();
         $modelCol = Collaboration::findone(['id' =>$model->col_id]);
         if (!Yii::$app->user->isGuest) {
@@ -193,7 +168,8 @@ class AgreementController extends Controller
         $model = new Agreement();
         $colModel = new Collaboration();
         $modelsPoc = [new AgreementPoc()];
-        $model->scenario = 'createSpecial';
+        $model->scenario = 'uploadCreate';
+
         if ($this->request->isPost) {
             $model->load($this->request->post());
             $colModel->load($this->request->post());
@@ -204,60 +180,77 @@ class AgreementController extends Controller
                 $modelPoc = new AgreementPoc();
                 $modelPoc->load($data, '');
                 $modelsPoc[] = $modelPoc;
-
             }
 
             $status = $this->request->post('checked');
             $model->status = $status;
-            $model->status == Variables::agreement_executed ? $model->last_reminder = carbon::now()->addMonths(3)->toDateTimeString() : null;
-            $model->temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
+            $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
+            if ($model->agreement_type == 'other') {
+                $model->agreement_type = $model->agreement_type_other;
+            }
 
+            // Check if the collaboration already exists
+            $existingColModel = Collaboration::findOne(['col_organization' => $colModel->col_organization]);
+            if ($existingColModel) {
+                // Use the existing collaboration
+                $model->col_id = $existingColModel->id;
+            } else {
+                // Create a new collaboration
+                if ($colModel->save()) {
+                    $model->col_id = $colModel->id;
+                } else {
+                    // Handle the error if the collaboration fails to save
+                    Yii::$app->session->setFlash('error', 'Failed to save collaboration');
+                    return $this->redirect(['create']);
+                }
+            }
+
+            // Validate all models
             $valid = Model::validateMultiple($modelsPoc);
 
             if ($valid) {
-                $transaction = Yii::$app->db->beginTransaction();
+                $transaction = \Yii::$app->db->beginTransaction();
                 try {
-                    if($colModel->save()){
-                        $model->col_id = $colModel->id;
-                        if ($model->save(false)) {
-                            foreach ($modelsPoc as $modelPoc) {
-                                $modelPoc->agreement_id = $model->id;
-                                if (!($modelPoc->save(false))) {
-                                    $transaction->rollBack();
-                                    break;
-                                }
+                    if ($model->save(false)) {
+                        foreach ($modelsPoc as $modelPoc) {
+                            $modelPoc->agreement_id = $model->id;
+                            if (!($modelPoc->save(false))) {
+                                $transaction->rollBack();
+                                break;
                             }
-                            $this->multiFileHandler($model, 'files_applicant', 'document', 'applicant_doc');
-                            $transaction->commit();
-                            return $this->redirect(['index']);
                         }
+                        $this->multiFileHandler($model, 'files_applicant','document', 'applicant_doc');
+                        $this->sendEmail($model, Variables::email_init);
+                        $transaction->commit();
+                        return $this->redirect(['index']);
                     }
                 } catch (Exception $e) {
                     $transaction->rollBack();
                 }
             }
-
         } else {
             $model->loadDefaultValues();
         }
 
         return $this->renderAjax('create', [
             'model' => $model,
+            'colModel' => $colModel,
             'modelsPoc' => (empty($modelsPoc)) ? [new AgreementPoc()] : $modelsPoc
         ]);
     }
 
     function multiFileHandler($model, $attribute, $fileNamePrefix, $docAttribute)
     {
+        //31k folder in upload
         $files = UploadedFile::getInstances($model, $attribute);
         if ($files) {
             $baseUploadPath = Yii::getAlias('@common/uploads');
             $path = $baseUploadPath . '/' . $model->id . '/higher/';
 
             foreach ($files as $file) {
-                $fileName = $file->baseName . '.' . $file->extension;
+                $fileName = $file->baseName . '_'. date('Ymdhis') . '.' . $file->extension;
 
-                $filePath = $path . $fileName;
+                $filePath = $path . $fileName ;
                 if (!file_exists(dirname($filePath))) {
                     mkdir(dirname($filePath), 0777, true);
                 }
@@ -287,7 +280,7 @@ class AgreementController extends Controller
 
     public function actionViewActivities($id)
     {
-        $model = Activities::find()->where(['agreement_id' => $id])->all();
+        $model = Activities::find()->where(['col_id' => $id])->all();
         return $this->renderAjax('viewActivities', ['model' => $model,]);
     }
 
@@ -560,31 +553,34 @@ class AgreementController extends Controller
         return $this->renderAjax('_mcom', ['model' => $model, 'mcomDates' => $mcomDates]);
     }
 
-    /**
-     * Creates a new Agreement model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|Response
-     */
 
+    public function actionCheckOrganization()
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $organization = Yii::$app->request->post('col_organization');
 
-//    public function actionAddActivity($id = '')
-//    {
-//        $agreement = $this->findModel($id);
-//        $model = new Activities();
-//        $model->agreement_id = $id;
-//
-//        if ($this->request->isPost && $model->load($this->request->post())) {
-//            if ($model->save()) {
-//                return $this->redirect('index');
-//            }
-//        }
-//
-//        return $this->renderAjax('addActivity', [
-//            'model' => $model,
-//            'agreement' => $agreement,
-//        ]);
-//    }
+        // Using ILIKE for case-insensitive search
+        $collaboration = Collaboration::find()
+            ->where(['ILIKE', 'col_organization', $organization])
+            ->one();
 
+        if ($collaboration) {
+            return [
+                'exists' => true,
+                'data' => [
+                    'col_name' => $collaboration->col_name,
+                    'col_phone_number' => $collaboration->col_phone_number,
+                    'col_address' => $collaboration->col_address,
+                    'col_email' => $collaboration->col_email,
+                    'col_collaborators_name' => $collaboration->col_collaborators_name,
+                    'col_wire_up' => $collaboration->col_wire_up,
+                    'country' => $collaboration->country,
+                ]
+            ];
+        } else {
+            return ['exists' => false];
+        }
+    }
     /**
      * Deletes an existing Agreement model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -655,8 +651,6 @@ class AgreementController extends Controller
 
     public function actionLog($id)
     {
-
-
         $logsDataProvider = new ActiveDataProvider([
             'query' => Log::find()->where(['agreement_id' => $id]),
             'pagination' => ['pageSize' => 100,],
@@ -676,43 +670,6 @@ class AgreementController extends Controller
     {
         Yii::$app->response->sendFile($filePath);
     }
-
-    public function actionGetKcdioPoc($id)
-    {
-        $poc = Poc::find()->where(['kcdio' => $id])->all();
-
-        if ($poc) {
-            $options = "<option value=''>Select POC</option>";
-            foreach ($poc as $apoc) {
-                $options .= "<option value='" . $apoc->id . "'>" . $apoc->name . "</option>";
-            }
-        }
-
-        echo $options;
-    }
-
-    public function actionGetPocInfo($id)
-    {
-
-
-        if (is_numeric($id))
-            $poc = Poc::findOne($id);
-        else
-            $poc = Poc::find()->where(['name' => $id])->one();
-
-        if ($poc) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            return [
-                'name' => $poc->name,
-                'address' => $poc->address,
-                'email' => $poc->email,
-                'phone_number' => $poc->phone_number,
-            ];
-        } else {
-            return ['error' => 'POC not found'];
-        }
-    }
-
 
     public function actionImport()
     {
@@ -871,7 +828,8 @@ class AgreementController extends Controller
                             $agreementPoc->pi_email = $row['I'];
                             $agreementPoc->pi_address = $row['J'];
                             $agreementPoc->pi_phone = $row['K'];
-                            $agreementPoc->pi_kcdio = $row['D'];;
+                            $agreementPoc->pi_kcdio = $row['D'];
+                            $agreementPoc->pi_is_primary = true;
                             $agreementPoc->save(false);
 
 

@@ -14,7 +14,7 @@ class m240320_043149_create_activities_table extends Migration
     {
         $this->createTable('{{%activities}}', [
             'id'            => $this->primaryKey(),
-            'agreement_id'        => $this->integer   (),
+            'col_id'        => $this->integer   (),
             'name'          => $this->string(100),
             'staff_email'   => $this->string(50),
             'kcdio'         => $this->text(),
@@ -60,7 +60,7 @@ class m240320_043149_create_activities_table extends Migration
 
             //Consultancy
             'consultancy_name' => $this->string(100),
-            'project_duration' => $this->date(),
+            'project_duration' => $this->string(100),
 
             //Any other of Cooperation, Please specify
             'other' => $this->text(),
@@ -73,8 +73,8 @@ class m240320_043149_create_activities_table extends Migration
         $this->addForeignKey(
             'fk_activity',
             '{{%activities}}',
-            'agreement_id',
-            '{{%agreement}}',
+            'col_id',
+            '{{%collaboration}}',
             'id',
             'CASCADE'
         );

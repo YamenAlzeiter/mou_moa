@@ -10,6 +10,10 @@ class Variables
     const agreement_not_complete_osc = 2;
     const agreement_approved_ola = 11;
     const agreement_not_complete_ola = 12;
+    const agreement_approved_circulation = 13;
+
+    const agreement_approved_via_power = 14;
+
     const agreement_MCOM_approved = 31;
     const agreement_MCOM_reject = 32;
     const agreement_MCOM_KIV = 33;

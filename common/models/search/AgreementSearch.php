@@ -23,7 +23,7 @@ class   AgreementSearch extends Agreement
      */
     public function rules()
     {
-        return [[['id', 'status'], 'integer'], [['col_organization', 'col_name', 'country', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'agreement_sign_date', 'agreement_expiration_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'meeting_link', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason', 'transfer_to', 'agreement_type', 'full_info', 'type', 'endDate', 'applications'], 'safe'],];
+        return [[['id', 'status'], 'integer'], [['col_organization', 'col_name', 'country', 'col_address', 'col_contact_details', 'col_collaborators_name', 'col_wire_up', 'col_phone_number', 'col_email', 'pi_name', 'pi_kulliyyah', 'pi_phone_number', 'pi_email', 'project_title', 'grant_fund', 'agreement_sign_date', 'agreement_expiration_date', 'member', 'proposal', 'ssm', 'company_profile', 'mcom_date', 'doc_applicant', 'doc_draft', 'doc_newer_draft', 'doc_re_draft', 'doc_final', 'doc_extra', 'reason', 'transfer_to', 'agreement_type', 'full_info', 'type', 'endDate', 'applications'], 'safe'],];
     }
 
     /**
@@ -87,7 +87,6 @@ class   AgreementSearch extends Agreement
             ->orFilterWhere(['ilike', 'agreement.proposal', $this->full_info])
             ->orFilterWhere(['ilike', 'agreement.ssm', $this->full_info])
             ->orFilterWhere(['ilike', 'agreement.company_profile', $this->full_info])
-            ->orFilterWhere(['ilike', 'agreement.meeting_link', $this->full_info])
             ->orFilterWhere(['ilike', 'agreement.reason', $this->full_info])
             ->orFilterWhere(['ilike', 'agreement.agreement_type', $this->full_info])
             ->orFilterWhere(['agreement_poc.pi_name' => $this->full_info])

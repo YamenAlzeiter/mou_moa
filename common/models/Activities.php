@@ -9,9 +9,9 @@ use yii\db\ActiveRecord;
  * This is the model class for table "activities".
  *
  * @property int $id
- * @property int|null $agreement_id
+ * @property int|null $col_id
  * @property string|null $name
- * @property string|null $staff_number
+ * @property string|null $staff_email
  * @property string|null $kcdio
  * @property string|null $mou_moa
  * @property string|null $activity_type
@@ -122,16 +122,16 @@ class Activities extends ActiveRecord
         }"],
 
 
-            [['agreement_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'default', 'value' => null],
-            [['agreement_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'integer'],
+            [['col_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'default', 'value' => null],
+            [['col_id', 'number_students', 'non_number_students', 'in_number_of_staff', 'out_number_of_staff', 'participants_number'], 'integer'],
             [['name_students', 'non_name_students', 'in_staffs_name', 'out_staffs_name', 'research_title', 'justification'], 'string'],
             [['date_of_program', 'date', 'year', 'non_year'], 'safe'],
-            [['name', 'kcdio', 'mou_moa', 'activity_type', 'non_program_name', 'scwt_name_of_program', 'program_venue', 'upload_files', 'staff_number'], 'string', 'max' => 522],
+            [['name', 'kcdio', 'mou_moa', 'activity_type', 'non_program_name', 'scwt_name_of_program', 'program_venue', 'upload_files', 'staff_email'], 'string', 'max' => 522],
             [['type', 'non_type', 'semester', 'non_semester'], 'string', 'max' => 10],
             [['in_department_office'], 'string', 'max' => 100],
             [['publication_title', 'publisher', 'consultancy_name', 'other', 'name_participants_involved'], 'string', 'max' => 255],
             [['project_duration'], 'string', 'max' => 50],
-            [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],
+            [['col_id'], 'exist', 'skipOnError' => true, 'targetClass' => Collaboration::class, 'targetAttribute' => ['col_id' => 'id']],
         ];
     }
 
@@ -144,9 +144,9 @@ class Activities extends ActiveRecord
 
         return [
             'id' => 'ID',
-            'agreement_id' => 'Agreement ID',
+            'col_id' => 'Agreement ID',
             'name' => 'Name',
-            'staff_number' => 'Staff Number',
+            'staff_email' => 'Staff Number',
             'kcdio' => 'Kcdio',
             'mou_moa' => 'Mou Moa',
             'activity_type' => 'Activity Type',
@@ -190,6 +190,6 @@ class Activities extends ActiveRecord
      */
     public function getAgreement()
     {
-        return $this->hasOne(Agreement::class, ['id' => 'agreement_id']);
+        return $this->hasOne(Collaboration::class, ['id' => 'col_id']);
     }
 }

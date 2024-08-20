@@ -26,7 +26,7 @@ class builders
 
     public function pillBuilder($status, $options = "")
     {
-        $statusHelper = new statusLable();
+        $statusHelper = new statusLabel();
         $padgeClass = $statusHelper->statusBadgeClass($status);
         $textClass = $statusHelper->statusDotClass($status);
         $tag = $statusHelper->statusTag($status);

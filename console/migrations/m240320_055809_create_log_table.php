@@ -20,6 +20,7 @@ class m240320_055809_create_log_table extends Migration
             'new_status' => $this->integer(),
 
             'message' => $this->text(),
+            'changes' => 'hstore',
 
 
             'created_at' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),

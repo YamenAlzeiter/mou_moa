@@ -45,7 +45,7 @@ class Collaboration extends \yii\db\ActiveRecord
             [['col_wire_up'], 'string', 'max' => 255],
             [['col_phone_number'], 'string', 'max' => 20],
             [['col_email', 'country'], 'string', 'max' => 50],
-            [['col_organization'], 'unique'],
+
         ];
     }
 

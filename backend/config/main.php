@@ -11,7 +11,21 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [
+        'admin' => [
+            'class' => 'mdm\admin\Module',
+            'mainLayout' => '@frontend/views/layouts/main.php',
+            'layout' => 'left-menu',
+            'controllerMap' => [
+                'assignment' => [
+                    'class' => 'mdm\admin\controllers\AssignmentController',
+                    'userClassName' => 'common\models\User',
+//                    'idField' => 'username', // change this to use 'username' instead of 'id'
+                ],
+            ],
+        ],
+    ],
+
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',

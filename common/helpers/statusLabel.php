@@ -4,7 +4,7 @@ namespace common\helpers;
 
 use common\models\Status;
 
-class statusLable
+class statusLabel
 {
     public function statusTag($status)
     {

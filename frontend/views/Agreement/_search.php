@@ -1,11 +1,8 @@
 <?php
 
 use common\models\Agreement;
-use common\models\AgreementType;
-use common\models\McomDate;
-use yii\helpers\ArrayHelper;
-use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+
 
 /** @var yii\web\View $this */
 /** @var common\models\search\AgreementSearch $model */
@@ -42,7 +39,7 @@ use yii\widgets\ActiveForm;
             ?>
         </div>
     <?php endif; ?>
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex align-items-center gap-1">
 
         <?= $form->field($model, 'full_info', ['options' => ['mb-0']])->textInput([
             'class' => 'form-control', // Add class for styling
@@ -77,7 +74,7 @@ use yii\widgets\ActiveForm;
             'onchange' => '$(this).closest("form").submit();', // Submit form on change
         ])->label(false) ?>
 
-        <buttton class="btn btn-dark-light btn-sm"><i class="ti ti-search fs-7"></i></buttton>
+
     </div>
 
 </div>

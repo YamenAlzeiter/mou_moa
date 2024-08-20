@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use common\helpers\agreementPocMaker;
 use common\helpers\pocFieldMaker;
+use common\helpers\Variables;
 use common\models\Agreement;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
@@ -11,12 +12,28 @@ use yii\helpers\Html;
 /** @var yii\web\View $this */
 /** @var common\models\Agreement $model */
 /** @var common\models\Collaboration $colModel */
+/** @var common\models\AgreementPoc $modelsPoc */
 
 $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 
-$status = [2 => 15, 12 => 15, 11 => 21, 33 => 21, 34 => 31, 47 => 46, 43 => 21, 51 => 61, 72 => 61,];
+$status = [
+        Variables::agreement_init => Variables::agreement_init,
+        Variables::agreement_not_complete_osc => Variables::agreement_resubmitted,
+
+        Variables::agreement_resubmitted => Variables::agreement_resubmitted,
+        Variables::agreement_not_complete_ola => Variables::agreement_resubmitted,
+
+        Variables::email_agr_mcom_resubmitted => Variables::agreement_MCOM_date_set,
+        Variables::agreement_MCOM_KIV => Variables::agreement_MCOM_date_set,
+
+        Variables::agreement_UMC_KIV => Variables::agreement_MCOM_date_set,
+
+        Variables::agreement_draft_uploaded_ola => Variables::agreement_draft_upload_applicant,
+        Variables::agreement_draft_upload_applicant => Variables::agreement_draft_upload_applicant,
+        Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant
+    ];
 
 $additionalPoc = new pocFieldMaker();
 
@@ -55,7 +72,14 @@ $options = ArrayHelper::merge(
 <?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 
-<?php if (in_array($model->status, [2, 12, 33, 34, 43, 47])): ?>
+<?php if (in_array($model->status, [
+        Variables::agreement_init,
+        Variables::agreement_resubmitted,
+        Variables::agreement_not_complete_osc,
+        Variables::agreement_not_complete_ola,
+        Variables::agreement_MCOM_KIV,
+        Variables::agreement_UMC_KIV
+])): ?>
     <div class="row">
         <div class="col-md-4">
             <?=$form->field($model, 'agreement_type')->dropDownList(
@@ -68,7 +92,7 @@ $options = ArrayHelper::merge(
             ?>
         </div>
         <div id="other-agreement-type" class="col-md-4">
-            <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+            <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true, 'placeholder' => '']) ?>
         </div>
         <div class="col-md-4">
             <?= $form->field($model, 'transfer_to')->dropDownList(
@@ -84,25 +108,25 @@ $options = ArrayHelper::merge(
     <div class="row">
         <h4>Collaborator Details</h4>
         <div class="col-md-12">
-            <?= $form->field($colModel, 'col_organization')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_organization')->textInput(['maxlength' => true, 'id' => 'col_organization', 'placeholder' => '']) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($colModel, 'col_name')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($colModel, 'col_phone_number')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_name')->textInput(['maxlength' => true, 'id' => 'col_name', 'placeholder' => '']) ?>
+            <?= $form->field($colModel, 'col_phone_number')->textInput(['maxlength' => true, 'id' => 'col_phone_number', 'placeholder' => '']) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($colModel, 'col_address')->textInput(['maxlength' => true]) ?>
-            <?= $form->field($colModel, 'col_email')->textInput(['type' => 'email']) ?>
+            <?= $form->field($colModel, 'col_address')->textInput(['maxlength' => true, 'id' => 'col_address', 'placeholder' => '']) ?>
+            <?= $form->field($colModel, 'col_email')->textInput(['type' => 'email', 'maxlength' => true, 'id' => 'col_email', 'placeholder' => '']) ?>
         </div>
     </div>
-    <?= $form->field($colModel, 'col_collaborators_name')->textarea(['maxlength' => true, 'rows' => 6]) ?>
+    <?= $form->field($colModel, 'col_collaborators_name')->textarea(['maxlength' => true, 'rows' => 6, 'id' => 'col_collaborators_name', 'placeholder' => '']) ?>
 
     <div class="row">
         <div class="col-md-8">
-            <?= $form->field($colModel, 'col_wire_up')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'col_wire_up')->textInput(['maxlength' => true, 'id' => 'col_wire_up', 'placeholder' => '']) ?>
         </div>
         <div class="col-md-4">
-            <?= $form->field($colModel, 'country')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($colModel, 'country')->textInput(['maxlength' => true, 'id' => 'country', 'placeholder' => '']) ?>
         </div>
     </div>
     <!-- Collaborator details end -->
@@ -122,7 +146,7 @@ $options = ArrayHelper::merge(
     <h4>Project Information</h4>
     <div class="row">
         <div class="col-md-12">
-            <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'value' => 'Project Title Title Project']) ?>
+            <?= $form->field($model, 'project_title')->textarea(['rows' => 6, 'maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
     <div id="rmc-additional-info" class="row d-none">
@@ -138,22 +162,26 @@ $options = ArrayHelper::merge(
     </div>
     <div class="row">
         <div class="col-md">
-            <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'grant_fund')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         </div>
         <div class="col-md">
-            <?= $form->field($model, 'member')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'member')->textInput(['maxlength' => true, 'placeholder' => '']) ?>
         </div>
     </div>
     <div id="oil-additional-info" class="row d-none">
-        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true]) ?></div>
-        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true]) ?></div>
+        <div class="col-md"><?= $form->field($model, 'ssm')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
+        <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
     </div>
-    <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true]) ?>
+    <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'placeholder' => '']) ?>
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
     <?= $form->field($model,'pi_delete_ids')->hiddenInput()->label(false)?>
 <?php endif; ?>
 <?php
-if (in_array($model->status, [11, 33, 43])): ?>
+if (in_array($model->status, [
+        Variables::email_agr_mcom_resubmitted,
+        Variables::agreement_MCOM_KIV,
+        Variables::agreement_UMC_KIV
+])): ?>
 
     <?= $form->field($model, 'mcom_date')->dropDownList(
         ArrayHelper::map($mcomDates, 'date_from', function ($model) {
@@ -166,26 +194,27 @@ if (in_array($model->status, [11, 33, 43])): ?>
 
 
 <?php
-elseif (in_array($model->status, [51, 72])): ?>
+elseif (in_array($model->status, [
+        Variables::agreement_draft_uploaded_ola,
+        Variables::agreement_draft_rejected_ola,
+        Variables::agreement_draft_upload_applicant
+])): ?>
     <!--    --><?php //= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
     <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput(['required' => true])->label('Document') ?>
 
 <?php
-elseif ($model->status == 110): ?>
+elseif ($model->status == Variables::agreement_reminder_sent): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['111' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
+        <?= $form->field($model, 'status')->radioList(['10' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
             'item' => function ($index, $label, $name, $checked, $value) {
                 return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
             }])->label(false); ?>
-        <div class="end_date d-none">
-            <div class="col-md"><?= $form->field($model, 'agreement_expiration_date')->textInput(['type' => 'date']) ?></div>
-        </div>
     </div>
 <?php
 endif; ?>
 
-<?php if ($model->status == 110): ?>
+<?php if ($model->status == Variables::agreement_reminder_sent): ?>
     <div class="modal-footer p-0">
         <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn-submit', 'name' => 'checked']) ?>
         <?php ActiveForm::end(); ?>
@@ -196,6 +225,7 @@ endif; ?>
         <?php ActiveForm::end(); ?>
     </div>
 <?php endif; ?>
+
 <?php
 $existingFilesSize = 0;
 $baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/applicant/';
@@ -349,51 +379,102 @@ foreach ($storedFiles as $file) {
     });
 </script>
 
-<?php
-$script = <<< JS
-$('#agreement-type-dropdown').change(function() {
-    if ($(this).val() === 'other') {
-        $('#other-agreement-type input').prop('disabled', false);
-    } else {
-        $('#other-agreement-type input').prop('disabled', true);
-    }
-}).change();
+<script>
+    $('#agreement-type-dropdown').change(function() {
+        if ($(this).val() === 'other') {
+            $('#other-agreement-type input').prop('disabled', false);
+        } else {
+            $('#other-agreement-type input').prop('disabled', true);
+        }
+    }).change();
 
-$('#transfer-to-dropdown').change(function() {
-    if ($(this).val() === 'OIL') {
-        $('#oil-additional-info').removeClass('d-none');
-        $('#rmc-additional-info').addClass('d-none');
-    }else if  ($(this).val() === 'RMC'){
-        $('#rmc-additional-info').removeClass('d-none');
-        $('#oil-additional-info').addClass('d-none');
-    } else {
-        $('#oil-additional-info').addClass('d-none');
-        $('#rmc-additional-info').addClass('d-none');
-    }
+    $('#transfer-to-dropdown').change(function() {
+        if ($(this).val() === 'OIL') {
+            $('#oil-additional-info').removeClass('d-none');
+            $('#rmc-additional-info').addClass('d-none');
+        }else if  ($(this).val() === 'RMC'){
+            $('#rmc-additional-info').removeClass('d-none');
+            $('#oil-additional-info').addClass('d-none');
+        } else {
+            $('#oil-additional-info').addClass('d-none');
+            $('#rmc-additional-info').addClass('d-none');
+        }
 
-    var form = $('#{$form->id}');
-    form.yiiActiveForm('validateAttribute', 'model-member');
-    form.yiiActiveForm('validateAttribute', 'model-grant_fund');
-    form.yiiActiveForm('validateAttribute', 'model-project_title');
-}).change();
+        var form = $('#{$form->id}');
+        form.yiiActiveForm('validateAttribute', 'model-member');
+        form.yiiActiveForm('validateAttribute', 'model-grant_fund');
+        form.yiiActiveForm('validateAttribute', 'model-project_title');
+    }).change();
 
-$('#{$form->id}').on('beforeSubmit', function() {
-    if ($('#agreement-type-dropdown').val() === 'other') {
-        var otherValue = $('#{$model->formName()}-agreement_type_other').val();
-        $('#{$model->formName()}-agreement_type').val(otherValue);
-    }
-});
+    $('#{$form->id}').on('beforeSubmit', function() {
+        if ($('#agreement-type-dropdown').val() === 'other') {
+            var otherValue = $('#{$model->formName()}-agreement_type_other').val();
+            $('#{$model->formName()}-agreement_type').val(otherValue);
+        }
+    });
 
- $('input[name="Agreement[status]"]').on('change', function() {
+    $('input[name="Agreement[status]"]').on('change', function() {
         if ($('#is111').is(':checked')) {
             $('.end_date').removeClass('d-none');
         } else {
             $('.end_date').addClass('d-none');
         }
     });
+</script>
 
-    
+<script>
+    $(document).ready(function() {
+        $('#col_organization').on('blur', function() {
+            var orgName = $(this).val();
+            if (orgName) {
+                $.ajax({
+                    url: '/agreement/check-organization',
+                    type: 'POST',
+                    data: {col_organization: orgName},
+                    success: function(response) {
+                        if (response.exists) {
+                            Swal.fire({
+                                title: 'Organization already exists',
+                                text: 'This organization already exists. Do you want to use the same information?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes, use it',
+                                cancelButtonText: 'No, enter new organization'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    $('#col_name').val(response.data.col_name).prop('disabled', true);
+                                    $('#col_phone_number').val(response.data.col_phone_number).prop('disabled', true);
+                                    $('#col_address').val(response.data.col_address).prop('disabled', true);
+                                    $('#col_email').val(response.data.col_email).prop('disabled', true);
+                                    $('#col_collaborators_name').val(response.data.col_collaborators_name).prop('disabled', true);
+                                    $('#col_wire_up').val(response.data.col_wire_up).prop('disabled', true);
+                                    $('#country').val(response.data.country).prop('disabled', true);
+                                }
+                            });
+                        } else {
+                            resetFields();
+                        }
+                    }
+                });
+            } else {
+                resetFields();
+            }
+        });
 
-JS;
-$this->registerJs($script);
-?>
+        // Reset fields and re-enable inputs if the organization name changes
+        $('#col_organization').on('input', function() {
+            resetFields();
+        });
+
+        // Function to reset form fields and re-enable inputs
+        function resetFields() {
+            $('#col_name').val('').prop('disabled', false);
+            $('#col_phone_number').val('').prop('disabled', false);
+            $('#col_address').val('').prop('disabled', false);
+            $('#col_email').val('').prop('disabled', false);
+            $('#col_collaborators_name').val('').prop('disabled', false);
+            $('#col_wire_up').val('').prop('disabled', false);
+            $('#country').val('').prop('disabled', false);
+        }
+    });
+</script>

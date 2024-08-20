@@ -36,7 +36,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
 
 <div class="header-section">
     <?= $form->field($model, 'name')->hiddenInput(['value' => Yii::$app->user->identity->username])->label(false)?>
-    <?= $form->field($model, 'staff_number')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
+    <?= $form->field($model, 'staff_email')->hiddenInput(['value' => Yii::$app->user->identity->email])->label(false)?>
     <?= $form->field($model, 'kcdio')->hiddenInput(['value' => $agreement->champion])->label(false)?>
     <?= $form->field($model, 'mou_moa')->hiddenInput(['value' => $agreement->col_id])->label(false)?>
         <div class = "col"><?= $form->field($model, 'activity_type', ['enableClientValidation' => true])->dropDownList($activityOptionsMap, ['prompt' => 'Select Activity Type', 'id' => 'activity-type-dropdown']) ?></div>
@@ -200,7 +200,7 @@ $templateRadio = '<legend class="col-form-label col-sm-6 pt-0">{label}</legend>{
     <?= $form->field($model, 'justification')->textarea(['maxlength' => true, 'placeholder' => ''])?>
 </section>
 <div class="mb-4 text-end">
-    <?= Html::submitButton('Submit', ['class' => 'btn btn-lg btn-dark']) ?>
+    <?= Html::submitButton('Submit', ['class' => 'btn-submit']) ?>
 </div>
 <?php ActiveForm::end(); ?>
 
