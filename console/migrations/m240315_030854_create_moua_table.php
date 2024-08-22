@@ -144,7 +144,7 @@ class m240315_030854_create_moua_table extends Migration
                 special BOOLEAN := FALSE;
             BEGIN
                 -- Only log if status has changed
-                IF OLD.status IS DISTINCT FROM NEW.status THEN
+                -- IF OLD.status IS DISTINCT FROM NEW.status THEN
                     -- Determine log message based on status change
                     IF (OLD.status = 2 AND NEW.status = 15) THEN 
                         resubmitted := TRUE;
@@ -188,7 +188,7 @@ class m240315_030854_create_moua_table extends Migration
 
                     INSERT INTO log (agreement_id, old_status, new_status, message, changes, created_by)
                     VALUES (NEW.id, OLD.status, NEW.status, log_message, change_record, NEW.temp);
-                END IF;
+                -- END IF;
                 RETURN NEW;
             END;
             $$ LANGUAGE plpgsql;
