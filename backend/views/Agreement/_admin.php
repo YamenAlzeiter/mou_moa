@@ -120,9 +120,13 @@ echo GridView::widget([
         ],
         [
             'class' => ActionColumn::className(),
-            'template' => '{view}{log}{updatePoc}',
+            'template' => '{update}{view}{log}',
             'contentOptions' => ['class' => 'text-end'],
             'buttons' => [
+                'update' =>function ($url, $model, $key) {
+                    $build = new builders();
+                    return $build->actionBuilder($model, 'update-record');
+                },
                 'view' => function ($url, $model, $key) {
                     $build = new builders();
                     return $build->actionBuilder($model, 'view');
@@ -131,10 +135,6 @@ echo GridView::widget([
                     $build = new builders();
                     return $build->actionBuilder($model, 'log');
                 },
-                'updatePoc' => function ($url, $model, $key) {
-                    $build = new builders();
-                    return $build->tableProbChanger($model->status, 'ApplicantActivity') ? $build->actionBuilder($model, 'update-poc') : null;
-                }
             ],
         ],
     ],

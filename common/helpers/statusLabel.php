@@ -55,6 +55,8 @@ class statusLabel
 
             110 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
             111 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
+            13  => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
+            14  => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
         ];
 
         $default = ['badge' => 'bg-danger-subtle text-danger', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];

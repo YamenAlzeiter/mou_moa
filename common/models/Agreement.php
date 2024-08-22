@@ -55,7 +55,7 @@ class Agreement extends ActiveRecord
 
     public $advice;
     public $principle;
-    public $umc_date;
+    public $circulation;
     /**
      * {@inheritdoc}
      */
@@ -159,7 +159,7 @@ class Agreement extends ActiveRecord
             [['member'], 'string', 'max' => 2],
             [['agreement_type'], 'string', 'max' => 50],
             [['ssm'], 'string', 'max' => 25],
-            [['umc_series', 'mcom_series'], 'string', 'max' => 100],
+            [['umc_series', 'mcom_series', 'circulation'], 'string', 'max' => 100],
             [['col_id'], 'exist', 'skipOnError' => true, 'targetClass' => Collaboration::class, 'targetAttribute' => ['col_id' => 'id']],
         ];
     }
@@ -207,8 +207,7 @@ class Agreement extends ActiveRecord
 
             'isReminded' => 'Reminder Step',
 
-            'temp_attribute_poc' => 'KCDIO',
-            'temp_attribute' => 'person in charge name',
+
 
             'agreement_type_other' => 'Other'
         ];
@@ -219,10 +218,6 @@ class Agreement extends ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getActivities()
-    {
-        return $this->hasMany(Activities::class, ['agreement_id' => 'id']);
-    }
 
     public function getAgreementPoc()
     {
@@ -231,12 +226,10 @@ class Agreement extends ActiveRecord
     public function getcollaboration(){
         return $this->hasOne(Collaboration::class, ['id' => 'col_id']);
     }
-
     public function getMcomDate()
     {
         return $this->hasOne(McomDate::class, ['date_from' => 'mcom_date']);
     }
-
     public function getPrimaryAgreementPoc()
     {
         return $this->hasOne(AgreementPoc::className(), ['agreement_id' => 'id'])->andWhere(['pi_is_primary' => true]);

@@ -2,6 +2,7 @@
 
 namespace backend\controllers;
 
+
 use Carbon\Carbon;
 use common\helpers\Model;
 use common\helpers\Variables;
@@ -14,18 +15,19 @@ use common\models\Import;
 use common\models\Log;
 use common\models\LookupCdKcdiom;
 use common\models\McomDate;
-use common\models\Poc;
 use common\models\search\AgreementSearch;
+use common\models\search\DashboardSearch;
 use common\models\User;
 use Exception;
 use Mpdf\HTMLParserMode;
 use Mpdf\Mpdf;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\Expression;
 use yii\filters\AccessControl;
-use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
@@ -60,7 +62,7 @@ class AgreementController extends Controller
                             'allow' => false,
                             'roles' => ['OLA'],
                             'actions' => [
-                                 'import-excel', 'import-excel-activity', 'update-poc', 'bulk-delete', 'dashboard'],
+                                 'import-excel', 'import-excel-activity', 'update-poc', 'bulk-delete', 'dashboard', 'update-record'],
                         ],
                         [
                             'allow' => true,
@@ -69,7 +71,7 @@ class AgreementController extends Controller
                         [
                             'allow' => false,
                             'roles' => ['IO' , 'OIL', 'RMC'],
-                            'actions' => ['mcom', 'create-poc', 'create', 'get-poc-info', 'get-kcdio-poc', 'bulk-delete'],
+                            'actions' => ['mcom', 'create-poc', 'create', 'get-poc-info', 'get-kcdio-poc', 'bulk-delete', 'update-record'],
                         ],
                         [
                             'allow' => false,
@@ -190,9 +192,12 @@ class AgreementController extends Controller
             }
 
             // Check if the collaboration already exists
-            $existingColModel = Collaboration::findOne(['col_organization' => $colModel->col_organization]);
+            $existingColModel = Collaboration::find()
+                ->where(['ILIKE', 'col_organization', $colModel->col_organization])
+                ->one();
             if ($existingColModel) {
                 // Use the existing collaboration
+
                 $model->col_id = $existingColModel->id;
             } else {
                 // Create a new collaboration
@@ -263,21 +268,6 @@ class AgreementController extends Controller
         }
     }
 
-    public function actionCreatePoc()
-    {
-        $model = new Poc();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['index']);
-            }
-        } else {
-            $model->loadDefaultValues();
-        }
-
-        return $this->renderAjax('createPoc', ['model' => $model,]);
-    }
-
     public function actionViewActivities($id)
     {
         $model = Activities::find()->where(['col_id' => $id])->all();
@@ -318,6 +308,85 @@ class AgreementController extends Controller
         return $this->renderAjax('update', ['model' => $model]);
     }
 
+    public function actionUpdateRecord($id)
+    {
+        $model = $this->findModel($id);
+        $colModel = Collaboration::findOne($model->col_id);
+        $modelsPoc = $model->getAgreementPoc()->all();
+
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $modelsPocData = Yii::$app->request->post('AgreementPoc', []);
+            $colModel->load($this->request->post());
+            $modelsPoc = [];
+
+            foreach ($modelsPocData as $data) {
+                $poc = isset($data['id']) ? AgreementPoc::findOne($data['id']) : new AgreementPoc();
+                $poc->load($data, '');
+                $modelsPoc[] = $poc;
+            }
+
+            foreach ($modelsPoc as $modelPoc) {
+                $modelPoc->agreement_id = $model->id;
+                $modelPoc->save();
+            }
+
+
+            $piDeleteIds = Yii::$app->request->post('Agreement')['pi_delete_ids'] ?? '';
+
+            if (!empty($piDeleteIds)) {
+                $piDeleteIds = explode(',', $piDeleteIds);
+                if (!empty($piDeleteIds)) {
+                    AgreementPoc::deleteAll(['id' => $piDeleteIds]);
+                }
+            }
+
+            if ($model->status == Variables::agreement_executed) {
+                $model->last_reminder = Carbon::now()->addMonths(3)->toDateTimeString();
+            }
+
+            $this->multiFileHandler($model, 'files_dp', 'draft', 'dp_doc');
+
+            $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
+
+            if ($model->status == Variables::agreement_extended) {
+                $newAgreement = new Agreement();
+                $newAgreement->attributes = $model->attributes;
+                $newAgreement->status = Variables::agreement_executed;
+                $newAgreement->col_id = $model->col_id;
+
+                if ($newAgreement->save()) {
+                    $modelsPoc = $model->getAgreementPoc()->all();
+
+                    foreach ($modelsPoc as $modelPoc) {
+                        $newPoc = new AgreementPoc();
+                        $newPoc->attributes = $modelPoc->attributes;
+                        $newPoc->agreement_id = $newAgreement->id;
+                        $newPoc->save();
+                    }
+
+                    $oldFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$model->id}";
+                    $newFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$newAgreement->id}";
+
+                    $this->copyDirectory($oldFolder, $newFolder);
+
+                    $newAgreement->applicant_doc = $newFolder . '/applicant/';
+                    $newAgreement->dp_doc = $newFolder . '/higher/';
+                    $newAgreement->save();
+                }
+
+            }
+
+            if ($model->save() && $colModel->save()) {
+                return $this->redirect(['index']);
+            }
+
+        }
+        return $this->renderAjax('update-record', [
+            'model' => $model,
+            'colModel' => $colModel,
+            'modelsPoc' => $modelsPoc,
+        ]);
+    }
 
     private function sendEmail($model, $needCC)
     {
@@ -342,6 +411,10 @@ class AgreementController extends Controller
                 'template' => Variables::email_agr_review_not_complete_ola,
                 'cc' => 'OSC'
             ],
+            Variables::agreement_approved_circulation => [
+                'template' => Variables::email_agr_approved_circulation,
+                'cc' => 'OSC'
+            ],
             Variables::agreement_MCOM_date_changed => [
                 'template' => Variables::email_agr_mcom_date_change,
                 'cc' => 'OSC'
@@ -356,6 +429,10 @@ class AgreementController extends Controller
             ],
             Variables::agreement_MCOM_KIV => [
                 'template' => Variables::email_agr_mcom_kiv,
+                'cc' => 'OSC'
+            ],
+            Variables::agreement_approved_via_power => [
+                'template' => Variables::email_agr_mcom_approved_power,
                 'cc' => 'OSC'
             ],
             Variables::agreement_UMC_approve => [
@@ -422,6 +499,7 @@ class AgreementController extends Controller
         $body = str_replace('{advice}', $model->advice, $body);
         $body = str_replace('{execution_date}', $model->execution_date, $body);
         $body = str_replace('{expiry_date}', $model->agreement_expiration_date, $body);
+        $body = str_replace('{circulation}', $model->circulation, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
@@ -703,75 +781,6 @@ class AgreementController extends Controller
 
     }
 
-    public function importExcel1($filePath, $model)
-    {
-        // to import an excel file to the system, the excel file need to be in this format
-
-        //#1 columns should follow the order in the for loop
-        //#2 details of person in charge should be in this order name, kcdio, address, phone, email between each one |
-        $to = $model->import_from;
-        $temp = "(" . Yii::$app->user->identity->type . ") " . "(" . Yii::$app->user->identity->staff_ID . ") " . Yii::$app->user->identity->username;
-        $insertedRowIds = []; // Array to store inserted row IDs
-        try {
-            $spreadsheet = IOFactory::load($filePath);
-            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-            unset($sheetData[1]);
-
-            foreach ($sheetData as $row) {
-                if (!empty($row['A'])) {
-                    $kcdioName = LookupCdKcdiom::findOne(['kcdiom_desc' => $row['E']])->abb_code ?? 'Error';
-                    $pi_details = $this->applyExcelFormula($row['K']);
-
-                    $parts = explode('|', $row['K']);
-
-
-                    $status = $row['L'] == "Active" ? 100 : 102;
-
-                    $agreement = new Agreement();
-                    $agreement->agreement_type = $row['B'];
-                    $agreement->col_organization = $row['C'];
-                    $agreement->country = $row['D'];
-                    $agreement->champion = $kcdioName;
-                    $agreement->sign_date = $row['G'];
-                    $agreement->end_date = $row['H'];
-                    $agreement->status = $status;
-                    $agreement->transfer_to = $to;
-                    $agreement->temp = $temp;
-
-                    // Save the agreement
-                    if ($agreement->save()) {
-                        $agreementPoc = new AgreementPoc();
-                        $agreementPoc->agreement_id = $agreement->id;
-                        foreach ($parts as $index => $part) {
-                            if ($index == 0) {
-                                $agreementPoc->pi_name = $part;
-                            } elseif ($index == 1) {
-                                $agreementPoc->pi_kcdio = $part;
-                            } elseif ($index == 2) {
-                                $agreementPoc->pi_address = $part;
-                            } elseif ($index == 3) {
-                                $agreementPoc->pi_phone = $part;
-                            } elseif ($index == 4) {
-                                $agreementPoc->pi_email = $part;
-                            }
-                        }
-                        $agreementPoc->save();
-                    } else {
-                        Yii::error('Failed to save agreement: ' . print_r($agreement->errors, true));
-                    }
-                }
-            }
-
-            Yii::$app->session->setFlash('success', 'Data imported successfully.');
-
-        } catch (Exception $e) {
-            var_dump($e);
-            die();
-        }
-
-        return $insertedRowIds;
-    }
-
     public function importExcel($filePath, $model)
     {
         $to = array_values(Yii::$app->authManager->getRolesByUser(Yii::$app->user->id))[0]->name;
@@ -1019,10 +1028,10 @@ class AgreementController extends Controller
         }
     }
 
-    public function actionDeleteFile($id, $filename)
+    public function actionDeleteFile($id, $filePath)
     {
         $model = Agreement::findOne($id);
-        $filePath = $model->dp_doc . $filename;
+
 
         if (file_exists($filePath) && unlink($filePath)) {
             Yii::$app->session->setFlash('success', 'File deleted successfully.');
@@ -1073,33 +1082,17 @@ class AgreementController extends Controller
         exit;
     }
 
-    public function actionDashboard(){
-        $searchModel = new AgreementSearch();
+    public function actionDashboard()
+    {
+        $searchModel = new DashboardSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        // Get data for charts
-        $agreementCountsByCountry = $searchModel->getAgreementCountsByCountry();
-        $executedAgreementsCount = $searchModel->getExecutedAgreementsCount();
-        $expiredAgreementsCount = $searchModel->getExpiredAgreementsCount();
-
-        // Prepare data for charts
-        $countryChartData = [
-            'categories' => array_column($agreementCountsByCountry, 'country'),
-            'series' => array_column($agreementCountsByCountry, 'count'),
-        ];
-
-        $pieChartData = [
-            'categories' => ['Executed', 'Expired'],
-            'series' => [$executedAgreementsCount, $expiredAgreementsCount],
-        ];
+        $chartData = $searchModel->getChartData();
 
         return $this->render('dashboard', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'countryChartData' => $countryChartData,
-            'pieChartData' => $pieChartData,
+            'chartData' => $chartData,
         ]);
     }
-
-
 }

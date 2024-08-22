@@ -14,15 +14,20 @@ return [
     'modules' => [
         'admin' => [
             'class' => 'mdm\admin\Module',
-            'mainLayout' => '@frontend/views/layouts/main.php',
+            'mainLayout' => '@backend/views/layouts/main.php',
             'layout' => 'left-menu',
             'controllerMap' => [
                 'assignment' => [
                     'class' => 'mdm\admin\controllers\AssignmentController',
                     'userClassName' => 'common\models\User',
-//                    'idField' => 'username', // change this to use 'username' instead of 'id'
                 ],
             ],
+             'viewPath' => '@backend/views/admin',
+//             'on beforeAction' => function ($event) {
+//                if (Yii::$app->user->isGuest || !Yii::$app->user->can('OSIC')) {
+//                    throw new \yii\web\ForbiddenHttpException('you are not authorize to access this page');
+//                }
+//            },
         ],
     ],
 

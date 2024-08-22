@@ -232,7 +232,9 @@ class AgreementController extends Controller
             }
 
             // Check if the collaboration already exists
-            $existingColModel = Collaboration::findOne(['col_organization' => $colModel->col_organization]);
+            $existingColModel = Collaboration::find()
+                ->where(['ILIKE', 'col_organization', $colModel->col_organization])
+                ->one();
             if ($existingColModel) {
                 // Use the existing collaboration
                 $model->col_id = $existingColModel->id;

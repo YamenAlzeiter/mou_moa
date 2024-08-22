@@ -18,22 +18,7 @@ $this->title = 'Update Agreement: ' . $model->id;
 $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-md-2 col-md-form-label">{label}</div>
                         <div class="col-md-md">{input}{error}</div></div>';
 
-$status = [
-        Variables::agreement_init => Variables::agreement_init,
-        Variables::agreement_not_complete_osc => Variables::agreement_resubmitted,
 
-        Variables::agreement_resubmitted => Variables::agreement_resubmitted,
-        Variables::agreement_not_complete_ola => Variables::agreement_resubmitted,
-
-        Variables::email_agr_mcom_resubmitted => Variables::agreement_MCOM_date_set,
-        Variables::agreement_MCOM_KIV => Variables::agreement_MCOM_date_set,
-
-        Variables::agreement_UMC_KIV => Variables::agreement_MCOM_date_set,
-
-        Variables::agreement_draft_uploaded_ola => Variables::agreement_draft_upload_applicant,
-        Variables::agreement_draft_upload_applicant => Variables::agreement_draft_upload_applicant,
-        Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant
-    ];
 
 $additionalPoc = new pocFieldMaker();
 
@@ -72,16 +57,11 @@ $options = ArrayHelper::merge(
 <?php $form = ActiveForm::begin(['id' => 'update-form', 'fieldConfig' => ['template' => "<div class='form-floating mb-3'>{input}{label}{error}</div>", 'labelOptions' => ['class' => ''],],]); ?>
 
 
-<?php if (in_array($model->status, [
-        Variables::agreement_init,
-        Variables::agreement_resubmitted,
-        Variables::agreement_not_complete_osc,
-        Variables::agreement_not_complete_ola,
-        Variables::agreement_MCOM_KIV,
-        Variables::agreement_UMC_KIV
-])): ?>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <?= $form->field($model, 'status')->dropDownList(ArrayHelper::map(\common\models\Status::find()->all(),'status','description'),['prompt' => 'Change Status'])?>
+        </div>
+        <div class="col-md-3">
             <?=$form->field($model, 'agreement_type')->dropDownList(
                 $options,
                 [
@@ -91,10 +71,10 @@ $options = ArrayHelper::merge(
             );
             ?>
         </div>
-        <div id="other-agreement-type" class="col-md-4">
+        <div id="other-agreement-type" class="col-md-3">
             <?= $form->field($model, 'agreement_type_other')->textInput(['maxlength' => true, 'disabled' => true, 'placeholder' => '']) ?>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <?= $form->field($model, 'transfer_to')->dropDownList(
                 ['IO' => 'IO', 'RMC' => 'RMC', 'OIL' => 'OIL'],
                 [
@@ -131,13 +111,13 @@ $options = ArrayHelper::merge(
     </div>
     <!-- Collaborator details end -->
 
-<div id="poc-container">
+    <div id="poc-container">
 
-    <?php foreach ($modelsPoc as $index => $modelPoc):
-        $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
-        echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
-    endforeach; ?>
-</div>
+        <?php foreach ($modelsPoc as $index => $modelPoc):
+            $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
+            echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
+        endforeach; ?>
+    </div>
     <div class="d-grid mb-3">
         <?= Html::button('Add person in charge', ['class' => 'btn btn-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?>
     </div>
@@ -173,62 +153,28 @@ $options = ArrayHelper::merge(
         <div class="col-md"><?= $form->field($model, 'company_profile')->textInput(['maxlength' => true, 'placeholder' => '']) ?></div>
     </div>
     <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'placeholder' => '']) ?>
-    <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
-    <?= $form->field($model,'pi_delete_ids')->hiddenInput()->label(false)?>
-<?php endif; ?>
-<?php
-if (in_array($model->status, [
-        Variables::email_agr_mcom_resubmitted,
-        Variables::agreement_MCOM_KIV,
-        Variables::agreement_UMC_KIV
-])): ?>
-
-    <?= $form->field($model, 'mcom_date')->dropDownList(
-        ArrayHelper::map($mcomDates, 'date_from', function ($model) {
-            $dateFrom = new DateTime($model->date_from);
-            $dateUntil = new DateTime($model->date_until);
-            return 'Date: ' . ' ' . $dateFrom->format('Y/M/d H:i') .", Time: " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i') .  ', available: ' . ' ' . (10 - $model->counter);
-        }),
-        ['prompt' => 'Select a Date', 'required' => true]
-    ) ?>
-
-
-<?php
-elseif (in_array($model->status, [
-        Variables::agreement_draft_uploaded_ola,
-        Variables::agreement_draft_rejected_ola,
-        Variables::agreement_draft_upload_applicant
-])): ?>
-    <!--    --><?php //= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
-    <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput(['required' => true])->label('Document') ?>
-
-<?php
-elseif ($model->status == Variables::agreement_reminder_sent): ?>
-    <h4>Do You want to Extend the Agreement?</h4>
-    <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['10' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
-            'item' => function ($index, $label, $name, $checked, $value) {
-                return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
-            }])->label(false); ?>
+    <h4>Commencement Date</h4>
+    <div class="row">
+        <div class="col-md"><?= $form->field($model, 'agreement_sign_date')->textInput(['type' => 'date']) ?></div>
+        <div class="col-md"><?= $form->field($model, 'agreement_expiration_date')->textInput(['type' => 'date']) ?></div>
     </div>
-<?php
-endif; ?>
+    <h4>Execution Date</h4>
+    <div class="row">
+        <div class="col-md"><?= $form->field($model, 'execution_date')->textInput(['type' => 'date']) ?></div>
+    </div>
+    <?= $form->field($model, 'files_dp[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
+    <?= $form->field($model,'pi_delete_ids')->hiddenInput()->label(false)?>
 
-<?php if ($model->status == Variables::agreement_reminder_sent): ?>
     <div class="modal-footer p-0">
         <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn-submit', 'name' => 'checked']) ?>
         <?php ActiveForm::end(); ?>
     </div>
-<?php else: ?>
-    <div class="modal-footer p-0">
-        <?= Html::submitButton('Submit', ['id' => 'form-update-submit', 'class' => 'btn-submit', 'name' => 'checked', 'value' => $status[$model->status]]) ?>
-        <?php ActiveForm::end(); ?>
-    </div>
-<?php endif; ?>
+
 
 <?php
 $existingFilesSize = 0;
-$baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/applicant/';
+$baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/higher/';
+
 
 if (is_dir($baseUploadPath)) {
     $storedFiles = array_diff(scandir($baseUploadPath), ['.', '..']);
@@ -240,6 +186,7 @@ if (is_dir($baseUploadPath)) {
         }
     }
 }
+
 ?>
 
 <script>
@@ -263,46 +210,46 @@ if (is_dir($baseUploadPath)) {
 
     $(document).ready(function() {
         var roleData = <?= json_encode($roleData); ?>;
-            function populateRoleDropdowns() {
-                var selectedValue = $('#transfer-to-dropdown').val();
-                var $roleDropdowns = $('.role-dropdown');
+        function populateRoleDropdowns() {
+            var selectedValue = $('#transfer-to-dropdown').val();
+            var $roleDropdowns = $('.role-dropdown');
 
-                $roleDropdowns.each(function(index) {
-                    var $this = $(this);
-                    var currentValue = roleData[index];
-                    $this.empty();
-                    $this.append($('<option>', { value: '', text: 'Select Role' }));
+            $roleDropdowns.each(function(index) {
+                var $this = $(this);
+                var currentValue = roleData[index];
+                $this.empty();
+                $this.append($('<option>', { value: '', text: 'Select Role' }));
 
-                    var options = [];
-                    if (selectedValue === 'IO' || selectedValue === 'OIL') {
-                        options = [
-                            { value: 'Project Leader', text: 'Project Leader'},
-                            { value: 'Member', text: 'Member' }
-                        ];
-                    } else if (selectedValue === 'RMC') {
-                        options = [
-                            { value: 'Principal Researcher', text: 'Principal Researcher' },
-                            { value: 'Co Researcher', text: 'Co Researcher' }
-                        ];
-                    }
+                var options = [];
+                if (selectedValue === 'IO' || selectedValue === 'OIL') {
+                    options = [
+                        { value: 'Project Leader', text: 'Project Leader'},
+                        { value: 'Member', text: 'Member' }
+                    ];
+                } else if (selectedValue === 'RMC') {
+                    options = [
+                        { value: 'Principal Researcher', text: 'Principal Researcher' },
+                        { value: 'Co Researcher', text: 'Co Researcher' }
+                    ];
+                }
 
-                    $.each(options, function(index, option) {
-                        $this.append($('<option>', { value: option.value, text: option.text }));
-                    });
-
-                    $this.val(currentValue);
+                $.each(options, function(index, option) {
+                    $this.append($('<option>', { value: option.value, text: option.text }));
                 });
-            }
+
+                $this.val(currentValue);
+            });
+        }
 
 // Call the function when the page loads to initialize the dropdowns
-            $(document).ready(function() {
-                populateRoleDropdowns();
+        $(document).ready(function() {
+            populateRoleDropdowns();
 
-                // Attach the function to the change event of the transfer-to dropdown
-                $('#transfer-to-dropdown').change(function() {
-                    populateRoleDropdowns();
-                });
+            // Attach the function to the change event of the transfer-to dropdown
+            $('#transfer-to-dropdown').change(function() {
+                populateRoleDropdowns();
             });
+        });
 
         $('#transfer-to-dropdown').on('change', populateRoleDropdowns);
         $('#transfer-to-dropdown').trigger('change');

@@ -64,6 +64,7 @@ AppAsset::register($this);
         ['url' => 'agreement/index', 'icon' => 'ti ti-layout-dashboard fs-7', 'optionTitle' => 'Agreements'],
     ];
     if (Yii::$app->user->can('OSIC')) {
+        $menuItems[] = ['url' => 'agreement/dashboard', 'icon' => 'ti ti-chart-line fs-7', 'optionTitle' => 'Dashboard'];
         $menuItems[] = [
             'icon' => 'ti ti-settings-2 fs-7',
             'optionTitle' => 'settings',
@@ -71,8 +72,11 @@ AppAsset::register($this);
                 ['url' => 'setting/email-template', 'optionTitle' => 'Email Template'],
                 ['url' => 'setting/status', 'optionTitle' => 'Status'],
                 ['url' => 'setting/others', 'optionTitle' => 'Others'],
+                ['url' => 'setting/collaboration', 'optionTitle' => 'Organizations']
             ]
         ];
+        $menuItems[] = ['url' => 'admin', 'icon' => 'ti ti-user fs-7', 'optionTitle' => 'User Manager'];
+
     }
     echo SidebarV2::widget([
         'items' => $menuItems,

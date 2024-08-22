@@ -38,9 +38,9 @@ use yii\widgets\ActiveForm;
 
     <div class = "d-flex gap-3 ">
         <?= $form->field($model, 'full_info', ['options' => ['mb-0']])->textInput([
-            'class' => 'form-control', // Add class for styling
-            'placeholder' => 'Search', // Placeholder text
-            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+            'class' => 'form-control',
+            'placeholder' => 'Search',
+            'onchange' => '$(this).closest("form").submit();',
         ])->label(false) ?>
 
         <?= $form->field($model, 'agreement_type', ['options' => ['mb-0']])
@@ -64,11 +64,11 @@ use yii\widgets\ActiveForm;
             '1 Year' => '1 Year', '6 Month' => '6 Month', '3 Month' => '3 Month', '2 Month' => '2 Month',
             '1 Month' => '1 Month'
         ], [
-            'class' => 'form-select', 'prompt' => 'Pick End Date', // Placeholder text
-            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+            'class' => 'form-select', 'prompt' => 'Pick End Date',
+            'onchange' => '$(this).closest("form").submit();',
         ])->label(false) ?>
         <?= $form->field($model, 'transfer_to', ['options' => ['mb-0']])->dropDownList(['IO' => 'IO', 'OIL' => 'OIL', 'RMC' => 'RMC'], ['class' => 'form-select', 'prompt' => 'Pick ', // Placeholder text
-            'onchange' => '$(this).closest("form").submit();', // Submit form on change
+            'onchange' => '$(this).closest("form").submit();',
         ])->label(false) ?>
 
     </div>

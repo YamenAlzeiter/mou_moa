@@ -62,6 +62,8 @@ class Variables
     const email_progress_reminder = 20;
     const email_expiry_date_reminder = 21;
     const email_agr_expired = 22;
+    const email_agr_approved_circulation = 24;
+    const email_agr_mcom_approved_power  = 25;
 
 //Email Template
 

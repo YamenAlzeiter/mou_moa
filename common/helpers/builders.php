@@ -20,7 +20,7 @@ class builders
             case 'OSC'               :
                 return in_array($status, [10, 15, 81]);
             case 'OLA'               :
-                return in_array($status, [1, 21, 31, 41, 46, 61, 121, 86]);
+                return in_array($status, [1, 21, 31, 41, 46, 61, 121, 86, 13, 14]);
         }
     }
 
@@ -53,6 +53,8 @@ class builders
             'update' => 'text-primary ti-edit-circle         ',
             'status-update' => 'text-primary ti-edit-circle         ',
             'update-kcdio' => 'text-primary ti-edit-circle         ',
+            'update-collaboration' => 'text-primary ti-edit-circle         ',
+
             'mcom-update' => 'text-primary ti-edit-circle         ',
             'type-update' => 'text-primary ti-edit-circle         ',
             'poc-update' => 'text-primary ti-edit-circle         ',
@@ -87,6 +89,7 @@ class builders
             'delete' => 'text-danger ti-trash             ',
             'update' => 'text-primary ti-edit-circle         ',
             'update-poc' => 'text-primary ti-user-circle          ',
+            'update-record' => 'text-primary ti-pencil',
             'log' => 'text-warning ti-file-description ',
             'MCOM Date' => 'text-secondary ti-calendar-event',
             'Add Activity' => 'text-indigo ti-radar-2',

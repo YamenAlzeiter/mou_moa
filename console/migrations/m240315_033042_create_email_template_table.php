@@ -330,6 +330,28 @@ class m240315_033042_create_email_template_table extends Migration
 
                   <p>Your application ID no: {id} has been received by the Office of Legal Adviser and will be reviewed within 3 working days.</p>
                 HTML
+            ],[
+                'id' => 24,
+                'subject' => 'Agreement Approved in Paper',
+                'body' => <<<HTML
+                 <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+
+                <p>Your application ID no: {id} has been approved by in paper by circulation NO. {circulation}</p>
+
+                HTML
+            ],[
+                'id' => 25,
+                'subject' => 'MCOM Approved by OLA via Power delecated by UMC',
+                'body' => <<<HTML
+                  <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+
+                <p>Your application ID no: {id} has been approved by OLA via power delecated by UMC</p>
+
+                HTML
             ],
 
         ];

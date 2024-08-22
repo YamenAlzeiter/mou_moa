@@ -137,11 +137,43 @@ modal::end();
             }
 
             if (!empty($files)) {
-                echo GridView::widget(['dataProvider' => new ArrayDataProvider(['allModels' => array_values($files), 'pagination' => false, // Disable pagination
-                ]), 'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize), 'columns' => [['attribute' => 'file', 'label' => 'File Name', 'value' => function ($file) use ($model) {
-                    $build = new builders();
-                    return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
-                }, 'format' => 'raw',],],]);
+                echo GridView::widget(
+                        [
+                            'dataProvider' => new ArrayDataProvider(
+                                    [
+                                        'allModels' => array_values($files),
+                                        'pagination' => false,
+                                    ]
+                            ),
+                            'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
+                            'columns' => [
+                                ['attribute' => 'file',
+                                    'label' => 'File Name',
+                                    'value' => function ($file) use ($model) {
+                                        $build = new builders();
+                                        return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                                    },
+                                    'format' => 'raw',
+                                ],
+                                [
+                                    'label' => 'File Size',
+                                    'value' => function ($file) use ($model) {
+                                        $filePath = $model->applicant_doc . DIRECTORY_SEPARATOR . $file;
+                                        if (is_file($filePath)) {
+                                            return Yii::$app->formatter->asShortSize(filesize($filePath));
+                                        }
+                                        return 'N/A';
+                                    },],
+                                [
+                                    'class' => 'yii\grid\ActionColumn',
+                                    'template' => '{delete}',
+                                    'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
+                                        return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->applicant_doc . '/'. $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
+                                    },
+                                    ],
+                                ],
+                            ],
+                        ]);
             } else {
                 echo 'No files found.';
             }
@@ -172,7 +204,7 @@ modal::end();
                                 'label' => 'File Name',
                                 'value' => function ($file) use ($model) {
                                     $build = new builders();
-                                    return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                                    return $build->downloadLinkBuilder($model->dp_doc . $file, $file);
                                 },
                                 'format' => 'raw',
                             ],
@@ -189,7 +221,7 @@ modal::end();
                                 'class' => 'yii\grid\ActionColumn',
                                 'template' => '{delete}',
                                 'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
-                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filename' => $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
+                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->dp_doc . '/'. $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
                                 },
                                     ],
                                 ],

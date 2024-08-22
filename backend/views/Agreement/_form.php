@@ -23,7 +23,9 @@ $approveMap = [
         Variables::agreement_UMC_approve => Variables::agreement_draft_uploaded_ola,
         Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant,
         Variables::agreement_draft_approve_final_draft => Variables::agreement_executed,
-];
+        Variables::agreement_approved_circulation => Variables::agreement_MCOM_approved,
+        Variables::agreement_approved_via_power => Variables::agreement_draft_uploaded_ola,
+    ];
 $notCompleteMap = [
         Variables::agreement_init => Variables::agreement_not_complete_osc,
         Variables::agreement_resubmitted => Variables::agreement_not_complete_osc,
@@ -33,6 +35,7 @@ $notCompleteMap = [
         Variables::agreement_draft_upload_applicant => Variables::agreement_draft_rejected_ola,
         Variables::agreement_conditional_upload => Variables::agreement_conditional_upload_not_complete,
         Variables::agreement_MCOM_date_changed => Variables::agreement_MCOM_KIV,
+        Variables::agreement_approved_circulation => Variables::agreement_MCOM_KIV,
     86 => 87,
 
 ];
@@ -40,6 +43,13 @@ $rejectMap = [
         Variables::agreement_MCOM_date_set => Variables::agreement_MCOM_reject,
         Variables::agreement_MCOM_approved => Variables::agreement_UMC_reject,
         Variables::agreement_MCOM_date_changed => Variables::agreement_MCOM_reject,
+        Variables::agreement_approved_circulation => Variables::agreement_MCOM_reject,
+];
+$extraApprove = [
+    Variables::agreement_approved_osc => Variables::agreement_approved_circulation,
+    Variables::agreement_MCOM_date_set => Variables::agreement_approved_via_power,
+    Variables::agreement_MCOM_approved => Variables::agreement_approved_via_power,
+    Variables::agreement_approved_circulation => Variables::agreement_approved_via_power,
 ];
 
 
@@ -50,7 +60,8 @@ if (!in_array($model->status,
         Variables::agreement_draft_uploaded_ola,
         Variables::agreement_draft_rejected_ola,
         Variables::agreement_draft_approve_final_draft,
-        Variables::agreement_UMC_approve
+        Variables::agreement_UMC_approve,
+        Variables::agreement_approved_via_power
     ])) {
 
     $notCompleteTag = (in_array($model->status, [Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) ? 'KIV' : 'Not Complete';
@@ -61,6 +72,13 @@ if (!in_array($model->status,
     if (in_array($model->status, [Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) {
         $options += [$rejectMap[$model->status] => ' Reject'];
     }
+    if($model->status == Variables::agreement_approved_osc){
+        $options += [$extraApprove[$model->status] => 'Approved by circulation'];
+    }
+    if(in_array($model->status, [Variables::agreement_approved_circulation, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])){} {
+        $options += [$extraApprove[$model->status] => 'Approved By OLA via power delegated by UMC'];
+    }
+
     echo $form->field($model, 'status')->radioList(
         $options,
         [
@@ -91,7 +109,7 @@ $model->reason = null; // init reason to null for ckeditor value
 ?>
 
 <div class="agreement-form">
-    <?php if (in_array($model->status, [Variables::agreement_draft_rejected_ola, Variables::agreement_UMC_approve])): ?>
+    <?php if (in_array($model->status, [Variables::agreement_draft_rejected_ola, Variables::agreement_UMC_approve, Variables::agreement_approved_via_power])): ?>
         <?= $form->field($model, 'status')->hiddenInput(['value' => $approveMap[$model->status]])->label(false) ?>
         <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput()->label('Document') ?>
     <?php endif;?>
@@ -120,7 +138,9 @@ $model->reason = null; // init reason to null for ckeditor value
         <div class="col umc_date d-none">
             <?= $form->field($model, 'umc_date')->textInput(['type' => 'date', 'id' => 'umc_date'])->label('UMC Date') ?>
         </div>
-
+        <div class="col umc_ser d-none">
+            <?= $form->field($model, 'umc_series')->textInput(['type' => 'date', 'id' => 'umc_series'])->label('UMC Series') ?>
+        </div>
         <div class="col principle d-none">
             <?= $form->field($model, 'principle')->dropDownList(['in principle' => 'in principle'], ['prompt' => 'Select One', 'id' => 'principle'])->label('Principle') ?>
         </div>
@@ -131,6 +151,9 @@ $model->reason = null; // init reason to null for ckeditor value
 
     <div class="not-complete mb-4 d-none">
         <?= $form->field($model, 'reason')->widget(CKEditor::className(), ['preset' => 'basic',]) ?>
+    </div>
+    <div class="circulation d-none">
+        <?= $form->field($model, 'circulation')->textInput(['id' => 'circulation'])->label('circulation NO.') ?>
     </div>
 
 
@@ -166,7 +189,7 @@ $model->reason = null; // init reason to null for ckeditor value
             });
 
             function updateVisibility() {
-                $('.umc_date, .advice, .principle').addClass('d-none');
+                $('.umc_date, .advice, .principle, .circulation').addClass('d-none');
 
                 if ($('#is31').is(':checked') || $('#is43').is(':checked') || $('#is42').is(':checked') || $('#is41').is(':checked'))  {
                     $('.umc_date').removeClass('d-none');
@@ -179,11 +202,14 @@ $model->reason = null; // init reason to null for ckeditor value
                 if ($('#is41').is(':checked') || $('#is31').is(':checked')) {
                     $('.principle').removeClass('d-none');
                 }
+                if($('#is13').is(':checked')){
+                    $('.circulation').removeClass('d-none');
+                }
             }
 
             function updateNotCompleteVisibility() {
                 const notCompleteSelectors = "#is2, #is12, #is42, #is43, #is31, #is32, #is34, #is33, #is47, #is72, #is87, #is52";
-                const completeSelectors = "#is1, #is11, #is51, #is81, #is91";
+                const completeSelectors = "#is1, #is11, #is13, #is51, #is81, #is91";
 
                 if ($(notCompleteSelectors).is(':checked')) {
                     $(".not-complete").removeClass('d-none');
@@ -216,15 +242,21 @@ $model->reason = null; // init reason to null for ckeditor value
     <?php
     $existingFilesSize = 0;
     $baseUploadPath = Yii::getAlias('@common/uploads') . '/' . $model->id . '/applicant/';
-    $storedFiles = array_diff(scandir($baseUploadPath), ['.', '..']);
 
-    foreach ($storedFiles as $file) {
-        $filePath = $baseUploadPath . DIRECTORY_SEPARATOR . $file;
-        if (is_file($filePath)) {
-            $existingFilesSize += filesize($filePath);
+    if (is_dir($baseUploadPath)) {
+        $storedFiles = array_diff(scandir($baseUploadPath), ['.', '..']);
+
+        foreach ($storedFiles as $file) {
+            $filePath = $baseUploadPath . DIRECTORY_SEPARATOR . $file;
+            if (is_file($filePath)) {
+                $existingFilesSize += filesize($filePath);
+            }
         }
+    } else {
+        Yii::error("Directory does not exist: $baseUploadPath", __METHOD__);
     }
     ?>
+
 
     <script>
         $(document).ready(function() {

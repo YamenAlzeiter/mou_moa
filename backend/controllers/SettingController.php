@@ -5,6 +5,7 @@ namespace backend\controllers;
 use common\models\Agreement;
 
 use common\models\AgreementType;
+use common\models\Collaboration;
 use common\models\EmailTemplate;
 use common\models\Kcdio;
 use common\models\Log;
@@ -48,6 +49,9 @@ class SettingController extends Controller
 
                             // email template
                             'email-template', 'view-email-template', 'update-email-template',
+
+                            //collaboration
+                            'collaboration', 'update-collaboration',
 
                             // status
                             'status', 'status-update',
@@ -108,6 +112,23 @@ class SettingController extends Controller
 
         return $this->render('vemailTemplate', [
             'emailDataProvider' => $emailDataProvider,
+        ]);
+    }
+    public function actionCollaboration(){
+        $collaborationDataProvider = new ActiveDataProvider([
+            'query' => Collaboration::find()->orderBy(['id' => SORT_ASC]),
+           'pagination' => [
+               'pageSize' => 50,
+           ],
+            'sort' => [
+                'defaultOrder' => [
+                    'id' => SORT_ASC,
+                ]
+            ]
+        ]);
+
+        return $this->render('vCollaboration', [
+            'collaborationDataProvider' => $collaborationDataProvider,
         ]);
     }
 
@@ -214,6 +235,15 @@ class SettingController extends Controller
         ]);
     }
 
+    public function actionUpdateCollaboration($id){
+        $model = Collaboration::findOne($id);
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['collaboration']);
+        }
+        return $this->renderAjax('updateCollaboration', [
+            'model' => $model,
+        ]);
+    }
     public function actionUpdateReminder($id)
     {
         $model = Reminder::findOne($id);

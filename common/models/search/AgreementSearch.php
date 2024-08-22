@@ -3,6 +3,8 @@
 namespace common\models\search;
 
 use Carbon\Carbon;
+use common\models\AgreementPoc;
+use common\models\Collaboration;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -12,7 +14,7 @@ use yii\db\Expression;
 /**
  * AgreementSearch represents the model behind the search form of `common\models\Agreement`.
  */
-class   AgreementSearch extends Agreement
+class AgreementSearch extends Agreement
 {
     public $full_info;
     public $applications;
@@ -144,7 +146,7 @@ class   AgreementSearch extends Agreement
     }
     public function getAgreementCountsByCountry()
     {
-        return Agreement::find()
+        return Collaboration::find()
             ->select(['country', 'COUNT(*) AS count'])
             ->groupBy('country')
             ->asArray()

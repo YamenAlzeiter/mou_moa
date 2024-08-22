@@ -7,7 +7,7 @@ use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
-
+$this->title = 'Other';
 ?>
 <div class = "container-md my-3 p-4">
     <div class = "row">
