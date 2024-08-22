@@ -18,7 +18,7 @@ class m240513_042118_create_agreement_poc_table extends Migration
             'pi_name' => $this->string(100),
             'pi_email' => $this->string(50),
             'pi_phone' => $this->string(15),
-            'pi_kcdio' => $this->string(7),
+            'pi_kcdio' => $this->string(20),
             'pi_address' => $this->string(255),
             'pi_role' => $this->string(30),
             'pi_is_primary' => $this->boolean()->defaultValue(false),

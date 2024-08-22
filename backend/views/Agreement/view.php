@@ -36,7 +36,7 @@ modal::end();
 
             <?php if ($model->primaryAgreementPoc): ?>
                 <p class="badge  fw-bolder mw-pill rounded-2 bg-indigo-subtle text-indigo fs-5">
-                    <span class='text-gray-dark fw-bolder fs-5'><?=  $model->primaryAgreementPoc->pi_kcdio  ?></span>
+                    <span class='text-gray-dark fw-bolder fs-5'><?= $model->primaryAgreementPoc->pi_kcdio ?></span>
                 </p>
             <?php endif; ?>
 
@@ -57,7 +57,6 @@ modal::end();
 
     <!--section collaborator details-->
     <h4>Collaborator Details</h4>
-
     <div class="row">
         <div class="col-12">
             <?= $view->renderer($modelCol->col_organization, 'Organization') ?>
@@ -77,7 +76,7 @@ modal::end();
 
     <!--section person in charge details-->
 <?php foreach ($modelsPoc as $index => $modelPoc): ?>
-    <h4>Person In Charge Details <?= $modelPoc->pi_is_primary ? '(primary)':'' ?></h4>
+    <h4>Person In Charge Details <?= $modelPoc->pi_is_primary ? '(primary)' : '' ?></h4>
     <div class="row">
         <div class="col-md-6">
             <?= $view->renderer($modelPoc->pi_name, 'Name') ?>
@@ -94,6 +93,7 @@ modal::end();
 
     <!--section additional details-->
     <h4> Details</h4>
+<?= $view->renderer($model->ref_old_agreement, 'Extended from agreement') ?>
 <?= $view->renderer($model->project_title, $model->transfer_to == "OIL" ? 'Research Title' : 'Project Title') ?>
 <?= $view->renderer($model->grant_fund, 'Fund') ?>
 <?= $view->renderer($model->member, 'No. of Project Members') ?>
@@ -102,20 +102,18 @@ modal::end();
 <?= $view->renderer($model->ssm, 'SSM') ?>
 <?= $view->renderer($model->company_profile, 'Company Profile') ?>
     <h4>Dates</h4>
-    <div class = "row">
-        <div class = "col-6">
+    <div class="row">
+        <div class="col-6">
             <?= $view->renderer($model->execution_date, 'Execution Date') ?>
             <?= $view->renderer($model->agreement_sign_date, 'Sign Date') ?>
             <?= $view->renderer($model->agreement_expiration_date, 'Expiration Date') ?>
         </div>
-        <div class = "col-6">
+        <div class="col-6">
             <?= $view->renderer($model->rmc_start_date, 'Project Start Date') ?>
             <?= $view->renderer($model->rmc_end_date, 'Project End Date') ?>
             <?= $view->renderer($model->mcom_date, 'MCOM Date') ?>
         </div>
     </div>
-
-
 
 
     <!--section files-->
@@ -138,42 +136,42 @@ modal::end();
 
             if (!empty($files)) {
                 echo GridView::widget(
-                        [
-                            'dataProvider' => new ArrayDataProvider(
-                                    [
-                                        'allModels' => array_values($files),
-                                        'pagination' => false,
-                                    ]
-                            ),
-                            'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
-                            'columns' => [
-                                ['attribute' => 'file',
-                                    'label' => 'File Name',
-                                    'value' => function ($file) use ($model) {
-                                        $build = new builders();
-                                        return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
-                                    },
-                                    'format' => 'raw',
-                                ],
-                                [
-                                    'label' => 'File Size',
-                                    'value' => function ($file) use ($model) {
-                                        $filePath = $model->applicant_doc . DIRECTORY_SEPARATOR . $file;
-                                        if (is_file($filePath)) {
-                                            return Yii::$app->formatter->asShortSize(filesize($filePath));
-                                        }
-                                        return 'N/A';
-                                    },],
-                                [
-                                    'class' => 'yii\grid\ActionColumn',
-                                    'template' => '{delete}',
-                                    'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
-                                        return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->applicant_doc . '/'. $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
-                                    },
-                                    ],
+                    [
+                        'dataProvider' => new ArrayDataProvider(
+                            [
+                                'allModels' => array_values($files),
+                                'pagination' => false,
+                            ]
+                        ),
+                        'summary' => 'Total folder size: ' . Yii::$app->formatter->asShortSize($totalSize),
+                        'columns' => [
+                            ['attribute' => 'file',
+                                'label' => 'File Name',
+                                'value' => function ($file) use ($model) {
+                                    $build = new builders();
+                                    return $build->downloadLinkBuilder($model->applicant_doc . $file, $file);
+                                },
+                                'format' => 'raw',
+                            ],
+                            [
+                                'label' => 'File Size',
+                                'value' => function ($file) use ($model) {
+                                    $filePath = $model->applicant_doc . DIRECTORY_SEPARATOR . $file;
+                                    if (is_file($filePath)) {
+                                        return Yii::$app->formatter->asShortSize(filesize($filePath));
+                                    }
+                                    return 'N/A';
+                                },],
+                            [
+                                'class' => 'yii\grid\ActionColumn',
+                                'template' => '{delete}',
+                                'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
+                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->applicant_doc . '/' . $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
+                                },
                                 ],
                             ],
-                        ]);
+                        ],
+                    ]);
             } else {
                 echo 'No files found.';
             }
@@ -211,22 +209,22 @@ modal::end();
                             [
                                 'label' => 'File Size',
                                 'value' => function ($file) use ($model) {
-                                $filePath = $model->dp_doc . DIRECTORY_SEPARATOR . $file;
-                                if (is_file($filePath)) {
-                                    return Yii::$app->formatter->asShortSize(filesize($filePath));
-                                }
-                                return 'N/A';
-                            },],
+                                    $filePath = $model->dp_doc . DIRECTORY_SEPARATOR . $file;
+                                    if (is_file($filePath)) {
+                                        return Yii::$app->formatter->asShortSize(filesize($filePath));
+                                    }
+                                    return 'N/A';
+                                },],
                             [
                                 'class' => 'yii\grid\ActionColumn',
                                 'template' => '{delete}',
                                 'buttons' => ['delete' => function ($url, $fileModel, $key) use ($model) {
-                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->dp_doc . '/'. $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
+                                    return Html::a('<span class="ti ti-trash fs-7 text-danger"></span>', ['delete-file', 'id' => $model->id, 'filePath' => $model->dp_doc . '/' . $fileModel], ['class' => 'btn-action', 'id' => 'modelButton', 'data-confirm' => 'Are you sure you want to delete this file?', 'data-method' => 'post',]);
                                 },
-                                    ],
                                 ],
                             ],
-                        ]
+                        ],
+                    ]
                 );
             }
             ?>

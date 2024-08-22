@@ -12,8 +12,10 @@ class landing extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
+        'css/styles.css',
         'css/landing.css',
         'css/tabler-icons.css',
+
 
     ];
     public $js = [];

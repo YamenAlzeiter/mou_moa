@@ -352,6 +352,31 @@ class m240315_033042_create_email_template_table extends Migration
                 <p>Your application ID no: {id} has been approved by OLA via power delecated by UMC</p>
 
                 HTML
+            ],[
+                'id' => 26,
+                'subject' => 'Agreement Information Updated',
+                'body' => <<<HTML
+                  <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your application Info with ID no: {id} has been Changed or updated: changes made:</p>
+                
+                <p>{changes}</p>
+                <p>by: {applicant}</p>
+                HTML
+            ],[
+                'id' => 27,
+                'subject' => 'Agreement Extended',
+                'body' => <<<HTML
+                  <p>السلام عليكم ورحمة الله وبركاته</p>
+
+                <p>Dear {user},</p>
+                
+                <p>Your application Info with ID no: {ref_id} has been Extended and the new one Extended Agreement {id}, please check it's information before submitting to OSC for reviewal </p>
+                
+                
+                HTML
             ],
 
         ];

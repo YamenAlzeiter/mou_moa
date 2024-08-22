@@ -12,7 +12,7 @@ class builders
     {
         switch ($viewer) {
             case 'Applicant'         :
-                return in_array($status, [2, 12, 33, 34, 43, 47, 51, 72, 110]);
+                return in_array($status, [-10, 10, 2, 11, 12, 33, 34, 43, 47, 51, 61, 72, 110]);
             case 'ApplicantMCOM'     :
                 return in_array($status, [11]);
             case 'ApplicantActivity' :
@@ -98,6 +98,8 @@ class builders
         ];
         $title = [
             21 => 'Result of MCOM Meeting',
+            13 => 'Result of MCOM Meeting',
+            14 => 'Result of UMC Meeting',
             31 => 'Result of UMC Meeting',
             11 => 'Set MCOM Date',
         ];

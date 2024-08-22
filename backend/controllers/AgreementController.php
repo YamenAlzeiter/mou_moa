@@ -217,6 +217,7 @@ class AgreementController extends Controller
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     if ($model->save(false)) {
+
                         foreach ($modelsPoc as $modelPoc) {
                             $modelPoc->agreement_id = $model->id;
                             if (!($modelPoc->save(false))) {
@@ -377,6 +378,7 @@ class AgreementController extends Controller
             }
 
             if ($model->save() && $colModel->save()) {
+                $this->sendEmail($model, ($model->status != 2 && $model->status != 1));
                 return $this->redirect(['index']);
             }
 
@@ -390,89 +392,105 @@ class AgreementController extends Controller
 
     private function sendEmail($model, $needCC)
     {
-        $mailMap = [
-            Variables::agreement_init => [
-                'template' => Variables::email_agr_complete_osc,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_approved_osc => [
-                'template' => Variables::email_agr_complete_osc,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_not_complete_osc => [
-                'template' => Variables::email_agr_not_complete,
-                'cc' => ''
-            ],
-            Variables::agreement_approved_ola => [
-                'template' => Variables::email_agr_review_complete_ola,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_not_complete_ola => [
-                'template' => Variables::email_agr_review_not_complete_ola,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_approved_circulation => [
-                'template' => Variables::email_agr_approved_circulation,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_MCOM_date_changed => [
-                'template' => Variables::email_agr_mcom_date_change,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_MCOM_approved => [
-                'template' => Variables::email_agr_mcom_approve,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_MCOM_reject => [
-                'template' => Variables::email_agr_mcom_reject,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_MCOM_KIV => [
-                'template' => Variables::email_agr_mcom_kiv,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_approved_via_power => [
-                'template' => Variables::email_agr_mcom_approved_power,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_UMC_approve => [
-                'template' => Variables::email_umc_approve,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_UMC_KIV => [
-                'template' => Variables::email_umc_kiv,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_UMC_reject => [
-                'template' => Variables::email_umc_reject,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_draft_uploaded_ola => [
-                'template' => Variables::email_draft_upload_ola,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_draft_approved_ola => [
-                'template' => Variables::email_draft_approve,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_draft_rejected_ola => [
-                'template' => Variables::email_draft_not_complete,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_draft_approve_final_draft => [
-                'template' => Variables::email_draft_approve,
-                'cc' => 'OLA'
-            ],
-            Variables::agreement_executed => [
-                'template' => Variables::email_agr_executed,
-                'cc' => 'OSC'
-            ],
-            Variables::agreement_rejected => [
-                'template' => Variables::email_agr_reject,
-                'cc' => 'OSC'
-            ],
-        ];
+        $log = Log::find()
+            ->where(['agreement_id' => $model->id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
+        if($log->old_status == $log->new_status && $log->changes != null){
+            $mailMap = [
+                $model->status =>[
+                    'template' => Variables::email_agr_changed_updated,
+                    'cc' => 'OSC',
+                ],
+            ];
+        }else{
+            $mailMap = [
+                Variables::agreement_init => [
+                    'template' => Variables::email_agr_complete_osc,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_approved_osc => [
+                    'template' => Variables::email_agr_complete_osc,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_not_complete_osc => [
+                    'template' => Variables::email_agr_not_complete,
+                    'cc' => ''
+                ],
+                Variables::agreement_approved_ola => [
+                    'template' => Variables::email_agr_review_complete_ola,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_not_complete_ola => [
+                    'template' => Variables::email_agr_review_not_complete_ola,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_approved_circulation => [
+                    'template' => Variables::email_agr_approved_circulation,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_MCOM_date_changed => [
+                    'template' => Variables::email_agr_mcom_date_change,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_MCOM_approved => [
+                    'template' => Variables::email_agr_mcom_approve,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_MCOM_reject => [
+                    'template' => Variables::email_agr_mcom_reject,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_MCOM_KIV => [
+                    'template' => Variables::email_agr_mcom_kiv,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_approved_via_power => [
+                    'template' => Variables::email_agr_mcom_approved_power,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_UMC_approve => [
+                    'template' => Variables::email_umc_approve,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_UMC_KIV => [
+                    'template' => Variables::email_umc_kiv,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_UMC_reject => [
+                    'template' => Variables::email_umc_reject,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_draft_uploaded_ola => [
+                    'template' => Variables::email_draft_upload_ola,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_draft_approved_ola => [
+                    'template' => Variables::email_draft_approve,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_draft_rejected_ola => [
+                    'template' => Variables::email_draft_not_complete,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_draft_approve_final_draft => [
+                    'template' => Variables::email_draft_approve,
+                    'cc' => 'OLA'
+                ],
+                Variables::agreement_executed => [
+                    'template' => Variables::email_agr_executed,
+                    'cc' => 'OSC'
+                ],
+                Variables::agreement_rejected => [
+                    'template' => Variables::email_agr_reject,
+                    'cc' => 'OSC'
+                ],
+            ];
+        }
 
+        if (!isset($mailMap[$model->status])) {
+            return; // Exit early if there's no template for this status
+        }
 
         // Find the email template based on the status
         $mail = EmailTemplate::findOne($mailMap[$model->status]['template']);
@@ -500,6 +518,8 @@ class AgreementController extends Controller
         $body = str_replace('{execution_date}', $model->execution_date, $body);
         $body = str_replace('{expiry_date}', $model->agreement_expiration_date, $body);
         $body = str_replace('{circulation}', $model->circulation, $body);
+        $body = str_replace('{applicant}', $log->created_by, $body);
+        $body = str_replace('{changes}', $log->changes, $body);
 
         // Initialize the CC array
         $ccRecipients = [];
@@ -730,16 +750,23 @@ class AgreementController extends Controller
     public function actionLog($id)
     {
         $logsDataProvider = new ActiveDataProvider([
-            'query' => Log::find()->where(['agreement_id' => $id]),
-            'pagination' => ['pageSize' => 100,],
-            'sort' => ['defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
-            ],]);
-
-        $logModel = Agreement::findOne($id);
+            'query' => Log::find()
+                ->where(['agreement_id' => $id])
+                ->andWhere([
+                    'or',
+                    ['!=', 'old_status', new \yii\db\Expression('new_status')],
+                    ['and', ['old_status' => null], ['is not', 'new_status', null]]
+                ]),
+            'pagination' => [
+                'pageSize' => 99,
+            ],
+            'sort' => [
+                'defaultOrder' => ['created_at' => SORT_DESC],
+            ],
+        ]);
 
         return $this->renderAjax('log', [
             'logsDataProvider' => $logsDataProvider,
-            'logModel' => $logModel
         ]);
     }
 
@@ -875,7 +902,7 @@ class AgreementController extends Controller
 
     public function importExcelActivity($filePath)
     {
-
+        //example
         $input_string = "ALUMNI - International Islamic Fiqh Academy Saudi Arabia (19/09/2025)";
 
         $parts = explode('-', $input_string);
@@ -899,13 +926,13 @@ class AgreementController extends Controller
 
                     $academy_name = substr(explode('-', $row['F'])[1], 1, strpos(explode('-', $row['F'])[1], ',') - 1);
                     // Fetch all Agreements, likely needs optimization for efficiency
-                    $agreements = Agreement::find()->all();
+                    $agreements = Collaboration::find()->all();
 
                     $similarities = []; // Map to store similarities
 
                     foreach ($agreements as $agreement) {
                         $similarity = similar_text($academy_name, $agreement->col_organization, $percent);
-                        if ($percent >= 70.0) {
+                        if ($percent >= 100.0) {
                             $similarities[$agreement->id] = $percent; // Store similarity percentage
                         }
                     }
@@ -926,7 +953,7 @@ class AgreementController extends Controller
                     $batchData[] = [$agreement_id,//ID
 
                         $row['C'],  //Name
-                        $row['D'],  //Staff No
+                        $row['B'],  //Staff Email
                         $row['E'],  //KCDIOs
                         $row['G'],  //Implementation Activities
 
@@ -973,10 +1000,10 @@ class AgreementController extends Controller
             }
 
             // Perform batch insert
-            Yii::$app->db->createCommand()->batchInsert('activities', ['agreement_id',//agreement_ID
+            Yii::$app->db->createCommand()->batchInsert('activities', ['col_id',//agreement_ID
 
                 'name',//row c
-                'staff_number',//row d
+                'staff_email',//row d
                 'kcdio',//row e
                 'activity_type',//row g
 
@@ -1024,7 +1051,7 @@ class AgreementController extends Controller
             // You can redirect the user to another page or render a view here
             return $this->redirect(['index']); // Redirect to index or wherever you want
         } catch (Exception $e) {
-            Yii::$app->session->setFlash('error', 'Unsuccessful Import.');
+            Yii::$app->session->setFlash('error', 'Unsuccessful Import.' . $e);
         }
     }
 

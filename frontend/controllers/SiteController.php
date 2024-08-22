@@ -2,7 +2,9 @@
 
 namespace frontend\controllers;
 
+use common\models\Faq;
 use common\models\search\AgreementSearch;
+use common\models\search\FaqSearch;
 use common\models\User;
 use frontend\models\ResendVerificationEmailForm;
 use frontend\models\SignupForm;
@@ -10,6 +12,7 @@ use frontend\models\VerifyEmailForm;
 use phpCAS;
 use Yii;
 use yii\base\InvalidArgumentException;
+use yii\data\ActiveDataProvider;
 use yii\web\BadRequestHttpException;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
@@ -36,7 +39,7 @@ class SiteController extends Controller
                 'class' => AccessControl::class,
                 'rules' => [
                     [
-                        'actions' => ['cas-login','error', 'index'],
+                        'actions' => ['cas-login','error', 'index', 'faq', 'public-index'],
                         'allow' => true,
                     ],
                     [
@@ -190,6 +193,21 @@ class SiteController extends Controller
         ]);
     }
 
+    public function actionFaq()
+    {
+        $this->layout = 'blank';
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => Faq::find(),
+            'pagination' => [
+                'pageSize' => 20, // Adjust the page size as needed
+            ],
+        ]);
+
+        return $this->render('faq', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
     /**
      * Displays contact page.
      *

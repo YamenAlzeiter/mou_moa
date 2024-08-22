@@ -7,6 +7,7 @@ use common\models\Agreement;
 use common\models\AgreementType;
 use common\models\Collaboration;
 use common\models\EmailTemplate;
+use common\models\Faq;
 use common\models\Kcdio;
 use common\models\Log;
 use common\models\McomDate;
@@ -52,6 +53,9 @@ class SettingController extends Controller
 
                             //collaboration
                             'collaboration', 'update-collaboration',
+
+                            //faq
+                            'faq', 'update-faq', 'create-faq', 'delete-faq',
 
                             // status
                             'status', 'status-update',
@@ -112,6 +116,17 @@ class SettingController extends Controller
 
         return $this->render('vemailTemplate', [
             'emailDataProvider' => $emailDataProvider,
+        ]);
+    }
+    public function actionFaq(){
+        $faqDataProvider = new ActiveDataProvider([
+            'query' => Faq::find(),
+            'pagination' => [
+                'pageSize' => 20, // Adjust the page size as needed
+            ],
+        ]);
+        return $this->render('vfaq', [
+            'faqDataProvider' => $faqDataProvider,
         ]);
     }
     public function actionCollaboration(){
@@ -192,6 +207,17 @@ class SettingController extends Controller
             'model' => $model,
         ]);
     }
+    public function actionCreateFaq(){
+        $model = new Faq();
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['faq']);
+            }else{
+                $model->loadDefaultValues();
+            }
+        }
+        return $this->renderAjax('updateFaq', ['model' => $model]);
+    }
     public function actionCreateMcom()
     {
         $model = new McomDate();
@@ -235,6 +261,16 @@ class SettingController extends Controller
         ]);
     }
 
+    public function actionUpdateFaq($id){
+        $model = Faq::findOne($id);
+
+        if($this->request->isPost && $model->load($this->request->post()) && $model->save()){
+            return $this->redirect(['faq']);
+        }
+
+        return $this->renderAjax('updateFaq',['model' => $model]);
+    }
+
     public function actionUpdateCollaboration($id){
         $model = Collaboration::findOne($id);
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
@@ -273,6 +309,11 @@ class SettingController extends Controller
         Reminder::findOne($id)->delete();
 
         return $this->redirect(['others']);
+    }
+
+    public function actionDeleteFaq($id){
+        Faq::findOne($id)->delete();
+        return $this->redirect('faq');
     }
     public function actionDeleteMcom($id)
     {

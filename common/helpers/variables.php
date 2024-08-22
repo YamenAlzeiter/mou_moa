@@ -3,6 +3,7 @@ namespace common\helpers;
 class Variables
 {
     //status
+    const agreement_extended_based_on_old_one = -10;
     const agreement_init = 10;
     const agreement_resubmitted = 15;
     const agreement_MCOM_date_set = 21;
@@ -64,6 +65,8 @@ class Variables
     const email_agr_expired = 22;
     const email_agr_approved_circulation = 24;
     const email_agr_mcom_approved_power  = 25;
+    const email_agr_changed_updated = 26;
+    const email_extended_agreement = 27;
 
 //Email Template
 

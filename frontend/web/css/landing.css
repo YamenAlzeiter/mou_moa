@@ -6,6 +6,7 @@
     --primary: #000000;
     --secondary: #ffffff;
     --primbuttn: #00928f;
+    --lightprimbuttn: #f9ffff;
     --secbuttn: #F2F2F2;
     --accent: #FFB084;
 
@@ -53,7 +54,7 @@ body {
 main {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 8em;
     margin: 3em 0;
@@ -82,6 +83,9 @@ h3 {
 
 a {
     text-decoration: none;
+    color: inherit;
+}
+a:hover{
     color: inherit;
 }
 
@@ -209,23 +213,6 @@ label {
 }
 
 
-/* toolbar animation after clicking Get Started */
-
-.toolbar.highlighted {
-    animation-name: highlight;
-    animation-duration: 0.4s;
-}
-
-@keyframes highlight {
-    0%, 100% {transform: translate(0, 0px) scale(1); transition: all 0.4s cubic-bezier(.47,1.64,.41,.8);}
-
-    25% {transform: translate(0, -15px) scale(1); transition: all 0.4s cubic-bezier(.47,1.64,.41,.8);}
-
-    50% {transform: translate(0, 0px) scale(1); transition: all 0.4s cubic-bezier(.47,1.64,.41,.8);}
-
-    75% {transform: translate(0, -7px) scale(1); transition: all 0.4s cubic-bezier(.47,1.64,.41,.8);}
-}
-
 
 /* nav */
 
@@ -243,6 +230,17 @@ nav {
     backdrop-filter: blur(10px); /* Glass effect */
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: subtle shadow for better visibility */
     z-index: 999; /* Ensure it stays on top of other content */
+}
+.nav-section{
+    background: var(--primbuttn);
+    min-height: 300px;
+    display: flex;
+    padding: 2em 8em;
+    position: relative;
+    flex-direction: column;
+    align-items:flex-start;
+    min-width: 100%;
+    color: white;
 }
 
 .logo {
@@ -290,6 +288,31 @@ nav {
     font-size: 18px;
     z-index: 2;
 }
+.download-button {
+    background-color: var(--primbuttn);
+    color: var(--secondary);
+    border-radius: 10px;
+    font-size: 20px;
+    padding: 4em 8em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: transform ease 0.2s;
+}
+.download-button:hover{
+    color: white;
+}
+.download-button:hover {
+    transform: translate(0, -3px);
+}
+@media (max-width: 576px) {
+    .download-button {
+        padding: 2em 4em; /* Reduce padding on small screens */
+        font-size: 16px; /* Optionally reduce font size */
+    }
+}
+
 
 .primary-button:hover {
     transform: translate(0, -3px);
@@ -325,7 +348,6 @@ nav {
     height: 100vh;
     width: 100%;
     background: url('../hero-bg.jpg') no-repeat center center/cover;
-
     gap: 3em;
 }
 
@@ -539,23 +561,7 @@ nav {
     height: 100%;
     padding: 1em 3em 3em 3em;
     position: relative;
-    gap: 2em;
-}
 
-.promo {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 1em;
-}
-
-.promo-text {
-    color: var(--primbuttn);
-}
-
-.promo-img {
-    background-color: var(--primbuttn);
 }
 
 
@@ -630,6 +636,44 @@ nav {
     gap: 2em;
     width: 100%;
 }
+.faq-container{
+    display: flex;
+    flex-direction: row;
+    padding: 0 8em;
+    width: 100%;
+    gap: 2em;
+}
+.faq-card {
+    padding: 1em 4em;
+    width: 90%;
+    background: var(--secondary);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 1em;
+    margin-top: -60px;
+    margin-bottom: 50px;
+    z-index: 1;
+}
+.faq-category{
+    margin-top: 1em;
+    width: 18%;
+}
+.category{
+    padding: .7em 1em;
+    border-radius: 1em;
+    cursor: pointer;
+}
+.category>p{
+    margin-bottom: 0;
+    color: var(--static2);
+
+}
+.faq-category > .category.active{
+    background-color: var(--lightprimbuttn);
+}
+.faq-category > .category.active>p{
+    color: var(--primbuttn);
+}
+
 
 .faq-list {
     width: 100%;
@@ -637,13 +681,11 @@ nav {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    gap: 2em;
+    gap: 1em;
 }
 
 .faq {
-    background-color: var(--secbuttn);
-    padding: 0.5em 2em;
-    border-radius: 6px;
+    padding: 0.5em 0;
     width: 100%;
     cursor: pointer;
 }
@@ -655,7 +697,9 @@ nav {
     align-items: center;
     width: 100%;
 }
-
+.faq-q > h3 {
+    font-size: 1.2rem;
+}
 .faq-q > p {
     font-weight: bold;
 }
@@ -675,7 +719,9 @@ nav {
 }
 
 .faq-icon {
-    transform: rotate(0deg);
+    font-size: 23px;
+    color: var(--accent);
+
     transition: all ease-in-out 0.2s;
 }
 
@@ -715,7 +761,7 @@ nav {
     color: var(--secondary);
     padding: 3em 5em;
     width: 100%;
-    margin-bottom: 10em;
+    margin-top: auto;
 }
 
 .footer-cols {
@@ -891,7 +937,7 @@ nav {
 
     main {
         margin: 3% 5%;
-        width: 100%;
+
     }
 
     .footer-cols {

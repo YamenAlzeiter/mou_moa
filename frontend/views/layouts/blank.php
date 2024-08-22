@@ -22,38 +22,18 @@ landing::register($this);
 <body>
 <?php $this->beginBody() ?>
 
-<nav>
-    <div class="logo">
-        <?= Html::a(Html::img(Yii::getAlias('@web') . '/iiumLogo.svg', ['class' => 'logoface']), 'index', ['class' => 'logo']) ?>
-        <a href="http://applicant.iium/" target="_blank"><h2 class="sitename">Memorandum Program</h2></a>
-    </div>
-
-    <div class="menu">
-        <a href="#home" class="menu-item active">Home</a>
-        <a href="/site/public-index" class="menu-item">Agreements</a>
-        <a href="#about" class="menu-item">Templates</a>
-        <a href="#about" class="menu-item">FAQ</a>
-        <a href="#contact" class="menu-item">Contact</a>
-        <a href="/site/cas-login" class="primary-button">Sign In</a>
-    </div>
-</nav>
-
-
     <?= $content ?>
-
-
 <div class="footer" id="footer">
     <div class="logo">
         <?= Html::a(Html::img(Yii::getAlias('@web') . '/iiumLogo.svg', ['class' => 'logoface']), 'index', ['class' => 'logo']) ?>
         <a href="http://applicant.iium/" target="_blank"><h2 class="sitename reversed">Memorandum Program</h2></a>
     </div>
-    <div class="footer-cols">
 
-
+    <div class="footer-cols" id="contact">
         <div class="footer-col">
-         <h4 class="fw-bolder">
-             Contact Us:
-         </h4>
+            <h4 class="fw-bolder">
+                Contact Us:
+            </h4>
             <p>
                 <span class="fw-bolder">OFFICE FOR STRATEGY AND INSTITUTIONAL CHANGE (OSIC)</span><br>
                 <span>Level 3, Muhammad Abdul-rauf Building,</span><br>
@@ -63,33 +43,20 @@ landing::register($this);
                 <span class="fw-bolder">Email:</span> qaiium@iium.edu.my
             </p>
         </div>
-    </div>
+        <div class="footer-col">
+            <a href="/site/index" class="menu-item active">Home</a>
+            <a href="/site/public-index" class="menu-item">Agreements</a>
+            <a href="/site/faq" class="menu-item">FAQ</a>
+            <a href="#contact" class="menu-item">Contact</a>
+            <a href="/site/cas-login" class="menu-item">Sign In</a>
+        </div>
+        <div class="footer-col">
 
+        </div>
+    </div>
+    <p class="sub">&copy; 2024 IIUM. All rights reserved.</p>
 </div>
 
-
-<script>
-    let menu = document.querySelector('#menu-icon');
-    let navbar = document.querySelector('.navbarr');
-
-    menu.onclick = () =>
-    {
-        menu.classList.toggle('bi-x');
-        navbar.classList.toggle('open');
-    }
-
-
-
-    window.addEventListener('scroll', function() {
-        let scrollPosition = window.pageYOffset;
-        let parallaxElements = document.querySelectorAll('.parallax');
-
-        parallaxElements.forEach(function(element) {
-            let speed = element.getAttribute('data-speed');
-            element.style.backgroundPositionY = (scrollPosition * speed) + 'px';
-        });
-    });
-</script>
 <?php $this->endBody() ?>
 </body>
 </html>

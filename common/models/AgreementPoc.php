@@ -44,7 +44,7 @@ class AgreementPoc extends \yii\db\ActiveRecord
             [['pi_name'], 'string', 'max' => 100],
             [['pi_email'], 'string', 'max' => 50],
             [['pi_phone'], 'string', 'max' => 15],
-            [['pi_kcdio'], 'string', 'max' => 7],
+            [['pi_kcdio'], 'string', 'max' => 20],
             [['pi_address'], 'string', 'max' => 255],
             [['pi_role'], 'string', 'max' => 30],
             [['agreement_id'], 'exist', 'skipOnError' => true, 'targetClass' => Agreement::class, 'targetAttribute' => ['agreement_id' => 'id']],

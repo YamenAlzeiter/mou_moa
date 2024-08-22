@@ -11,6 +11,7 @@ use yii\db\Expression;
  * This is the model class for table "agreement".
  *
  * @property int $id
+ * @property int $ref_old_agreement
  * @property int|null $status
  * @property int|null $col_id
  * @property string|null $champion
@@ -150,7 +151,7 @@ class Agreement extends ActiveRecord
         }"],
 
             [['status', 'col_id', 'isReminded'], 'default', 'value' => null],
-            [['status', 'col_id', 'isReminded'], 'integer'],
+            [['status', 'col_id', 'isReminded', 'ref_old_agreement'], 'integer'],
             [['rmc_start_date', 'rmc_end_date', 'agreement_sign_date', 'agreement_expiration_date', 'execution_date', 'mcom_date', 'umc_date', 'last_reminder', 'updated_at', 'created_at'], 'safe'],
             [['applicant_doc', 'dp_doc', 'reason', 'collaboration_area', 'temp'], 'string'],
             [['champion'], 'string', 'max' => 522],
@@ -172,7 +173,7 @@ class Agreement extends ActiveRecord
     {
         return [
             'id' => 'ID',
-
+            'ref_old_agreement' => 'Extended From',
             'agreement_expiration_date' => 'Agreement Expiration Date',
             'agreement_sign_date' => 'Agreement Sign Date',
             'execution_date' => 'Agreement Execution Date',

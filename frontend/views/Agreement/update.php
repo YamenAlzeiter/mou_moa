@@ -4,7 +4,7 @@ use Carbon\Carbon;
 use common\helpers\agreementPocMaker;
 use common\helpers\pocFieldMaker;
 use common\helpers\Variables;
-use common\models\Agreement;
+use common\models\AgreementPoc;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -19,21 +19,22 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
                         <div class="col-md-md">{input}{error}</div></div>';
 
 $status = [
-        Variables::agreement_init => Variables::agreement_init,
-        Variables::agreement_not_complete_osc => Variables::agreement_resubmitted,
+    Variables::agreement_extended_based_on_old_one => Variables::agreement_init,
+    Variables::agreement_init => Variables::agreement_init,
+    Variables::agreement_not_complete_osc => Variables::agreement_resubmitted,
 
-        Variables::agreement_resubmitted => Variables::agreement_resubmitted,
-        Variables::agreement_not_complete_ola => Variables::agreement_resubmitted,
+    Variables::agreement_resubmitted => Variables::agreement_resubmitted,
+    Variables::agreement_not_complete_ola => Variables::agreement_resubmitted,
 
-        Variables::email_agr_mcom_resubmitted => Variables::agreement_MCOM_date_set,
-        Variables::agreement_MCOM_KIV => Variables::agreement_MCOM_date_set,
+    Variables::email_agr_mcom_resubmitted => Variables::agreement_MCOM_date_set,
+    Variables::agreement_MCOM_KIV => Variables::agreement_MCOM_date_set,
 
-        Variables::agreement_UMC_KIV => Variables::agreement_MCOM_date_set,
+    Variables::agreement_UMC_KIV => Variables::agreement_MCOM_date_set,
 
-        Variables::agreement_draft_uploaded_ola => Variables::agreement_draft_upload_applicant,
-        Variables::agreement_draft_upload_applicant => Variables::agreement_draft_upload_applicant,
-        Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant
-    ];
+    Variables::agreement_draft_uploaded_ola => Variables::agreement_draft_upload_applicant,
+    Variables::agreement_draft_upload_applicant => Variables::agreement_draft_upload_applicant,
+    Variables::agreement_draft_rejected_ola => Variables::agreement_draft_upload_applicant
+];
 
 $additionalPoc = new pocFieldMaker();
 
@@ -49,7 +50,7 @@ foreach ($modelsPoc as $index => $modelPoc) {
     $roleData[$index] = $modelPoc->pi_role;
 }
 
-$existingTypes = (array) $model->agreement_type;
+$existingTypes = (array)$model->agreement_type;
 
 // Predefined types
 $predefinedTypes = [
@@ -60,7 +61,7 @@ $predefinedTypes = [
     'RCA',
     'other'
 ];
-$filteredExistingTypes = array_filter($existingTypes, function($type) use ($predefinedTypes) {
+$filteredExistingTypes = array_filter($existingTypes, function ($type) use ($predefinedTypes) {
     return !in_array($type, $predefinedTypes);
 });
 
@@ -73,16 +74,17 @@ $options = ArrayHelper::merge(
 
 
 <?php if (in_array($model->status, [
-        Variables::agreement_init,
-        Variables::agreement_resubmitted,
-        Variables::agreement_not_complete_osc,
-        Variables::agreement_not_complete_ola,
-        Variables::agreement_MCOM_KIV,
-        Variables::agreement_UMC_KIV
+    Variables::agreement_extended_based_on_old_one,
+    Variables::agreement_init,
+    Variables::agreement_resubmitted,
+    Variables::agreement_not_complete_osc,
+    Variables::agreement_not_complete_ola,
+    Variables::agreement_MCOM_KIV,
+    Variables::agreement_UMC_KIV
 ])): ?>
     <div class="row">
         <div class="col-md-4">
-            <?=$form->field($model, 'agreement_type')->dropDownList(
+            <?= $form->field($model, 'agreement_type')->dropDownList(
                 $options,
                 [
                     'prompt' => 'Select Type',
@@ -131,13 +133,13 @@ $options = ArrayHelper::merge(
     </div>
     <!-- Collaborator details end -->
 
-<div id="poc-container">
+    <div id="poc-container">
 
-    <?php foreach ($modelsPoc as $index => $modelPoc):
-        $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
-        echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
-    endforeach; ?>
-</div>
+        <?php foreach ($modelsPoc as $index => $modelPoc):
+            $additionalPoc->renderUpdatedPocFields($form, $modelPoc, $index);
+            echo $form->field($modelPoc, "[$index]id", ['template' => "{input}{label}{error}", 'options' => ['class' => 'mb-0']])->hiddenInput(['value' => $modelPoc->id, 'maxlength' => true, 'readonly' => true])->label(false);
+        endforeach; ?>
+    </div>
     <div class="d-grid mb-3">
         <?= Html::button('Add person in charge', ['class' => 'btn btn-dark btn-block btn-lg', 'id' => 'add-poc-button']) ?>
     </div>
@@ -174,20 +176,20 @@ $options = ArrayHelper::merge(
     </div>
     <?= $form->field($model, 'proposal')->textarea(['rows' => 6, 'maxlength' => true, 'placeholder' => '']) ?>
     <?= $form->field($model, 'files_applicant[]', ['template' => $templateFileInput])->fileInput(['multiple' => true])->label('Document') ?>
-    <?= $form->field($model,'pi_delete_ids')->hiddenInput()->label(false)?>
+    <?= $form->field($model, 'pi_delete_ids')->hiddenInput()->label(false) ?>
 <?php endif; ?>
 <?php
 if (in_array($model->status, [
-        Variables::email_agr_mcom_resubmitted,
-        Variables::agreement_MCOM_KIV,
-        Variables::agreement_UMC_KIV
+    Variables::email_agr_mcom_resubmitted,
+    Variables::agreement_MCOM_KIV,
+    Variables::agreement_UMC_KIV
 ])): ?>
 
     <?= $form->field($model, 'mcom_date')->dropDownList(
         ArrayHelper::map($mcomDates, 'date_from', function ($model) {
             $dateFrom = new DateTime($model->date_from);
             $dateUntil = new DateTime($model->date_until);
-            return 'Date: ' . ' ' . $dateFrom->format('Y/M/d H:i') .", Time: " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i') .  ', available: ' . ' ' . (10 - $model->counter);
+            return 'Date: ' . ' ' . $dateFrom->format('Y/M/d H:i') . ", Time: " . $dateFrom->format('H:i') . " - " . $dateUntil->format('H:i') . ', available: ' . ' ' . (10 - $model->counter);
         }),
         ['prompt' => 'Select a Date', 'required' => true]
     ) ?>
@@ -195,9 +197,9 @@ if (in_array($model->status, [
 
 <?php
 elseif (in_array($model->status, [
-        Variables::agreement_draft_uploaded_ola,
-        Variables::agreement_draft_rejected_ola,
-        Variables::agreement_draft_upload_applicant
+    Variables::agreement_draft_uploaded_ola,
+    Variables::agreement_draft_rejected_ola,
+    Variables::agreement_draft_upload_applicant
 ])): ?>
     <!--    --><?php //= $form->field($model, 'status')->hiddenInput(['value' => $status[$model->status]])->label(false) ?>
     <?= $form->field($model, 'files_applicant', ['template' => $templateFileInput])->fileInput(['required' => true])->label('Document') ?>
@@ -206,7 +208,7 @@ elseif (in_array($model->status, [
 elseif ($model->status == Variables::agreement_reminder_sent): ?>
     <h4>Do You want to Extend the Agreement?</h4>
     <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['10' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
+        <?= $form->field($model, 'status')->radioList(['111' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
             'item' => function ($index, $label, $name, $checked, $value) {
                 return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
             }])->label(false); ?>
@@ -244,7 +246,7 @@ if (is_dir($baseUploadPath)) {
 
 <script>
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         function calculateDuration() {
             var startDate = new Date($('#project-start-date').val());
             var endDate = new Date($('#project-end-date').val());
@@ -261,58 +263,59 @@ if (is_dir($baseUploadPath)) {
         calculateDuration();
     });
 
-    $(document).ready(function() {
+    $(document).ready(function () {
         var roleData = <?= json_encode($roleData); ?>;
-            function populateRoleDropdowns() {
-                var selectedValue = $('#transfer-to-dropdown').val();
-                var $roleDropdowns = $('.role-dropdown');
 
-                $roleDropdowns.each(function(index) {
-                    var $this = $(this);
-                    var currentValue = roleData[index];
-                    $this.empty();
-                    $this.append($('<option>', { value: '', text: 'Select Role' }));
+        function populateRoleDropdowns() {
+            var selectedValue = $('#transfer-to-dropdown').val();
+            var $roleDropdowns = $('.role-dropdown');
 
-                    var options = [];
-                    if (selectedValue === 'IO' || selectedValue === 'OIL') {
-                        options = [
-                            { value: 'Project Leader', text: 'Project Leader'},
-                            { value: 'Member', text: 'Member' }
-                        ];
-                    } else if (selectedValue === 'RMC') {
-                        options = [
-                            { value: 'Principal Researcher', text: 'Principal Researcher' },
-                            { value: 'Co Researcher', text: 'Co Researcher' }
-                        ];
-                    }
+            $roleDropdowns.each(function (index) {
+                var $this = $(this);
+                var currentValue = roleData[index];
+                $this.empty();
+                $this.append($('<option>', {value: '', text: 'Select Role'}));
 
-                    $.each(options, function(index, option) {
-                        $this.append($('<option>', { value: option.value, text: option.text }));
-                    });
+                var options = [];
+                if (selectedValue === 'IO' || selectedValue === 'OIL') {
+                    options = [
+                        {value: 'Project Leader', text: 'Project Leader'},
+                        {value: 'Member', text: 'Member'}
+                    ];
+                } else if (selectedValue === 'RMC') {
+                    options = [
+                        {value: 'Principal Researcher', text: 'Principal Researcher'},
+                        {value: 'Co Researcher', text: 'Co Researcher'}
+                    ];
+                }
 
-                    $this.val(currentValue);
+                $.each(options, function (index, option) {
+                    $this.append($('<option>', {value: option.value, text: option.text}));
                 });
-            }
+
+                $this.val(currentValue);
+            });
+        }
 
 // Call the function when the page loads to initialize the dropdowns
-            $(document).ready(function() {
-                populateRoleDropdowns();
+        $(document).ready(function () {
+            populateRoleDropdowns();
 
-                // Attach the function to the change event of the transfer-to dropdown
-                $('#transfer-to-dropdown').change(function() {
-                    populateRoleDropdowns();
-                });
+            // Attach the function to the change event of the transfer-to dropdown
+            $('#transfer-to-dropdown').change(function () {
+                populateRoleDropdowns();
             });
+        });
 
         $('#transfer-to-dropdown').on('change', populateRoleDropdowns);
         $('#transfer-to-dropdown').trigger('change');
 
-        $('#add-poc-button').on('click', function() {
+        $('#add-poc-button').on('click', function () {
 
             var pocIndex = $('#poc-container .poc-row').length;
             console.log(pocIndex)
             if (pocIndex < 5) {
-                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, new \common\models\AgreementPoc());?>`;
+                var newRow = `<?php $additionalPoc->renderExtraPocFields($form, new AgreementPoc());?>`;
                 newRow = newRow.replace(/\[pocIndex\]/g, pocIndex);
                 newRow = newRow.replace(/AgreementPoc\d*\[pi_/g, 'AgreementPoc[' + pocIndex + '][pi_');
                 newRow = newRow.replace(/id="agreementpoc-pocindex/g, 'id="agreementpoc-' + pocIndex);
@@ -330,7 +333,7 @@ if (is_dir($baseUploadPath)) {
         });
         var deletedPocIds = [];
 
-        $(document).on('click', '.remove-poc-button', function() {
+        $(document).on('click', '.remove-poc-button', function () {
             var index = $(this).data('index');
             var pocId = $('input[name="AgreementPoc[' + index + '][id]"]').val();
             if (pocId) {
@@ -421,59 +424,59 @@ JS;
 $this->registerJs($script);
 ?>
 
-<script>
-    $(document).ready(function() {
-        $('#col_organization').on('blur', function() {
-            var orgName = $(this).val();
-            if (orgName) {
-                $.ajax({
-                    url: '/agreement/check-organization',
-                    type: 'POST',
-                    data: {col_organization: orgName},
-                    success: function(response) {
-                        if (response.exists) {
-                            Swal.fire({
-                                title: 'Organization already exists',
-                                text: 'This organization already exists. Do you want to use the same information?',
-                                icon: 'warning',
-                                showCancelButton: true,
-                                confirmButtonText: 'Yes, use it',
-                                cancelButtonText: 'No, enter new organization'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    $('#col_name').val(response.data.col_name).prop('disabled', true);
-                                    $('#col_phone_number').val(response.data.col_phone_number).prop('disabled', true);
-                                    $('#col_address').val(response.data.col_address).prop('disabled', true);
-                                    $('#col_email').val(response.data.col_email).prop('disabled', true);
-                                    $('#col_collaborators_name').val(response.data.col_collaborators_name).prop('disabled', true);
-                                    $('#col_wire_up').val(response.data.col_wire_up).prop('disabled', true);
-                                    $('#country').val(response.data.country).prop('disabled', true);
-                                }
-                            });
-                        } else {
-                            resetFields();
-                        }
-                    }
-                });
-            } else {
-                resetFields();
-            }
-        });
-
-        // Reset fields and re-enable inputs if the organization name changes
-        $('#col_organization').on('input', function() {
-            resetFields();
-        });
-
-        // Function to reset form fields and re-enable inputs
-        function resetFields() {
-            $('#col_name').val('').prop('disabled', false);
-            $('#col_phone_number').val('').prop('disabled', false);
-            $('#col_address').val('').prop('disabled', false);
-            $('#col_email').val('').prop('disabled', false);
-            $('#col_collaborators_name').val('').prop('disabled', false);
-            $('#col_wire_up').val('').prop('disabled', false);
-            $('#country').val('').prop('disabled', false);
-        }
-    });
-</script>
+<!--<script>-->
+<!--    $(document).ready(function() {-->
+<!--        $('#col_organization').on('blur', function() {-->
+<!--            var orgName = $(this).val();-->
+<!--            if (orgName) {-->
+<!--                $.ajax({-->
+<!--                    url: '/agreement/check-organization',-->
+<!--                    type: 'POST',-->
+<!--                    data: {col_organization: orgName},-->
+<!--                    success: function(response) {-->
+<!--                        if (response.exists) {-->
+<!--                            Swal.fire({-->
+<!--                                title: 'Organization already exists',-->
+<!--                                text: 'This organization already exists. Do you want to use the same information?',-->
+<!--                                icon: 'warning',-->
+<!--                                showCancelButton: true,-->
+<!--                                confirmButtonText: 'Yes, use it',-->
+<!--                                cancelButtonText: 'No, enter new organization'-->
+<!--                            }).then((result) => {-->
+<!--                                if (result.isConfirmed) {-->
+<!--                                    $('#col_name').val(response.data.col_name).prop('disabled', true);-->
+<!--                                    $('#col_phone_number').val(response.data.col_phone_number).prop('disabled', true);-->
+<!--                                    $('#col_address').val(response.data.col_address).prop('disabled', true);-->
+<!--                                    $('#col_email').val(response.data.col_email).prop('disabled', true);-->
+<!--                                    $('#col_collaborators_name').val(response.data.col_collaborators_name).prop('disabled', true);-->
+<!--                                    $('#col_wire_up').val(response.data.col_wire_up).prop('disabled', true);-->
+<!--                                    $('#country').val(response.data.country).prop('disabled', true);-->
+<!--                                }-->
+<!--                            });-->
+<!--                        } else {-->
+<!--                            resetFields();-->
+<!--                        }-->
+<!--                    }-->
+<!--                });-->
+<!--            } else {-->
+<!--                resetFields();-->
+<!--            }-->
+<!--        });-->
+<!---->
+<!--        // Reset fields and re-enable inputs if the organization name changes-->
+<!--        $('#col_organization').on('input', function() {-->
+<!--            resetFields();-->
+<!--        });-->
+<!---->
+<!--        // Function to reset form fields and re-enable inputs-->
+<!--        function resetFields() {-->
+<!--            $('#col_name').val('').prop('disabled', false);-->
+<!--            $('#col_phone_number').val('').prop('disabled', false);-->
+<!--            $('#col_address').val('').prop('disabled', false);-->
+<!--            $('#col_email').val('').prop('disabled', false);-->
+<!--            $('#col_collaborators_name').val('').prop('disabled', false);-->
+<!--            $('#col_wire_up').val('').prop('disabled', false);-->
+<!--            $('#country').val('').prop('disabled', false);-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->

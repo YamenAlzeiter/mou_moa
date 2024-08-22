@@ -93,6 +93,7 @@ modal::end();
 
     <!--section additional details-->
     <h4> Details</h4>
+<?= $view->renderer($model->ref_old_agreement, 'Extended from agreement') ?>
 <?= $view->renderer($model->project_title, $model->transfer_to == "OIL" ? 'Research Title' : 'Project Title') ?>
 <?= $view->renderer($model->grant_fund, 'Fund') ?>
 <?= $view->renderer($model->member, 'No. of Project Members') ?>

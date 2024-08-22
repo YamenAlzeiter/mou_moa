@@ -15,6 +15,7 @@ class m240315_030854_create_moua_table extends Migration
 
         $this->createTable('{{%agreement}}', [
             'id' => $this->primaryKey(),
+            'ref_old_agreement' => $this->integer(),
             //status
             'status' => $this->integer(),
             'col_id' => $this->integer(),
@@ -94,7 +95,7 @@ class m240315_030854_create_moua_table extends Migration
                 new_id := CONCAT(
                     EXTRACT(YEAR FROM CURRENT_DATE) % 100, 
                     LPAD(EXTRACT(MONTH FROM CURRENT_DATE)::TEXT, 2, '0'), 
-                    LPAD((max_id + 1)::TEXT, 3, '0')
+                    LPAD((max_id + 1)::TEXT, 4, '0')
                 );
 
                 -- Get the next value from the sequence

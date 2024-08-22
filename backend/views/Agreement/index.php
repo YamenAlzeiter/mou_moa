@@ -12,7 +12,7 @@ $this->title = 'Agreements';
 $build = new \common\helpers\builders();
 Pjax::begin();
 echo '<div class="table-responsive">';
-echo '<div class="container-md my-3 p-3 rounded-3 glass shadow">
+echo '<div class="container-md my-3 p-3 rounded-3 bg-white shadow">
         <div class="row align-items-end">
             <div class="col-md-9 col-sm-12">
                 '.$this->render('_search', ['model' => $searchModel]). '

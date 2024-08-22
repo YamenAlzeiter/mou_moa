@@ -145,10 +145,18 @@ class AgreementController extends Controller
     public function actionLog($id)
     {
         $logsDataProvider = new ActiveDataProvider([
-            'query' => Log::find()->where(['agreement_id' => $id]), 'pagination' => [
+            'query' => Log::find()
+                ->where(['agreement_id' => $id])
+                ->andWhere([
+                    'or',
+                    ['!=', 'old_status', new \yii\db\Expression('new_status')],
+                    ['and', ['old_status' => null], ['is not', 'new_status', null]]
+                ]),
+            'pagination' => [
                 'pageSize' => 99,
-            ], 'sort' => [
-                'defaultOrder' => ['created_at' => SORT_DESC], // Display logs by creation time in descending order
+            ],
+            'sort' => [
+                'defaultOrder' => ['created_at' => SORT_DESC],
             ],
         ]);
 
@@ -156,6 +164,8 @@ class AgreementController extends Controller
             'logsDataProvider' => $logsDataProvider,
         ]);
     }
+
+
 
     public function actionAddActivity($id)
     {
@@ -381,10 +391,16 @@ class AgreementController extends Controller
     {
         // Find the email template
         $mail = EmailTemplate::findOne($template);
-
+        $log = Log::find()
+            ->where(['agreement_id' => $model->id])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->one();
         // Ensure that the template exists
         if ($mail === null) {
             throw new \Exception("Email template not found.");
+        }
+        if($log->changes == null && $log->old_status == $log->new_status){
+            return; // Exit early if there's no template for this status
         }
 
         // Get user IDs by role
@@ -404,6 +420,9 @@ class AgreementController extends Controller
         $body = str_replace('{reason}', $model->reason, $body);
         $body = str_replace('{id}', $model->id, $body);
         $body = str_replace('{MCOM_date}', $model->mcom_date, $body);
+        $body = str_replace('{applicant}', $log->created_by, $body);
+        $body = str_replace('{changes}', $log->changes, $body);
+        $body = str_replace('{ref_id}', $model->ref_old_agreement, $body);
 
         // Compose the email
         $mailer = Yii::$app->mailer->compose([
@@ -500,15 +519,33 @@ class AgreementController extends Controller
 
             $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
 
-            if($model->status == Variables::agreement_extended){
+            if ($model->status == Variables::agreement_extended) {
+                // Create a new Agreement instance
                 $newAgreement = new Agreement();
-                $newAgreement->attributes = $model->attributes;
-                $newAgreement->status = Variables::agreement_executed;
+
+                // Copy all attributes except the ones you want to exclude
+                $attributes = $model->attributes;
+
+                // List of attributes to exclude
+                $excludedAttributes = ['temp', 'is_reminded', 'reason', 'mcom_date', 'umc_date', 'last_reminder', 'umc_series', 'mcom_series', 'execution_date', 'agreement_expiration_date','status'];
+
+                // Remove the excluded attributes
+                foreach ($excludedAttributes as $attribute) {
+                    unset($attributes[$attribute]);
+                }
+
+                // Assign the filtered attributes to the new agreement
+                $newAgreement->attributes = $attributes;
+
+                // Set any additional attributes
+                $newAgreement->status = Variables::agreement_extended_based_on_old_one;
                 $newAgreement->col_id = $model->col_id;
+                $newAgreement->ref_old_agreement = $model->id;
 
+                // Save the new agreement
                 if ($newAgreement->save()) {
+                    // Copy associated AgreementPoc models
                     $modelsPoc = $model->getAgreementPoc()->all();
-
                     foreach ($modelsPoc as $modelPoc) {
                         $newPoc = new AgreementPoc();
                         $newPoc->attributes = $modelPoc->attributes;
@@ -516,26 +553,35 @@ class AgreementController extends Controller
                         $newPoc->save();
                     }
 
+                    // Copy the directory
                     $oldFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$model->id}";
                     $newFolder = "C:/xampp/htdocs/mou_moa/common/uploads/{$newAgreement->id}";
-
                     $this->copyDirectory($oldFolder, $newFolder);
 
-                    $newAgreement->applicant_doc = $newFolder.'/applicant/';
-                    $newAgreement->dp_doc = $newFolder.'/higher/';
-                    $newAgreement->save();
-                }
+                    // Set paths to the new documents
+                    $newAgreement->applicant_doc = $newFolder . '/applicant/';
+                    $newAgreement->dp_doc = $newFolder . '/higher/';
 
+                    // Save the changes
+                    $newAgreement->save();
+                    $this->sendEmail($newAgreement, Variables::email_extended_agreement);
+                }
             }
 
-              if ($model->save()) {
+
+            if ($model->save()) {
                   $colModel->save();
+
                   if ($model->status == Variables::agreement_resubmitted) {
                       $this->sendEmail($model, Variables::email_init);
                   }elseif ($oldStatus == Variables::agreement_MCOM_KIV){
                       $this->sendEmail($model, Variables::email_agr_mcom_resubmitted);
                   }elseif($model->status == Variables::agreement_MCOM_date_set){
                       $this->sendEmail($model, Variables::email_agr_pick_mcom_date);
+                  }elseif($model->status == Variables::agreement_init && $oldStatus == Variables::agreement_extended_based_on_old_one){
+                      $this->sendEmail($model, Variables::email_init);
+                  } elseif($model->status == $oldStatus){
+                      $this->sendEmail($model, Variables::email_agr_changed_updated);
                   }
                   return $this->redirect(['index']);
               }

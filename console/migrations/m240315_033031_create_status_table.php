@@ -21,7 +21,8 @@ class m240315_033031_create_status_table extends Migration
 
         $this->insert('{{%status}}', ['status' => 1, 'tag' => 'OSC-A', 'description' => 'Approved by OSC']);
         $this->insert('{{%status}}', ['status' => 2, 'tag' => 'OSC-R', 'description' => 'Rejected by OSC']);
-        $this->insert('{{%status}}', ['status' => 10, 'tag' => 'NA001', 'description' => 'New Application']);
+        $this->insert('{{%status}}', ['status' => 10, 'tag' => 'NA001', 'description' => 'New Agreement']);
+        $this->insert('{{%status}}', ['status' => -10, 'tag' => 'ExtendedAgr', 'description' => 'Extended Agreement']);
         $this->insert('{{%status}}', ['status' => 11, 'tag' => 'OLA-A', 'description' => 'Approved by OLA']);
         $this->insert('{{%status}}', ['status' => 12, 'tag' => 'OLA-R', 'description' => 'Rejected by OLA']);
         $this->insert('{{%status}}', ['status' => 15, 'tag' => 'RE-SUB', 'description' => 'resubmited   ']);

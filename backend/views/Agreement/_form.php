@@ -70,14 +70,17 @@ if (!in_array($model->status,
     $options = [$approveMap[$model->status] => $recommendedTag, $notCompleteMap[$model->status] => $notCompleteTag,];
 
     if (in_array($model->status, [Variables::agreement_MCOM_date_set, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) {
-        $options += [$rejectMap[$model->status] => ' Reject'];
+        $options += [$rejectMap[$model->status] => 'Reject'];
     }
-    if($model->status == Variables::agreement_approved_osc){
+
+    if ($model->status == Variables::agreement_approved_osc) {
         $options += [$extraApprove[$model->status] => 'Approved by circulation'];
     }
-    if(in_array($model->status, [Variables::agreement_approved_circulation, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])){} {
+
+    if (in_array($model->status, [Variables::agreement_approved_circulation, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) {
         $options += [$extraApprove[$model->status] => 'Approved By OLA via power delegated by UMC'];
     }
+
 
     echo $form->field($model, 'status')->radioList(
         $options,
