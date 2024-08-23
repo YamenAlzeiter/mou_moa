@@ -3,6 +3,7 @@
 namespace frontend\controllers;
 
 use common\models\Faq;
+use common\models\LookupCdKcdiom;
 use common\models\search\AgreementSearch;
 use common\models\search\FaqSearch;
 use common\models\User;
@@ -146,6 +147,15 @@ class SiteController extends Controller
         $username = phpCAS::getUser();
         $email = isset(phpCAS::getAttributes()['mail']) ? phpCAS::getAttributes()['mail'] : '';
         $defaultGroup = isset(phpCAS::getAttributes()['defaultgroup']) ? phpCAS::getAttributes()['defaultgroup'] : '';
+        $kcdiValue = isset(phpCAS::getAttributes()['kcdi']) ? phpCAS::getAttributes()['kcdi'] : '';
+
+        if ($kcdiValue !== '') {
+            $kcdiomRecord = LookupCdKcdiom::find()
+                ->where(['abb_code' => $kcdiValue])
+                ->orWhere(['kcdiom_desc' => $kcdiValue])
+                ->one();
+        } else $kcdiomRecord = '';
+
 //        var_dump(phpCAS::getAttributes());
 //        die();
 //        if (strpos($defaultGroup, 'stud') !== false) {
@@ -159,7 +169,7 @@ class SiteController extends Controller
             $newUser->status = User::STATUS_ACTIVE;
             $newUser->auth_key = Yii::$app->security->generateRandomString();
             $newUser->email = $email;
-            $newUser->type = isset(phpCAS::getAttributes()['kcdi']) ? phpCAS::getAttributes()['kcdi'] : '';
+            $newUser->type = $kcdiomRecord !== null ? $kcdiomRecord->abb_code : '';
             $newUser->save();
             Yii::$app->user->login($newUser, 3600 * 24 * 30);
         } else {
