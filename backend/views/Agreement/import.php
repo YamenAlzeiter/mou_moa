@@ -1,6 +1,7 @@
 <?php
 
 
+use yii\helpers\Url;
 use Itstructure\CKEditor\CKEditor;
 use yii\bootstrap5\ActiveForm;
 use yii\helpers\Html;
@@ -26,8 +27,14 @@ $templateFileInput = '<div class="col align-items-center">
 <h3>INSTRUCTION</h3>
 <ul>
     <li>Choose between Activity or Agreement</li>
-    <li>if you're importing activities, you should follow this <a href="">Template</a></li>
-    <li>if you're importing Agreement, you should follow this <a href="">Template</a></li>
+    <li>
+        If you're importing activities, you should follow this
+        <a href="<?= Url::to('@web/files/activity_template.xlsx') ?>" target="_blank">Template</a>
+    </li>
+    <li>
+        If you're importing Agreement, you should follow this
+        <a href="<?= Url::to('@web/files/agreement_template.xlsx') ?>" target="_blank">Template</a>
+    </li>
     <li>Use consistent date formatting (DD/MM/YYYY) throughout your document. Dates that renew after a period or are open-ended may cause errors.</li>
 </ul>
 <div class="row">

@@ -19,7 +19,7 @@ $templateFileInput = '<div class="col-md align-items-center"><div class="col-md-
                         <div class="col-md-md">{input}{error}</div></div>';
 
 $status = [
-    Variables::agreement_extended_based_on_old_one => Variables::agreement_init,
+    Variables::agreement_extended => Variables::agreement_init,
     Variables::agreement_init => Variables::agreement_init,
     Variables::agreement_not_complete_osc => Variables::agreement_resubmitted,
 
@@ -74,7 +74,7 @@ $options = ArrayHelper::merge(
 
 
 <?php if (in_array($model->status, [
-    Variables::agreement_extended_based_on_old_one,
+    Variables::agreement_extended,
     Variables::agreement_init,
     Variables::agreement_resubmitted,
     Variables::agreement_not_complete_osc,
@@ -206,12 +206,30 @@ elseif (in_array($model->status, [
 
 <?php
 elseif ($model->status == Variables::agreement_reminder_sent): ?>
-    <h4>Do You want to Extend the Agreement?</h4>
+    <h4>Do You want to Renew or Extend the Agreement?</h4>
     <div class="mb-2">
-        <?= $form->field($model, 'status')->radioList(['111' => 'Yes', '92' => 'No'], ['class' => 'gap-2 row', // Use flexbox
-            'item' => function ($index, $label, $name, $checked, $value) {
-                return '<label class=" col-md  border-dark-light px-4 py-5 border rounded-4 text-nowrap fs-4">' . Html::radio($name, $checked, ['id' => "is" . $value, 'value' => $value, 'class' => 'mx-2']) . $label . '</label>';
-            }])->label(false); ?>
+
+        <?= $form->field($model, 'status')->radioList(
+            ['112' => 'Renew', '111' => 'Extend'],
+            [
+                'item' => function($index, $label, $name, $checked, $value) {
+                    return '
+            <label class="plan ' . strtolower($value) . '-plan" for="is' . $value . '">
+            
+                <input type="radio" id="is' . $value . '" name="' . $name . '" value="' . $value . '" ' . ($checked ? 'checked' : '') . ' />
+                <div class="plan-content">
+                    <div class="plan-details">
+                        <span>' . $label . '</span>
+                    </div>
+                </div>
+                <p class="invalid-feedback mb-0"></p>
+            </label>
+            ';
+                },
+                'class' => 'plans',
+                'errorOptions' => ['class' => 'invalid-feedback'],
+            ]
+        )->label(false);?>
     </div>
 <?php
 endif; ?>

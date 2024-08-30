@@ -12,15 +12,45 @@ class builders
     {
         switch ($viewer) {
             case 'Applicant'         :
-                return in_array($status, [-10, 10, 2, 11, 12, 33, 34, 43, 47, 51, 61, 72, 110]);
+                return in_array($status, [
+                    Variables::agreement_re_state,
+                    Variables::agreement_init,
+                    Variables::agreement_not_complete_osc,
+                    Variables::agreement_approved_ola,
+                    Variables::agreement_not_complete_ola,
+                    Variables::agreement_MCOM_KIV,
+                    Variables::agreement_UMC_KIV,
+                    Variables::agreement_conditional_upload_not_complete,
+                    Variables::agreement_draft_uploaded_ola,
+                    Variables::agreement_draft_upload_applicant,
+                    Variables::agreement_draft_rejected_ola,
+                    Variables::agreement_reminder_sent
+                ]);
             case 'ApplicantMCOM'     :
-                return in_array($status, [11]);
+                return in_array($status, [Variables::agreement_approved_ola]);
             case 'ApplicantActivity' :
-                return in_array($status, [100, 91]);
+                return in_array($status, [
+                    Variables::imported_agreement_executed,
+                    Variables::agreement_executed
+                ]);
             case 'OSC'               :
-                return in_array($status, [10, 15, 81]);
+                return in_array($status, [
+                    Variables::agreement_init,
+                    Variables::agreement_resubmitted,
+                    Variables::agreement_draft_approve_final_draft
+                ]);
             case 'OLA'               :
-                return in_array($status, [1, 21, 31, 41, 46, 61, 121, 86, 13, 14]);
+                return in_array($status, [
+                    Variables::agreement_approved_osc,
+                    Variables::agreement_MCOM_date_set,
+                    Variables::agreement_MCOM_approved,
+                    Variables::agreement_UMC_approve,
+                    Variables::agreement_conditional_upload,
+                    Variables::agreement_draft_upload_applicant,
+                    Variables::agreement_MCOM_date_changed,
+                    Variables::agreement_approved_circulation,
+                    Variables::agreement_approved_via_power
+                ]);
         }
     }
 

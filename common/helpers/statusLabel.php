@@ -30,37 +30,44 @@ class statusLabel
     public function getStatusClasses($status, $attribute)
     {
         $classes = [
-            1  =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
-            11 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            21 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'applicant'],
-            31 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OLA/MCOM'],
-            41 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'OLA/UMC'],
-            51 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            61 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OLA'],
-            71 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            10 =>  ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
-            -10 => ['badge' => 'bg-warning-subtle text-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'Applicant'],
+            1  =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
+            11 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
+            13  => ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
+            14  => ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
+            21 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'applicant'],
+            31 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OLA/MCOM'],
+            41 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'OLA/UMC'],
+            51 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
+            61 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OLA'],
+            71 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      , 'to' => 'Applicant'],
+            110 => ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
+            10 =>  ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'OSC'],
+            -10 => ['badge' => 'pill-warning', 'dot' => 'text-bg-warning', 'from' => 'Applicant', 'to' => 'Applicant'],
+
             15 =>  ['badge' => 'bg-primary-subtle text-primary', 'dot' => 'text-bg-primary', 'from' => 'OSC'      , 'to' => 'Applicant'],
             121 => ['badge' => 'bg-primary-subtle text-primary', 'dot' => 'text-bg-primary', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            2  =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
-            12 =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
-            32 =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
+
+
             42 =>  ['badge' => 'bg-danger-subtle   text-danger', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
             33 =>  ['badge' => 'bg-info-subtle       text-info', 'dot' => 'text-bg-primary', 'from' => 'OLA'      , 'to' => 'Applicant'],
             43 =>  ['badge' => 'bg-info-subtle       text-info', 'dot' => 'text-bg-primary', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            81 =>  ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OLA'      , 'to' => 'Applicant'],
-            91 =>  ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
-            100 => ['badge' => 'bg-success-subtle text-success', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
-            92 =>  ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
-            102 => ['badge' => 'bg-danger-subtle  text-danger' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
 
-            110 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
-            111 => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
-            13  => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
-            14  => ['badge' => 'bg-warning-subtle  text-warning', 'dot' => 'text-bg-warning', 'from' => 'OLA'      ,'to' => 'Applicant'],
+            81 =>  ['badge' => 'pill-upcoming', 'dot' => 'text-bg-success', 'from' => 'OLA'      , 'to' => 'Applicant'],
+            91 =>  ['badge' => 'pill-upcoming', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
+            100 => ['badge' => 'pill-upcoming', 'dot' => 'text-bg-success', 'from' => 'OSC'      , 'to' => 'Applicant'],
+
+            92 =>  ['badge' => 'pill-alert' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+            102 => ['badge' => 'pill-alert' , 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+            2  =>  ['badge' => 'pill-alert', 'dot' => 'text-bg-danger' , 'from' => 'OSC'      , 'to' => 'Applicant'],
+            12 =>  ['badge' => 'pill-alert', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
+            32 =>  ['badge' => 'pill-alert', 'dot' => 'text-bg-danger' , 'from' => 'OLA'      , 'to' => 'Applicant'],
+
+            111 => ['badge' => 'pill-sendBack', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
+            112 => ['badge' => 'pill-sendBack', 'dot' => 'text-bg-warning', 'from' => 'System'      ,'to' => 'Applicant'],
+
         ];
 
-        $default = ['badge' => 'bg-danger-subtle text-danger', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];
+        $default = ['badge' => 'pill-alert', 'dot' => 'text-bg-danger', 'from' => 'error', 'to' => 'error'];
 
         if (isset($classes[$status])) {
             return $classes[$status][$attribute];

@@ -47,7 +47,8 @@ class m240315_033031_create_status_table extends Migration
         $this->insert('{{%status}}', ['status' => 100, 'tag' => 'I-AGR-EXC', 'description' => 'Excuted Agreement']);
         $this->insert('{{%status}}', ['status' => 102, 'tag' => 'I-AGR-EXP', 'description' => 'Expired Agreement']);
         $this->insert('{{%status}}', ['status' => 110, 'tag' => 'REMINDER', 'description' => 'Reminder for agreement update']);
-        $this->insert('{{%status}}', ['status' => 111, 'tag' => 'REMINDER', 'description' => 'Reminder for agreement update']);
+        $this->insert('{{%status}}', ['status' => 111, 'tag' => 'ExtendedAgr', 'description' => 'Extended Agreement']);
+        $this->insert('{{%status}}', ['status' => 112, 'tag' => 'Re-New-Agr', 'description' => 'Agreement renewed']);
         $this->insert('{{%status}}', ['status' => 121, 'tag' => 'AGR_EXT', 'description' => 'Agreement Extended']);
         $this->insert('{{%status}}', ['status' => 13, 'tag' => 'OLA-ACircu', 'description' => 'Approved in paper by circulation']);
         $this->insert('{{%status}}', ['status' => 14, 'tag' => 'MCOM-A-OLA', 'description' => 'Approved by legal Adviser via power delegated by UMC']);

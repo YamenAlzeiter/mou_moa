@@ -3,7 +3,7 @@ namespace common\helpers;
 class Variables
 {
     //status
-    const agreement_extended_based_on_old_one = -10;
+    const agreement_re_state = -10;
     const agreement_init = 10;
     const agreement_resubmitted = 15;
     const agreement_MCOM_date_set = 21;
@@ -12,9 +12,7 @@ class Variables
     const agreement_approved_ola = 11;
     const agreement_not_complete_ola = 12;
     const agreement_approved_circulation = 13;
-
     const agreement_approved_via_power = 14;
-
     const agreement_MCOM_approved = 31;
     const agreement_MCOM_reject = 32;
     const agreement_MCOM_KIV = 33;
@@ -35,6 +33,7 @@ class Variables
     const imported_agreement_expired = 102;
     const agreement_reminder_sent = 110;
     const agreement_extended = 111;
+    const agreement_renewed = 112;
     const agreement_MCOM_date_changed = 121;
 
 

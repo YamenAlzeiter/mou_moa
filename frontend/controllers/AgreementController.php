@@ -519,7 +519,7 @@ class AgreementController extends Controller
 
             $model->temp = "(" . Yii::$app->user->identity->email . ") " . Yii::$app->user->identity->username;
 
-            if ($model->status == Variables::agreement_extended) {
+            if (in_array($model->status, [Variables::agreement_extended, Variables::agreement_renewed])) {
                 // Create a new Agreement instance
                 $newAgreement = new Agreement();
 
@@ -538,7 +538,7 @@ class AgreementController extends Controller
                 $newAgreement->attributes = $attributes;
 
                 // Set any additional attributes
-                $newAgreement->status = Variables::agreement_extended_based_on_old_one;
+                $newAgreement->status = Variables::agreement_re_state;
                 $newAgreement->col_id = $model->col_id;
                 $newAgreement->ref_old_agreement = $model->id;
 
@@ -578,7 +578,7 @@ class AgreementController extends Controller
                       $this->sendEmail($model, Variables::email_agr_mcom_resubmitted);
                   }elseif($model->status == Variables::agreement_MCOM_date_set){
                       $this->sendEmail($model, Variables::email_agr_pick_mcom_date);
-                  }elseif($model->status == Variables::agreement_init && $oldStatus == Variables::agreement_extended_based_on_old_one){
+                  }elseif($model->status == Variables::agreement_init && $oldStatus == Variables::agreement_re_state){
                       $this->sendEmail($model, Variables::email_init);
                   } elseif($model->status == $oldStatus){
                       $this->sendEmail($model, Variables::email_agr_changed_updated);

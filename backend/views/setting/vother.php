@@ -70,7 +70,7 @@ $this->title = 'Other';
             <div class = "container-md my-3 p-4 rounded-3 bg-white shadow">
                 <div class = "table-responsive">
                     <div class = "d-flex justify-content-between align-items-center">
-                        <h1 class = "mb-0 fs-7 "><i class = "ti ti-align-right "></i>MCOM Dtea</h1>
+                        <h1 class = "mb-0 fs-7 "><i class = "ti ti-align-right "></i>MCOM Date</h1>
                         <?= Html::button('<i class="ti fs-7 ti-plus"></i>',
                             [
                                 'value' => Url::to(['create-mcom']),

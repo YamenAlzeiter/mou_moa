@@ -74,7 +74,7 @@ if (!in_array($model->status,
     }
 
     if ($model->status == Variables::agreement_approved_osc) {
-        $options += [$extraApprove[$model->status] => 'Approved by circulation'];
+        $options += [$extraApprove[$model->status] => 'Paper by circulation'];
     }
 
     if (in_array($model->status, [Variables::agreement_approved_circulation, Variables::agreement_MCOM_approved, Variables::agreement_MCOM_date_changed])) {

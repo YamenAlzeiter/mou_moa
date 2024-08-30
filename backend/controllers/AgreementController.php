@@ -925,6 +925,7 @@ class AgreementController extends Controller
                 if (!empty($row['A'])) {
 
                     $academy_name = substr(explode('-', $row['F'])[1], 1, strpos(explode('-', $row['F'])[1], ',') - 1);
+
                     // Fetch all Agreements, likely needs optimization for efficiency
                     $agreements = Collaboration::find()->all();
 
@@ -932,7 +933,7 @@ class AgreementController extends Controller
 
                     foreach ($agreements as $agreement) {
                         $similarity = similar_text($academy_name, $agreement->col_organization, $percent);
-                        if ($percent >= 100.0) {
+                        if ($percent == 100.0) {
                             $similarities[$agreement->id] = $percent; // Store similarity percentage
                         }
                     }
@@ -946,6 +947,12 @@ class AgreementController extends Controller
                             $agreement_id = $agreementId;
                         }
                     }
+
+                    // If no matching collaboration found, skip the row
+                    if ($agreement_id === null) {
+                        continue; // Skip this row and move to the next one
+                    }
+
                     $credited_name_of_student = $this->applyExcelFormula($row['K']);
                     $non_credited_name_of_student = $this->applyExcelFormula($row['R']);
 
